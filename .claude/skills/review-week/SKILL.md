@@ -72,6 +72,18 @@ After user responds, combine their reflection with the data to give:
 - Study hours logged
 - Progress on current goal
 
+### Context Bus Writes (after review)
+
+Post weekly summary signals to context-bus.md:
+
+| Condition | Write to context-bus.md (use canonical format: ## date, Type, Priority, TTL, Content, Status) |
+|-----------|------|
+| Always (after review) | `@boss → all` / `Type: data` / `Priority: info` / `TTL: 7 days` / `Content: Week [date] summary: [X/Y] tasks ([Z]%), goal [achieved/partial/missed], lesson: [1-line]` |
+| Completion rate < 60% | `@boss → @coo` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Weekly completion [X]%. Tasks may be too large or too many.` |
+| Completion rate > 90% | `@boss → @coo` / `Type: insight` / `Priority: info` / `TTL: 7 days` / `Content: High completion [X]%. User can stretch.` |
+| Spending spike this week | `@boss → @finance` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Weekly spending [X]% above average.` |
+| Multiple broken streaks | `@boss → @wellness, @coach` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: [X] streaks broken this week. Check if systemic.` |
+
 ### Step 5: Log and close
 Save to `state/weekly-log.md`:
 ```markdown
@@ -97,18 +109,43 @@ Then offer contextual follow-up via `AskUserQuestion`:
 - >80% → "Great week. You can stretch a bit more next time."
 - 0% → "What happened? No judgment — let's adjust the plan."
 
-## Identity Ledger (monthly, or when enough data)
+## Identity Ledger (every 2 weeks, or weekly if completion > 80%)
+
+**Frequency:**
+- Default: show every 2 weeks (check @boss memory: `last_identity_ledger: [date]`)
+- If last week's completion rate > 80% → show weekly (reward consistency)
+- Never show if less than 7 days of data since last ledger
+
+**Connected to @boss Week 2 Reveal:** The Identity Ledger IS the recurring version of the one-time Week 2 Reveal. After the Week 2 Reveal fires (at ~14 days), the Identity Ledger takes over on the bi-weekly/weekly schedule.
 
 Based on accumulated behavior data (NOT aspirations — ACTIONS), generate identity statements:
 
-"Based on your actions this month:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🪞  IDENTITY LEDGER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-You are:
-→ Someone who shows up. ([X]/[Y] days active)
-→ Someone who protects their financial safety. (buffer ↑ [X]%)
-→ Someone who finishes what they start. ([X]/[Y] commitments kept)
+  Based on your data:
 
-These aren't compliments. They're data."
+  → You are someone who [behavior + number].
+    ([X]/[Y] days active this period)
 
-Only show when there IS positive data. Never fabricate. Never use motivational language.
-Frame as observation, not praise: "These aren't compliments. They're data."
+  → You are someone who [behavior + number].
+    (buffer ↑ [X]% / streak [Y] days / etc.)
+
+  → You are someone who [behavior + number].
+    ([specific metric from state files])
+
+  This is not a compliment. This is a fact.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Statement generation rules:**
+- ONLY use data from state files (tasks.md completion, habits.md streaks, finances.md buffer, daily-log.md attendance)
+- Each statement = behavior + concrete number. No adjectives, no superlatives.
+- Max 3 statements per ledger
+- Only include statements where data is POSITIVE. Skip negative trends — the ledger builds identity, it doesn't tear it down.
+- If no positive data → skip the ledger entirely this cycle
+- Never fabricate. Never use motivational language. Frame as observation: "This is not a compliment. This is a fact."
+
+**Save:** Update @boss memory `last_identity_ledger: [today's date]`

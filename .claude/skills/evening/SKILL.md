@@ -59,6 +59,23 @@ If "Coś innego" → ask open text.
 
 Then ask open text: "Jaki #1 priorytet na jutro?"
 
+### Step 1B: Pattern Comparison (if 7+ entries in daily-log, runs after Step 1)
+
+**After user reports today's energy, compare with their baseline.**
+
+Check @boss agent memory for energy patterns. If 7-day average exists:
+
+- Today's energy vs 7-day average → show brief comparison:
+  - Above average: "Energy [X] today vs your usual [Y]. [If exercise done: 'Training + good sleep = your winning combo.'] [If no trigger found: 'Good day. Note what you did differently.']"
+  - Below average: "Energy [X] today vs your usual [Y]. [If bad sleep: 'Sleep was rough — that tracks with your data.'] [If no trigger: 'Low days happen. Tomorrow's a reset.']"
+  - At average: skip comparison, don't state the obvious
+
+**Rules:**
+- Max 2 sentences. This is a quick reflection, not an analysis.
+- Only show when 7+ data points exist.
+- Skip on first 7 days.
+- Never guilt. Frame as data, not judgment.
+
 ### Step 2: Log (after user responds)
 
 **CRITICAL: Don't assume /morning ran today.**
@@ -79,6 +96,23 @@ Never crash because /morning didn't run. Always create what's missing.
 
 **Pro mode:** INSERT into daily_logs (energia, sleep, mood).
 
+### Context Bus Writes (after logging)
+
+After writing today's log, post relevant signals to state/context-bus.md:
+
+| Condition | Write to context-bus.md |
+|-----------|------------------------|
+| Workout done today | `## [date] @boss → @trainer` / `Type: data` / `Priority: info` / `TTL: 3 days` / `Content: Workout logged [date]. Update streak.` / `Status: pending` |
+| Bad sleep 3+ consecutive days | `## [date] @boss → @wellness` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Poor sleep pattern: [X] days. Sleep hygiene check needed.` / `Status: pending` |
+| Energy pattern notable (3+ days low) | `## [date] @boss → @wellness` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Energy trend: [X] days below average.` / `Status: pending` |
+| Habit streak milestone (7, 14, 21, 30 days) | `## [date] @boss → @coach` / `Type: data` / `Priority: info` / `TTL: 3 days` / `Content: [habit] streak: [X] days!` / `Status: pending` |
+
+Use the canonical context-bus format from CLAUDE.md.
+
+**Rules:**
+- Check context-bus.md for existing signals before writing duplicates
+- Max 2 signals per /evening session
+
 ### Step 3: Close
 ```
 "Logged. Tomorrow starts with [#1 priority].
@@ -92,8 +126,21 @@ Always close /evening with a win highlight — the single best thing from the da
 
 Never end with guilt or "should have done more." Always find the win.
 
+## Optional Agent Feedback (~1 in 3 evenings)
+
+If the user interacted with a specific agent today (check context-bus or session context), and @boss memory `feedback_asked_today` is false, approximately 1 in 3 sessions ask:
+
+"How was @[agent]'s advice today?" via `AskUserQuestion`:
+- "Trafne — exactly what I needed"
+- "OK — decent"
+- "Nietrafione — missed the mark"
+- "Skip"
+
+If asked → set `feedback_asked_today: true` in @boss memory. Save response to relevant agent memory.
+If not asked or "Skip" → proceed to close. Never make this feel required.
+
 ## Rules
-- Keep it to 3 questions MAX
+- Keep it to 3 questions MAX (including optional feedback — if asked, it counts)
 - Don't lecture about what wasn't done
 - Celebrate what WAS done ("Nice work on [X]")
 - If user reports low energy → "Rest is productive too. No guilt."

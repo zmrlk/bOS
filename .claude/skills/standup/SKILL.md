@@ -136,14 +136,16 @@ Agents reporting: [list]
 
 **Pro mode:** INSERT into weekly_logs table.
 
-## Empty State Handling
+## Empty State Handling (Graceful — agents introduce themselves)
 
-If state files are empty or missing:
-- **tasks.md empty:** "@coo: Nie mam jeszcze tasków — /plan-week żeby ustawić tydzień."
-- **finances.md empty:** "@cfo/@finance: Nie mam danych finansowych — /expense żeby zacząć trackować."
-- **goals.md empty:** "@coach: Nie masz jeszcze celu — powiedz mi co chcesz osiągnąć."
-- **daily-log.md empty:** "@wellness: Brak danych o energii — /morning i /evening żeby zacząć logować."
-- **No agents have data:** Redirect: "Zespół dopiero Cię poznaje. Zacznij od /plan-week albo pogadaj z jednym agentem."
+If state files are empty or missing, agents give 1-line intros instead of "no data" messages:
+
+- **tasks.md empty:** "@coo: I'm ready to help plan your week. Say /plan-week and I'll build your first plan."
+- **finances.md empty:** "@cfo/@finance: I track your money. Tell me your monthly income to start, or log an expense with /expense."
+- **goals.md empty:** "@coach: I'm your accountability partner. What's the one thing you want to achieve? I'll help you get there."
+- **daily-log.md empty:** "@wellness: I watch your energy and sleep patterns. After a few days of /morning and /evening, I'll start spotting trends."
+- **habits.md empty:** "@trainer: I'm here when you're ready to move. Tell me about your fitness, or I'll suggest a starter routine."
+- **No agents have data at all:** Each reporting agent gives their 1-line intro (what they do, how to activate them). Then synthesis: "Your team is ready — they just need data. Start with /morning tomorrow and /evening tonight. After 3 days, this standup will be full of real insights."
 
 ## User Type Adaptation
 
@@ -152,7 +154,7 @@ If state files are empty or missing:
 - **Freelancer/Business owner:** Full business agent roster.
 - **Between things:** Focus on @coach, @mentor, @organizer, @finance.
 
-### Step 6: Follow-up
+### Step 7: Follow-up
 
 After standup, offer contextual next actions via `AskUserQuestion`:
 

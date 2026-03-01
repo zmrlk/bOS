@@ -45,20 +45,66 @@ Show current connection status (which method is active, available commands). Ask
 
 ## Step 0 — Choose Method
 
-Present both options. Adapt language to tech_comfort.
+**Default = Remote Control** (simplest, 1 minute, full power). Telegram is for advanced users who need 24/7 access.
+
+**Show costs upfront for Telegram:**
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📱  Phone Access Options
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Remote Control — FREE, 1 min setup
+     Scan QR code, full bOS access.
+     Computer must be on.
+
+  2. Lite Mobile — FREE, 0 min setup
+     Open claude.ai on your phone browser.
+     No file access, but basic chat works.
+
+  3. Telegram Bot — $25-35/mo extra
+     Always-on bot, works 24/7.
+     Requires n8n + Claude API key.
+     ~15 min setup.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
 Use `AskUserQuestion`:
 - header: "Mobile access"
 - question: "How do you want to use bOS from your phone?"
 - options:
-  - "Remote Control (Recommended)" (description: "Scan a QR code, use bOS from your phone instantly. Requires your computer to be on with Claude Code running.")
-  - "Telegram Bot" (description: "Set up an always-on bot. Works 24/7, even when your computer is off. Requires n8n + Supabase (~15 min setup).")
-  - "Both" (description: "Set up Remote Control now (1 min), Telegram later.")
+  - "Remote Control (Recommended)" (description: "Scan a QR code, use bOS instantly. Free, 1 min. Computer must be on.")
+  - "Lite Mobile — just bookmark claude.ai" (description: "Free, zero setup. Open claude.ai on phone. No files, but chat with agents works.")
+  - "Telegram Bot ($25-35/mo)" (description: "Always-on 24/7 bot. Requires n8n + Supabase + Claude API. ~15 min setup.")
   - "Not now" (description: "Come back anytime with /connect-mobile.")
 
 **If "Not now":** "No problem. Say /connect-mobile whenever you're ready." → END
 
-**If "Remote Control" or "Both":** → Go to OPTION A below.
+**If "Lite Mobile":**
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📱  Lite Mobile — Done!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Open claude.ai on your phone browser
+  and bookmark it. That's it.
+
+  What works:
+  ✅ Chat with any agent
+  ✅ Ask questions, get advice
+  ✅ Morning briefing (manual)
+
+  What doesn't:
+  ❌ No local file access
+  ❌ No MCP connections
+  ❌ No automated reminders
+
+  Upgrade to Remote Control anytime
+  for full access: /connect-mobile
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+Update profile.md: `mobile_connected = lite`. → END
+
+**If "Remote Control":** → Go to OPTION A below.
 **If "Telegram Bot":** → Skip to OPTION B (Telegram Setup) below.
 
 ---

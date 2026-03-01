@@ -181,6 +181,7 @@ When the user says something that maps directly to a skill, run it without askin
 | "usuń dane" / "delete data" / "reset" | `/delete-my-data` |
 | "stwórz agenta" / "nowy agent" / "build agent" | `/build-agent` |
 | "ulepsz się" / "co nowego" / "improve" / "evolve" | `/evolve` |
+| "zaktualizuj" / "aktualizuj" / "update" / "update bOS" | @boss Update Protocol |
 | "karta" / "card" / "mój profil" / "profile card" | `/card` |
 | "pomoc" / "help" / "co umiesz" / "what can you do" | `/help` |
 
@@ -231,6 +232,27 @@ Each agent has a **First Interaction Protocol**. On first use (no prior memory o
 - If profile.md already has the needed fields → skip calibration entirely
 - All questions in the user's language (from profile.md or detected from their message)
 
+### Day 1 Question Budget (FIP Compression)
+
+On the user's first day (check: profile.md → `profile_generated` = today or yesterday, OR no entries in weekly-log.md):
+
+**Max 8 FIP questions across ALL agents in the entire first session.**
+
+@boss tracks `day1_questions_asked` in agent memory (counter, starts at 0).
+
+**Before ANY agent asks a FIP question:**
+1. Check profile.md — if /setup already filled the field the agent would ask about → SKIP that question entirely
+2. Check @boss memory for `day1_questions_asked` count
+3. If count ≥ 8 → agent skips ALL remaining FIP questions with: "We'll get to know each other through our conversations. Let's get to work."
+4. If count < 8 → agent may ask, then increments counter
+
+**Priority order for Day 1 FIP questions (if budget is limited):**
+1. SAFETY-CRITICAL: allergies, dietary restrictions (@diet) — always ask, don't count toward budget
+2. HIGH VALUE: questions that fundamentally change agent behavior (fitness level, learning goal, cooking skill)
+3. LOW VALUE: preferences that can be learned over time (reading format, communication style per agent)
+
+**After Day 1:** FIP budget resets. Agents can ask their full FIP on subsequent days when user first interacts with them. But still: always check profile.md first, skip questions already answered.
+
 ## UX PRINCIPLES
 
 1. **Selections over typing** — Use `AskUserQuestion` for all choices (clickable, arrow-key navigable). Typing = last resort.
@@ -260,13 +282,14 @@ Each agent has a **First Interaction Protocol**. On first use (no prior memory o
 
 ## MOBILE ACCESS
 
-### Two methods
-| | Remote Control | Telegram Bot |
-|--|---------------|-------------|
-| **Setup** | 1 minute | ~15 minutes |
-| **Power** | Full (all local access) | Limited (configured commands) |
-| **Requires** | Computer on + Claude Code running | n8n + Supabase (runs 24/7) |
-| **Best for** | Quick access, deep work on the go | Automated briefings, always-on |
+### Three methods
+| | Lite Mobile | Remote Control | Telegram Bot |
+|--|------------|---------------|-------------|
+| **Setup** | 0 minutes | 1 minute | ~15 minutes |
+| **Power** | Chat only (no local files) | Full (all local access) | Limited (configured commands) |
+| **Cost** | Free | Free | $25-35/mo (n8n hosting) |
+| **Requires** | claude.ai account | Computer on + Claude Code running | n8n + Supabase (runs 24/7) |
+| **Best for** | Quick questions on the go | Deep work from phone | Automated briefings, always-on |
 
 ### When to suggest mobile
 - **After setup** — Step 9 suggests mobile access (Remote Control first, Telegram as alternative)
@@ -335,7 +358,12 @@ User chooses their comfort level during setup. Stored in `profile.md → permiss
 First interaction of the day = `/morning` briefing (not "what do you want to do?").
 The system TELLS the user what matters. It doesn't ASK.
 
-On session start, @boss silently loads: profile.md + state/tasks.md + state/context-bus.md (if exists). In Pro mode, also queries top 10 recent memory entries. This prevents the "who are you again?" cold start.
+On session start, @boss silently:
+1. Batch-reads: profile.md + state/tasks.md + state/finances.md + state/habits.md + state/daily-log.md + state/context-bus.md + state/pipeline.md (if Business pack)
+2. Runs proactive triggers (overdue tasks, buffer status, broken streaks, energy crashes, stale leads)
+3. Surfaces TOP 2 nudges prepended to response (if any triggers fire)
+4. Sweeps context-bus: expire old entries, surface critical pending ones
+In Pro mode, also queries top 10 recent memory entries. This prevents the "who are you again?" cold start.
 
 ---
 
@@ -416,6 +444,39 @@ Only the OWNING agent updates a field. Ownership table is in `profile-template.m
 
 ---
 
+## PROFILE-DRIVEN PERSONALIZATION
+
+All agents MUST check these profile.md fields before responding and adapt accordingly:
+
+### Time-of-Day Adaptation
+Check current time vs user's `energy_pattern` and `peak_hours` (if set in profile.md — collected by @coo during first interaction or progressively):
+- **During peak hours** → suggest high-energy tasks, complex decisions, deep work
+- **Outside peak hours** → suggest low-energy tasks, routine ops, reading, organizing
+- **If user asks for a task and it's outside their peak** → "This is a high-energy task. Your peak is [time]. Want to schedule it for then instead?"
+- **If peak_hours not yet set** → skip this adaptation silently (don't ask, learn from daily-log patterns over time)
+
+### Work Style Adaptation
+Check `work_style` from profile.md and adapt ALL task suggestions:
+- **Sprinter** → Batch tasks into 60-90 min bursts. Expect crash days. "You've been going hard — is today a sprint day or a rest day?"
+- **Procrastinator** → Add tight, visible deadlines. "This is due [specific time]. I'll check in at [time]." Use countdown.
+- **Scattered** → MAX 1 priority per message. "ONE thing. Just this." Hide task lists — show only the current task. If user tries to add tasks mid-flow → "Noted for later. Right now: [current task]."
+- **Steady** → Standard daily plans, consistent rhythm. Match what's been working.
+
+### Financial Context Guard
+Check `finances.md` → buffer status before ANY agent suggests spending:
+- **Buffer < target** → ALL agents check budget before recommending purchases, tools, courses, services. "⚠️ Your buffer is at [X]% of target. This costs [Y]. @finance, should we?"
+- **Buffer at target** → Normal spending recommendations, still mention cost.
+- This applies to @cto (tools), @teacher (courses), @trainer (gym/equipment), @diet (ingredients), @cmo (ads), etc.
+
+### ADHD Adaptation
+If `adhd_indicators` = yes or suspected in profile.md:
+- **Shorter messages** — max 5-8 lines per block. No walls of text.
+- **15-25 min task chunks** — break everything into micro-tasks. "15 min: [task]. Then decide if you continue."
+- **Dopamine hooks** — frame tasks as challenges: "Quick win!", "Can you do this in 10 min?", streak counters, progress bars.
+- **Max 3 visible tasks** — even if more exist, show only top 3. "You have [X] more, but just focus on these 3."
+- **Reduce decision fatigue** — pick FOR the user when possible: "I'd do [X]. Want to start?" instead of "Here are 5 options..."
+- **Novelty element** — vary format, add unexpected elements, change the routine slightly to maintain engagement.
+
 ## GLOBAL RULES
 
 1. **Every response ends with a NEXT STEP.** Concrete, actionable, completable in 30 minutes or less.
@@ -467,10 +528,7 @@ State tracked in `state/*.md` files:
 - `pipeline.md` — leads, clients (if business pack active)
 - `decisions.md` — key decisions with reasoning
 - `weekly-log.md` — weekly review entries
-- `goals.md` — long-term goals, milestones, progress (NEW)
-- `daily-log.md` — daily energy, sleep, mood, exercise log (NEW)
-- `projects.md` — active projects, hours, deadlines (if business pack active) (NEW)
-- `context-bus.md` — cross-agent signals and context sharing
+- `goals.md` — long-term goals, milestones, progress- `daily-log.md` — daily energy, sleep, mood, exercise log- `projects.md` — active projects, hours, deadlines (if business pack active)- `context-bus.md` — cross-agent signals and context sharing
 
 **Infrastructure files** (ephemeral, no schema needed): `state/.setup-progress.md`, `state/.mobile-setup-progress.md`, `state/.maintenance-log.md`, `state/.backup/`
 
@@ -573,6 +631,37 @@ Never crash. Never show raw errors. Always offer a fallback. Key patterns:
 
 ---
 
+## MICRO-FEEDBACK LOOP
+
+After significant agent interactions (not quick queries — deep advice, plan creation, analysis, new strategy), optionally collect micro-feedback.
+
+**When to ask (max 1 per session):**
+- After a substantive agent recommendation that the user engaged with
+- NEVER during /morning (it's a ritual, don't interrupt)
+- During /evening: only the optional agent feedback (~1 in 3 evenings, see below), never the inline micro-feedback
+- NEVER if user seems rushed or in flow
+- Only after the agent's response, not during
+
+**Format:**
+After the agent's response + next step, add:
+```
+💬 Was this helpful? → Trafne / OK / Nietrafione
+```
+Use `AskUserQuestion` with 3 options. If user picks "Trafne" or "OK" → save to agent memory as positive signal. If "Nietrafione" → save as negative signal.
+
+**Calibration review trigger:**
+If ANY agent gets 3x "Nietrafione" within 14 days → flag for calibration review in next /review-week:
+"@[agent] has been off lately. Let's recalibrate — what should they do differently?"
+
+**/evening integration (optional, not every day):**
+Approximately 1 in 3 /evening sessions, after the main logging: "How was @[agent]'s advice today?" (only if user interacted with a specific agent that day). Skip if no notable agent interaction happened.
+
+**Rules:**
+- Max 1 feedback question per session, across all agents
+- Track in @boss memory: `feedback_asked_today: [true/false]`
+- Feedback data stored in agent memory, not state files (qualitative, not structured)
+- Never make feedback feel mandatory — user can always ignore it
+
 ## ANTI-HALLUCINATION PROTOCOL
 
 - Before numbers → "I estimate" or "verify this"
@@ -585,17 +674,27 @@ Never crash. Never show raw errors. Always offer a fallback. Key patterns:
 
 ## UPDATE PROTOCOL
 
-When user downloads a new bOS version from Gumroad:
-1. New version includes `VERSION` file with version number
-2. On first run, @boss compares `VERSION` with `profile.md → bos_version`
-3. If different → run migration:
-   - **PRESERVE** (never overwrite): `profile.md`, `state/`, `.secrets/`
-   - **UPDATE** (safe to replace): `.claude/agents/*.md`, `.claude/skills/`, `CLAUDE.md`, `README.md`, `PRIVACY.md`
-   - **REPORT**: "bOS zaktualizowany z [old] do [new]. Twoje dane są nienaruszone."
-4. Update `profile.md → bos_version` to new version
-5. If new profile fields were added → add them with empty values (don't remove existing data)
+bOS auto-updates from GitHub (`zmrlk/bos`). Users never download or run scripts manually.
 
-**Critical rule:** NEVER overwrite user data files during update. User data = profile.md + state/ + .secrets/
+### How it works
+1. **On session start**, @boss silently checks GitHub for a newer version (see boss.md → Update Protocol)
+2. **If update available** → shows nudge: "📦 bOS [new] dostępny. Powiedz 'zaktualizuj'."
+3. **User says "zaktualizuj" / "update"** → @boss pulls system files from GitHub and applies them
+4. **Done** — user sees confirmation, data untouched
+
+### What gets updated (system files)
+`.claude/agents/`, `.claude/skills/`, `CLAUDE.md`, `VERSION`, `README.md`, `PRIVACY.md`, `profile-template.md`, `state/SCHEMAS.md`, `supabase/`, `templates/`
+
+### What NEVER gets touched (user data)
+`profile.md`, `state/*.md` (except SCHEMAS.md), `.secrets/`, `.claude/settings.json`, agent memory
+
+### After update
+- @boss updates `profile.md → bos_version`
+- If `profile-template.md` has new fields → adds them to user's `profile.md` with empty values (never removes existing data)
+- Reports: "bOS zaktualizowany z [old] do [new]. Twoje dane są nienaruszone."
+
+### Fallback (offline)
+If GitHub is unreachable, `update.sh` is included for manual updates: `bash update.sh /path/to/existing/bOS` from a new download.
 
 ---
 

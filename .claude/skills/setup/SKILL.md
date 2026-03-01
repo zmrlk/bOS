@@ -1625,20 +1625,93 @@ After writing profile.md, customize agent behavior based on discovered data:
 
 **6c. Supabase** (if detected): auto-create schema from `supabase/*.sql`
 
-**6d. Seed first entries** (so state files aren't empty):
+**6d. Seed Your System** (CRITICAL — pre-populate state for instant time-to-value):
 
-Based on setup data, create one meaningful entry in each relevant state file:
-- `tasks.md`: One task derived from primary_goal
-  - "Find clients" → "List 3 potential clients you could help"
-  - "Build habits" → "Pick a morning routine: 3 things, max 15 min"
-  - "Get fit" → "Today: 20-min beginner workout (or just a walk)"
-  - "Get organized" → "Brain dump everything on your mind (10 min)"
-- `weekly-log.md`: Entry for current week with week_goal from primary_goal
-- `habits.md` (if Health or Life pack): Day 0 entry — Health: stated fitness goal; Life: one habit from primary_goal (e.g., "Build habits" → morning routine streak)
-- `pipeline.md` (if Business pack): Placeholder "Your first prospect"
-- `context-bus.md`: Create empty file with header
+The first /morning MUST show real, personalized data — not empty scaffolding. Using data collected during setup (primary_goal, user_type, active_packs, energy_pattern, work_style, interests, income/expenses if shared), generate rich starter content.
 
-This ensures the first /morning has something to work with — NOT empty state.
+**tasks.md — 3-5 starter tasks matched to primary_goal + packs:**
+
+Generate tasks using the user's name, goal, and context. Each task has energy level and est. time.
+
+| primary_goal maps to | Starter tasks (pick 3-5 from pool, personalize) |
+|----------------------|--------------------------------------------------|
+| Business/clients | "List 3 potential clients" (M, 30min) · "Draft 1-paragraph pitch" (H, 45min) · "Set up pricing for 1 service" (H, 60min) · "Research 3 competitors" (M, 30min) · "Create LinkedIn headline" (L, 15min) |
+| Build habits/routines | "Write down your ideal morning routine" (M, 15min) · "Pick 1 habit to track this week" (L, 10min) · "Set up evening shutdown time" (L, 5min) · "Brain dump: everything on your mind" (M, 20min) · "Choose tomorrow's #1 priority" (L, 5min) |
+| Get fit/health | "20-min beginner workout (or walk)" (M, 20min) · "Plan 3 meals for tomorrow" (L, 15min) · "Set a bedtime alarm" (L, 2min) · "Fill a water bottle for today" (L, 1min) · "Log today's energy after this setup" (L, 2min) |
+| Learn something | "Choose 1 thing to learn this month" (M, 15min) · "Find 1 free resource for it" (M, 20min) · "Do a 15-min learning session" (H, 15min) · "Write down what you already know about it" (M, 10min) |
+| Get organized | "Brain dump everything on your mind" (M, 20min) · "Pick your top 3 priorities for this week" (M, 15min) · "Set up a 5-min morning check-in routine" (L, 5min) · "Clear 1 thing from your physical desk" (L, 10min) |
+| Mixed/unclear | "Write down your #1 goal for this month" (M, 15min) · "Pick 1 agent to talk to today" (L, 5min) · "Run /morning tomorrow when you wake up" (L, 2min) |
+
+Adapt task language (energy labels, phrasing) to `communication_style`. Match high-energy tasks to `energy_pattern` peak hours.
+
+**goals.md — primary_goal as Goal #1 with 3 milestones:**
+
+```markdown
+## Goal #1: [primary_goal — user's words]
+Status: Active
+Started: [today's date]
+Target: [realistic timeframe based on goal type]
+
+### Milestones
+1. [ ] Week 1: [First concrete step toward goal]
+2. [ ] Week 2-3: [Measurable midpoint]
+3. [ ] Month 1: [First tangible result]
+
+### Why this matters
+[1 sentence connecting to what user shared in Step 1D/conversational hooks]
+```
+
+**daily-log.md — Day 0 entry with energy from setup:**
+
+```markdown
+| [today's date] | [energy from Step 2h mapping: morning-peak→7, afternoon→6, evening→5, varies→5] | — | — | — | Setup complete | [first task from tasks.md] |
+```
+
+**finances.md — if user shared income/expenses during setup or conversational hooks:**
+
+Pre-populate Budget section:
+- If income mentioned → set monthly_income
+- If expenses mentioned → set estimated_expenses
+- Calculate buffer target (3 months expenses or default)
+- If nothing shared → leave Budget section with helpful prompts: "Tell @finance your monthly income to start tracking"
+
+**habits.md — 1-2 starter habits if Health or Life pack active:**
+
+| Pack | Starter habits |
+|------|---------------|
+| Health | "Exercise" (target: 3x/week) + "Water" (target: 8 glasses/day) |
+| Health + fitness_level=beginner | "Movement" (target: 20min/day, any activity) + "Sleep by [bedtime]" |
+| Life | "Morning routine" (target: daily) |
+| Life + ADHD | "1 priority picked before noon" (target: daily) |
+
+Each habit starts with streak = 0, Day 0 = today.
+
+**pipeline.md** (if Business pack): Empty with section headers ready.
+**context-bus.md**: Create with header.
+**weekly-log.md**: Entry for current week with week_goal from primary_goal.
+
+**Seeding display (show the user what was created):**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🌱  Seeding your system...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✅ [X] starter tasks created
+  ✅ Goal #1 set: [primary_goal short]
+  ✅ Day 0 logged
+  ✅ [Y] habits ready to track
+  [✅ Budget framework set — if finances shared]
+
+  Tomorrow's /morning will show all of this.
+```
+
+**Rules:**
+- Tasks MUST reference user's actual context (name, goal, industry from scan)
+- Never generate generic "lorem ipsum" tasks — every task should feel written for THIS user
+- If ADHD suspected → max 3 tasks, all under 20 min, include dopamine hooks ("Quick win!")
+- Language = user's language throughout
+- Sprinters get burst-friendly tasks (short, high-impact); Procrastinators get deadline-tagged tasks; Scattered get numbered priority order
 
 ---
 

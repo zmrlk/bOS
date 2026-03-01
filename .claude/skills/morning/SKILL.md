@@ -43,6 +43,26 @@ While processing energy answer, load ALL data in one batch of tool calls:
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn (tasks, daily_logs, leads, habits).
 
+## Step 1B: Pattern Insight (if 7+ entries in daily-log, runs after Step 1 data loading)
+
+**After Step 1 data loading, check @boss agent memory for patterns (from Pattern Analysis Protocol).**
+
+If patterns exist with medium+ confidence AND today matches a pattern trigger → show exactly 1 insight:
+
+**Energy-based insights (pick the most relevant ONE):**
+- Low-energy day pattern: "Heads up: [day_of_week] is usually your low-energy day (avg [X]/10). I've scheduled lighter tasks."
+- Post-rest day: "Yesterday was a rest day. Your data shows energy drops after rest days — consider a short walk to kickstart."
+- Bad sleep detected: "Bad sleep recently → your energy averages [X] lower after poor sleep. Lighter plan today."
+- Exercise boost: "Yesterday you trained → your data shows +[X] energy boost the next day. Let's use that!"
+- Energy crash (2+ days low): "Low energy for [X] days straight. This is a pattern, not a failure. Minimum viable day: 1 task + water + rest."
+
+**Rules:**
+- Max 1 insight per /morning
+- Only show when confidence is medium+ (14+ data points)
+- Never show on first 7 days (not enough data)
+- Hedging language for medium confidence, confident for high
+- If no pattern matches today → skip this step silently
+
 ## Step 2: Briefing (personalized to energy level)
 
 ### If Business pack active:
@@ -108,16 +128,33 @@ On next day: "Yesterday was a Low Battery Day. That's by design. Today: [normal 
 
 ## First Morning (day after setup)
 
-If this is the user's first /morning (check: no entries in state/weekly-log.md or agent memory flag):
+If this is the user's first /morning (check: no entries in state/weekly-log.md or `first_morning_shown` = false/missing in @boss agent memory):
+
+**Reference seeded data from /setup.** Read state/tasks.md, state/goals.md, state/habits.md to show what's already there.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🗓️  YOUR FIRST WEEK WITH bOS
+  ☀️  FIRST MORNING, [name]!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Day 1 (today): Talk to @[lead agent]
-                  about [primary_goal]
+  You already have:
+  ✅ [X] tasks ready to go
+  ✅ 1 goal set: [primary_goal short]
+  ✅ [Y] habits to track
+  [✅ Budget framework — if finances seeded]
+
+  Today's focus:
+  → [First seeded task by name]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🗓️  YOUR FIRST WEEK WITH bOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Day 1 (today): Do your first task:
+                  "[seeded task #1 title]"
   Day 2-3: Try /evening before bed
-  Day 4: Ask a different agent something
+  Day 4: Talk to @[relevant agent]
+         about [primary_goal]
   Day 5: Run /plan-week
   Day 7: Run /review-week
 
@@ -127,7 +164,10 @@ If this is the user's first /morning (check: no entries in state/weekly-log.md o
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Then continue with normal morning briefing. Set flag so this only shows once.
+Then continue with the normal morning briefing using seeded data. Set `first_morning_shown: true` in @boss agent memory so this only shows once.
+
+**First Morning motivational hook:**
+"You're not starting from zero — your system is already working for you. [X] tasks, 1 goal, [Y] profile fields filled. Let's make Day 1 count."
 
 ## Session Ending (Peak-End Rule)
 Always close /morning with a confidence statement based on DATA:
@@ -136,6 +176,23 @@ Always close /morning with a confidence statement based on DATA:
 If insufficient data for completion rate (first 2 weeks) → skip the percentage, just: "You have [X] clear tasks. One at a time. You've got this."
 
 Never end with a question or open-ended prompt. End with confidence.
+
+## Context Bus Writes (after briefing)
+
+After completing the morning briefing, write relevant signals to state/context-bus.md:
+
+| Condition | Write to context-bus.md |
+|-----------|------------------------|
+| Energy ≤ 3 (low battery day) | `## [date] @boss → @coo, @organizer` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: Low energy today ([X]/10). Lighten workload.` / `Status: pending` |
+| Energy ≤ 3 for 3+ consecutive days | `## [date] @boss → @wellness` / `Type: insight` / `Priority: critical` / `TTL: 7 days` / `Content: Energy crash: [X] days of low energy. Check-in needed.` / `Status: pending` |
+| Overdue tasks found (2+ days overdue) | `## [date] @boss → @coo` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: [X] overdue tasks. Reprioritize or reschedule.` / `Status: pending` |
+| Pattern insight about exercise/sleep | `## [date] @boss → @trainer or @wellness` / `Type: insight` / `Priority: info` / `TTL: 7 days` / `Content: [insight summary]` / `Status: pending` |
+
+Use the canonical context-bus format from CLAUDE.md (## date header, Type, Priority, TTL, Content, Status — each on its own line).
+
+**Rules:**
+- Only write NEW signals — check context-bus.md for existing recent signals on the same topic before writing duplicates
+- Don't write info-priority signals more than once per week on same topic
 
 ## State Writes (after briefing)
 
@@ -155,11 +212,16 @@ Before writing today's energy:
 
 **Pro mode:** INSERT into daily_logs (data, energia) for the morning entry.
 
-## Empty State
+## Empty State (Graceful — never show "no data")
 If state files are empty or missing:
 - Create the file with template headers silently
-- Show a simplified briefing: "Nie mam jeszcze danych — to normalne na początku. Zacznijmy od jednej rzeczy: co jest najważniejsze dziś?"
-- Never show empty tables or error messages
+- **Generate a starter plan from primary_goal** (read profile.md → primary_goal, active_packs):
+  - Generate 1-2 tasks relevant to the user's primary_goal and active packs
+  - Show as today's plan: "Based on your goal ([primary_goal]), here's your plan for today:"
+  - Include 1 quick win (< 15 min) and 1 meaningful task
+- If primary_goal is also empty → "Let's start simple: what's the ONE thing you want to get done today?"
+- Never show empty tables, "N/A" blocks, or "no data" messages
+- Never show raw error messages — always offer a constructive path forward
 
 ## Rules
 - Keep it SHORT (5-8 lines max)

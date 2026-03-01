@@ -31,10 +31,10 @@
 | **Profile generated** | |
 | **Last updated** | |
 | **Mobile connected** | no |
-| **Mobile platform** | (telegram / none) |
+| **Mobile platform** | (remote-control / telegram / lite / both / none) |
 | **Social profiles scanned** | (none / twitter, linkedin, instagram...) |
 | **Setup extras pending** | no |
-| **bOS version** | 0.1.0 |
+| **bOS version** | 0.2.0 |
 
 ---
 

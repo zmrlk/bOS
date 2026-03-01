@@ -155,6 +155,19 @@ Or just talk naturally — "good morning", "50 zl lunch", "plan my day" all work
 
 ---
 
+## Updating bOS
+
+bOS updates itself automatically. When a new version is available:
+
+1. Open bOS as usual
+2. bOS tells you: "bOS [version] dostępny. Powiedz 'zaktualizuj'."
+3. Say "zaktualizuj" (or "update")
+4. Done
+
+Your data (profile, tasks, finances, habits, goals) is never touched — only the system files (agents, skills) get updated. A backup is created automatically before every update.
+
+---
+
 ## Thank You
 
 You have the full version of bOS. Everything included:
@@ -182,7 +195,7 @@ No. bOS always explains what it wants to check, where, and why — then asks for
 Claude Code requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic.
 
 **How do I get updates?**
-Re-download from Gumroad. Your profile and data are preserved — only the agent files update.
+Automatically. Open bOS — it checks for updates and asks if you want to install. Say "zaktualizuj" and it's done. Your data stays safe.
 
 **Can I get a refund?**
 Yes — 30-day money-back guarantee through Gumroad. No questions asked.

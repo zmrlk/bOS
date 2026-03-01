@@ -186,6 +186,25 @@ Then use `AskUserQuestion` for quick actions:
 1. Dashboard must fit on ONE screen — no scrolling. If too many blocks, prioritize: TODAY → NEXT ACTION → BUFFER → STREAKS → PIPELINE → LEARNING
 2. Skip empty blocks entirely — don't show "No data" boxes
 3. Numbers are real — pull from state files or database. Never estimate or fabricate.
-4. If everything is empty (fresh install, no data) → show only TODAY block with a welcome message: "Your dashboard will fill up as you use bOS. Start with '/morning' or just tell me about your day."
+4. If everything is empty (fresh install, no data) → show a **progress tracker dashboard** instead of empty blocks:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🖥️  bOS — [name], [day]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  📊  YOUR PROGRESS
+  ┌─────────────────────────────────┐
+  │  👤 Profile    ▰▰▰▰▰▰▱▱▱▱  60%│
+  │  ✅ Tasks      ▱▱▱▱▱▱▱▱▱▱   0%│
+  │  🔥 Habits     ▱▱▱▱▱▱▱▱▱▱   0%│
+  │  🎯 Goals      ▰▱▱▱▱▱▱▱▱▱  10%│
+  └─────────────────────────────────┘
+
+  ⏭️  Try these to fill your dashboard:
+  → /morning — start your day
+  → /task add [task] — add your first task
+  → /evening — log your day tonight
+```
+Calculate profile % from filled vs total fields in profile.md for active packs. Goals % from goals.md milestones. Tasks % = 0 if none exist.
 5. Currency and date format from profile.md locale
 6. Language matches user's language from profile.md

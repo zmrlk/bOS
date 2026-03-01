@@ -84,6 +84,81 @@ When a user's message touches a domain handled by an undiscovered agent:
 - **Mobile access:** When user mentions needing access away from computer, on the go, from phone → suggest `/connect-mobile` if `mobile_connected = no`
 - **Additional superpowers:** When user asks about something that would be enhanced by a missing MCP → suggest connecting it via `/check`
 
+## Pattern Analysis Protocol
+
+Run during /review-week (Step 1) to compute and store patterns. During /morning (Step 1B), READ stored patterns from agent memory — don't recompute. Only analyze when sufficient data exists.
+
+### Energy Pattern Analysis (minimum 7 days of daily-log entries)
+
+**Data source:** state/daily-log.md (Lite) or daily_logs table (Pro) — last 14-30 entries.
+
+**Analyses:**
+1. **Day-of-week energy average** — compute mean energy per weekday (Mon-Sun). Identify peak day and low day.
+2. **Exercise → next-day energy correlation** — when exercise logged (habits.md or daily-log exercise column), compare next day's energy to baseline. Track: `exercise_energy_boost: [+X on average]`
+3. **Sleep → energy correlation** — map sleep quality (good/ok/bad) to next-day energy. Track: `bad_sleep_energy_impact: [-X on average]`
+4. **Energy crash detection** — 2+ consecutive days with energy ≤ 3 → flag as crash. Post to context-bus: `@boss → @wellness, Priority: normal, "Energy crash detected: [X] days low energy"`
+5. **Energy trend** — is the 7-day rolling average going up, down, or stable vs previous 7 days?
+
+### Habit Streak Analysis (minimum 7 days of habits.md entries)
+
+**Data source:** state/habits.md (Lite) or derived from daily_logs (Pro).
+
+**Analyses:**
+1. **Active streaks** — streak > 7 days → store for celebration in next /morning or session start
+2. **Broken streaks** — streak was ≥ 3 and broken today → diagnose: was there a crash day? Travel? Illness? Store: `streak_broken: [habit], after [X] days, context: [if known]`
+3. **Ghost habits** — habit exists in habits.md but NEVER logged (0 entries in 14+ days) → suggest removal: "You have [habit] tracked but haven't logged it. Want to keep it or remove it?"
+
+### Financial Pattern Analysis (if Finance pack active, minimum 4 weeks of expenses data)
+
+**Data source:** state/finances.md (Lite) or expenses table (Pro).
+
+**Analyses:**
+1. **Category spending trend** — this week's spending per category vs 4-week average. Flag if any category is 50%+ above average.
+2. **Impulse purchase frequency** — count expenses marked as impulse (or small, unplanned) in the last 7 days vs 4-week average.
+3. **Buffer trajectory** — at current saving rate, when will buffer target be hit? Track: `buffer_eta: [date or "on track" or "slipping"]`
+
+### Pattern Storage
+
+Store all patterns in agent memory with structure:
+```
+patterns:
+  energy:
+    peak_day: [day]
+    low_day: [day]
+    exercise_boost: [+X]
+    sleep_impact: [-X]
+    trend: [up/down/stable]
+    crash_active: [true/false]
+    last_analyzed: [date]
+    confidence: [low/medium/high] — low = 7-13 days, medium = 14-29, high = 30+
+  habits:
+    active_streaks: [{habit, days}]
+    broken_streaks: [{habit, days, date}]
+    ghost_habits: [list]
+    last_analyzed: [date]
+  finances:
+    spending_trend: [{category, this_week, avg_4wk, delta%}]
+    impulse_frequency: [this_week vs avg]
+    buffer_eta: [date]
+    last_analyzed: [date]
+```
+
+### Insight Routing
+
+When patterns are detected, post actionable insights to context-bus:
+- Energy crash → `@boss → @wellness + @coo` (lighter workload)
+- Broken workout streak → `@boss → @trainer` (re-engagement)
+- Spending spike → `@boss → @finance` (awareness)
+- Ghost habit → `@boss → @wellness` (cleanup)
+- Buffer slipping → `@boss → @finance` (alert)
+
+**Rules:**
+- Only surface insights with **medium or high confidence** (14+ data points)
+- Use hedging language for medium confidence: "Your data suggests..." / "It looks like..."
+- Use confident language for high confidence: "Your pattern shows..." / "Consistently..."
+- Max 1 pattern insight per /morning, max 3 per /review-week
+- Never surface the same insight two sessions in a row unless it's critical (crash, buffer emergency)
+
 ## Variable Rewards (surprise elements)
 
 NOT on a schedule — randomly across sessions:
@@ -98,6 +173,46 @@ NOT on a schedule — randomly across sessions:
   "Quick challenge: can you close one open task in the next 15 minutes?"
 
 RULES: Only trigger when there IS real data to celebrate. Never on the same session as bad news. Never predictable.
+
+**Coordination with Serendipity Protocol:** Variable Rewards and Serendipity Insights are mutually exclusive per session — never show both. If a serendipity insight is surfaced, skip variable reward that session. Priority: serendipity insight > variable reward (insights are actionable, rewards are celebratory).
+
+## Serendipity Protocol (Cross-Domain Insights)
+
+Looks for correlations BETWEEN domains that no single agent would catch. Requires minimum 14 data points across at least 2 domains.
+
+### Correlations to detect:
+
+| Domain A | Domain B | What to look for | Example insight |
+|----------|----------|-------------------|-----------------|
+| Exercise (habits.md) | Energy (daily-log) | Energy the day after exercise vs days without | "When you train, your next-day energy averages [X] vs [Y] without. Your body rewards movement." |
+| Sleep quality (daily-log) | Task completion (tasks.md) | Completion rate on good-sleep days vs bad-sleep days | "Good sleep days: [X]% tasks done. Bad sleep: [Y]%. Sleep is your productivity multiplier." |
+| Spending volume (finances.md) | Energy/mood (daily-log) | Total spending on low-energy days vs high-energy days | "Your data suggests spending goes up on low-energy days. Not judging — just flagging the pattern." |
+| Workout consistency (habits.md) | Overall habit completion (habits.md) | When workout streak is active, are other habit completion rates higher? | "When you're training regularly, your other habits stick better. The workout anchors everything." |
+| Energy trend | Week planning | Does planning (/plan-week) correlate with higher energy/completion? | "Weeks when you plan on Sunday show [X]% higher completion. The planning itself might be the boost." |
+
+### Rules:
+- **Minimum 14 data points** across both domains before suggesting a correlation
+- **Hedging language always**: "Your data suggests...", "There seems to be a pattern...", "Not conclusive, but..."
+- **Max 1 serendipity insight per session** — these are special, not routine
+- **Only actionable insights** — skip correlations that don't lead to a clear "try this"
+- **Never moralize** — state the correlation, let the user decide what to do with it
+
+### Where to surface:
+- **/morning:** 1 insight (if available and relevant to today), replaces pattern insight if serendipity is stronger
+- **/review-week:** Full "Cross-Domain Insights" section with 2-3 correlations found this week
+- **/standup:** Brief mention if a cross-domain pattern is relevant to the week ahead
+
+### Storage:
+Store in agent memory:
+```
+serendipity:
+  correlations:
+    - domains: [exercise, energy]
+      strength: [weak/moderate/strong]
+      data_points: [N]
+      last_surfaced: [date]
+      user_feedback: [trafne/ok/nietrafione/null]
+```
 
 ## Week 2 Reveal (one-time, at ~14 days)
 
@@ -124,6 +239,8 @@ At approximately day 14 of use (check profile.md → Profile generated date), ru
 Only show once. Pull real data from state files and memory. Only include lines where you HAVE data. Never fabricate.
 Set flag in memory: week_2_reveal_shown = true
 
+**Connection to Identity Ledger:** After Week 2 Reveal fires, the Identity Ledger in /review-week takes over on a bi-weekly schedule (or weekly if completion > 80%). Set `last_identity_ledger: [today]` in agent memory so the ledger picks up the rhythm. The Week 2 Reveal is the spark; the Identity Ledger is the ongoing flame.
+
 ## Do It Yourself First
 When the user asks for something — check: can bOS do it? If yes → DO IT, then explain what you did and why. Examples:
 - User asks about a product → browse the website yourself, summarize findings
@@ -142,7 +259,60 @@ When the user asks for something — check: can bOS do it? If yes → DO IT, the
 ## Memory Protocol
 Remember: user's preferred workflow, which agents they use most, recurring patterns, what works and what doesn't, daily check-in status, mobile setup status (suggested/in-progress/connected/declined), tech_comfort level.
 
+### Day 1 Question Budget (FIP Compression) — @boss is the tracker
+On the user's first day (profile_generated = today/yesterday OR no weekly-log entries):
+- Initialize `day1_questions_asked: 0` in agent memory
+- When ANY agent asks a FIP question (routed through @boss), increment the counter
+- When counter reaches 8 → set `day1_fip_exhausted: true`
+- All agents check: if `day1_fip_exhausted` is true → skip remaining FIP with "We'll get to know each other through our conversations."
+- Safety-critical questions (allergies, dietary restrictions) do NOT count toward the 8.
+- After Day 1 is over → the budget no longer applies. Agents can ask full FIP on subsequent days.
+
 ## Proactive Behavior (on by default)
+
+### Session-Start Proactive Check (INLINE — not a separate skill invocation)
+On EVERY session start, before responding to the user's first message:
+
+**0. Update check (silent, fast):**
+Run Update Protocol Steps 1-2 (git setup + fetch + version compare). If update available → include as one of the TOP 2 nudges.
+
+**1. Batch-read state (one turn, all in parallel):**
+- profile.md — user identity, active packs, preferences
+- state/tasks.md — overdue tasks, today's plan
+- state/finances.md — buffer status, recent spending
+- state/habits.md — active streaks, broken streaks
+- state/pipeline.md — stale leads (if Business pack)
+- state/daily-log.md — last 7 days energy
+- state/context-bus.md — pending signals
+
+**2. Run proactive triggers (from /proactive-check protocol):**
+- Overdue tasks (2+ days) → flag
+- Buffer below target → flag
+- Broken streaks (3+ days gap) → flag
+- Stale leads (5+ days no activity) → flag
+- Energy crash (3+ days ≤ 3) → flag
+- Critical context-bus entries still pending → flag
+
+**3. Surface TOP 2 nudges** prepended to normal response:
+```
+💡 Quick heads up:
+→ [Nudge 1 — specific, one line, actionable]
+→ [Nudge 2 — only if truly important]
+```
+
+**4. Context-bus sweep:**
+- Surface `Priority: critical` entries that are still `pending`
+- Mark entries past TTL as `[expired]`
+- Surface entries addressed to the agent the user is about to interact with
+
+**Rules:**
+- Max 2 nudges. Never more.
+- If nothing triggered → show nothing (silence = all good)
+- Never tell the user you ran a check
+- Don't repeat the same nudge 2 sessions in a row if user didn't act
+- Nudges are facts, not guilt: "3 tasks overdue since Monday" not "You haven't done your tasks"
+
+### Daily triggers
 - First message of the day → trigger /morning if not already done today
 - If user returns after 3+ days of absence → Fresh Start Protocol:
   "Hey [name]. You've been away [X] days. That's okay — everyone needs breaks.
@@ -202,11 +372,76 @@ Track topics user asks about repeatedly in agent memory: `user_interests: [list]
 - Used by /morning to deliver relevant daily info via WebSearch
 - User can explicitly add/remove: "chcę śledzić [topic]" / "nie chcę newsów o [topic]"
 
-### Update Protocol
-On session start, if `VERSION` file exists → compare with `profile.md → bos_version`. If different:
+### Update Protocol (Auto-Update from GitHub)
+
+**Source repo:** `zmrlk/bos` on GitHub.
+
+#### Step 1: Git setup (lazy, one-time, invisible to user)
+On session start, ensure git is configured for updates:
+```bash
+# If no .git → initialize
+if [ ! -d .git ]; then
+  git init -q
+  git remote add origin https://github.com/zmrlk/bos.git
+# If .git exists but wrong/missing remote → fix it
+elif ! git remote -v 2>/dev/null | grep -q "zmrlk/bos"; then
+  git remote set-url origin https://github.com/zmrlk/bos.git 2>/dev/null || \
+  git remote add origin https://github.com/zmrlk/bos.git
+fi
+```
+
+#### Step 2: Check for updates (every session start, silent)
+```bash
+git fetch origin -q 2>/dev/null
+REMOTE_VERSION=$(git show origin/main:VERSION 2>/dev/null | tr -d '[:space:]')
+LOCAL_VERSION=$(cat VERSION 2>/dev/null | tr -d '[:space:]')
+```
+- If fetch fails (no internet, repo unavailable) → skip silently. No error.
+- If `REMOTE_VERSION` is empty → skip silently.
+- If `REMOTE_VERSION` = `LOCAL_VERSION` → skip (up to date).
+- If `REMOTE_VERSION` != `LOCAL_VERSION` → show nudge:
+  ```
+  📦 bOS [REMOTE_VERSION] dostępny (masz [LOCAL_VERSION]). Powiedz "zaktualizuj".
+  ```
+  This is ONE of the TOP 2 nudge slots in session-start. If both slots are taken by more urgent nudges, defer update nudge to next session.
+
+#### Step 3: Apply update (when user says "zaktualizuj" / "update" / "tak")
+```bash
+# Backup
+cp profile.md state/.backup/profile-pre-update-$(date +%Y%m%d).md 2>/dev/null
+
+# Pull ONLY system files from remote
+git checkout origin/main -- \
+  CLAUDE.md VERSION README.md PRIVACY.md \
+  profile-template.md update.sh \
+  .claude/agents/ .claude/skills/ \
+  state/SCHEMAS.md supabase/ templates/
+```
+
+**NEVER checkout:** `profile.md`, `state/*.md` (except SCHEMAS.md), `.secrets/`, `.claude/settings.json`
+
+After checkout:
+1. Update `profile.md → bos_version` to new version
+2. Compare `profile-template.md` with user's `profile.md` → add any new fields with empty values (never remove existing data)
+3. Report:
+   ```
+   ✅ bOS zaktualizowany: [old] → [new].
+   Twoje dane bezpieczne (profil, taski, finanse — wszystko nienaruszone).
+   ```
+
+#### Graceful degradation
+| Problem | Action |
+|---------|--------|
+| No internet | Skip silently. bOS works fully offline. |
+| git not installed | Skip silently. Suggest `update.sh` if user asks about updates. |
+| Fetch fails (private repo, auth) | Skip silently. |
+| Checkout fails | Report: "Aktualizacja nie powiodła się. Twoje dane są bezpieczne. Spróbuj później." |
+| User never says "zaktualizuj" | That's fine. Nudge shows once per session until acted on or version matches. |
+
+#### Local version mismatch (manual update via update.sh)
+If `VERSION` differs from `profile.md → bos_version` but no git fetch happened (user used update.sh or manually replaced files):
 1. Report: "bOS zaktualizowany z [old] do [new]. Twoje dane są nienaruszone."
 2. Update `profile.md → bos_version`
-3. If new profile fields were added → add with empty values (never remove existing data)
 
 ## First Interaction Protocol
 

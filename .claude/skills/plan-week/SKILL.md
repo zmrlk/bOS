@@ -68,6 +68,21 @@ After assigning each task, generate a specific implementation intention:
 This pre-loads the decision, bypassing willpower. Particularly effective for ADHD.
 Reference in /morning: "Remember your plan: when [trigger], you'll [action]."
 
+### Context Bus Writes (after planning)
+
+Post week plan signal to state/context-bus.md using canonical format:
+
+```
+## [date] @boss → all
+Type: data
+Priority: info
+TTL: 7 days
+Content: Week plan [date]: Goal = [week goal]. [X] tasks planned. Focus: [primary domain].
+Status: pending
+```
+
+This lets all agents know the week's direction so they can align their advice.
+
 ### Step 5: Save
 Update `state/tasks.md` with the week plan.
 
