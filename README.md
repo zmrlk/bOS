@@ -1,0 +1,195 @@
+# bOS — Your Personal Operating System
+
+> One AI team for your whole life. Business. Health. Growth. Everything.
+
+---
+
+## What Is This?
+
+bOS turns Claude into a team of personalized AI agents that manage your life, work, and growth. It's not a chatbot — it's an operating system for ambitious people.
+
+**You open a folder, say hi, and it just works.** A quick setup (under 5 minutes) personalizes everything to YOU: your goals, your constraints, your personality.
+
+---
+
+## Requirements
+
+- **[Claude Code](https://claude.ai/code)** — Claude's official AI coding tool
+  - Requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic
+  - Think of it as the engine that powers bOS. You need both.
+- That's it. Everything else is optional.
+
+### Where to run bOS
+
+| Environment | Best for | How to start |
+|------------|----------|-------------|
+| **Terminal (CLI)** | Full power, all features | Install Claude Code, open Terminal, type `claude` |
+| **VS Code extension** | Developers, side-by-side editing | Install "Claude Code" extension from VS Code marketplace |
+| **Web (claude.ai)** | Quick access, easy connector setup | Open claude.ai — but limited (no local file access) |
+
+bOS works best in **Terminal or VS Code** (full file access, all superpowers). The web version is great for connecting services (Gmail, Calendar) but can't scan your files.
+
+---
+
+## Quick Start
+
+1. Download bOS from Gumroad
+2. Open the bOS folder in Claude Code
+   *(First time? Open Terminal, type `claude`, press Enter. Drag the bOS folder into the terminal window and press Enter.)*
+3. Say "hi"
+4. bOS introduces itself, asks your name, and guides you through setup (under 5 minutes, mostly clicking)
+
+**That's it.** bOS explains everything along the way. No technical knowledge needed.
+
+---
+
+## Your Team
+
+Pick what you need help with. bOS activates the right agents.
+
+| Area | Agents | What they do |
+|------|--------|-------------|
+| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales | Strategy, planning, tech, finances, marketing, sales |
+| 🧭 **Life** | @coach, @organizer, @finance | Goals, daily planning, personal budget |
+| 💪 **Health** | @trainer, @diet, @wellness | Workouts, nutrition, sleep & recovery |
+| 📚 **Learning** | @teacher, @mentor, @reader | Skills, career growth, reading |
+| 🤖 **Always on** | @boss | Routes your questions to the right agent |
+
+Plus: `/build-agent` to create any custom agent you need.
+
+---
+
+## Superpowers
+
+bOS gets better with every tool you connect. These are optional — everything works without them, but each one unlocks new capabilities:
+
+| Superpower | What it does | How to enable |
+|-----------|-------------|---------------|
+| 📁 **Files & Desktop** | Scan your files, organize, understand your projects | Enable Desktop Commander connector |
+| 📅 **Calendar** | Morning briefings with today's meetings | Enable Google Calendar connector |
+| 📧 **Email** | Triage, follow-ups, drafts | Gmail, Outlook, or any provider (IMAP) |
+| 🗄️ **Database** | Dashboards, analytics, long-term tracking | Connect free Supabase account |
+| 💻 **System Control** | Open apps, automate tasks on your Mac | Enable Control your Mac connector |
+| 📝 **Notion** | Sync with your second brain | Enable Notion connector |
+
+bOS auto-detects what's connected and adapts. No configuration needed.
+
+---
+
+## Phone Access
+
+Two ways to use bOS from your phone:
+
+### Remote Control (recommended)
+Run `claude remote-control` in your terminal → scan the QR code with your phone → done. Full bOS access from the Claude app or claude.ai/code. Your computer needs to stay on.
+
+### Telegram Bot
+For 24/7 access (even when your computer is off). Say `/connect-mobile` after setup — bOS walks you through creating a Telegram bot step by step (~15 min).
+
+**What works from your phone (both methods):**
+- Morning and evening briefings
+- Expense logging
+- Task management
+- Quick status checks
+- Full agent conversations (Remote Control only)
+
+---
+
+## Daily Rhythm
+
+| When | What | Command |
+|------|------|---------|
+| Morning | Priorities + quick win | `/morning` or just `m` |
+| Anytime | Dashboard at a glance | `/home` or just `h` |
+| Anytime | Talk to your agents | Just type |
+| Evening | Reflect + plan tomorrow | `/evening` or just `e` |
+| Sunday | Plan the week | `/plan-week` or just `p` |
+| Friday | Weekly review | `/review-week` or just `w` |
+
+You can also just talk naturally — say "good morning" and bOS starts your briefing. Say "50 zł lunch" and it logs the expense. No commands to memorize.
+
+---
+
+## All Commands
+
+| Command | Shortcut | What it does |
+|---------|----------|-------------|
+| `/morning` | `m` | Morning briefing — priorities + quick win |
+| `/evening` | `e` | Evening shutdown — reflect + plan tomorrow |
+| `/home` | `h` | Dashboard — everything at a glance |
+| `/plan-week` | `p` | Plan the week ahead |
+| `/review-week` | `w` | Weekly review — what worked, what didn't |
+| `/standup` | `s` | Team standup — all agents report in |
+| `/goal` | `g` | Set, review, and track goals |
+| `/task` | `t` | Manage tasks — add, complete, prioritize |
+| `/expense` | `x` | Log an expense |
+| `/workout` | — | Log a workout |
+| `/eval` | — | Evaluate a project opportunity |
+| `/scan` | — | Scan your computer to learn about you |
+| `/vault` | — | Manage passwords and API keys securely |
+| `/check` | — | System health check |
+| `/card` | — | Generate a shareable profile card |
+| `/export` | — | Export all your data |
+| `/delete-my-data` | — | Delete all personal data |
+| `/connect-mobile` | — | Set up phone access via Telegram |
+| `/build-agent` | — | Create a custom agent |
+| `/evolve` | — | Self-improve — discover new tools and capabilities |
+| `/help` | — | Show available commands and agents |
+| `/setup` | — | Guided onboarding (runs automatically on first use) |
+
+Or just talk naturally — "good morning", "50 zl lunch", "plan my day" all work.
+
+---
+
+## How It Works
+
+- **Works locally by default** — your core data stays on your machine in simple markdown files you control
+- **Always asks first** — bOS explains what it wants to do and asks for consent before scanning your files or checking anything. No surprises.
+- **Optional cloud services** — connect Supabase (database), Google Calendar, email, or other services for extra capabilities. When connected, data flows through those services. You control what you connect.
+- **Agents remember you** — persistent memory across sessions
+- **Gets smarter over time** — every conversation teaches your agents more about you
+- **You own everything** — it's just files in a folder. No lock-in. No subscription.
+- **Your data is private** — without optional cloud services, everything stays on your computer. When you connect services like Supabase or Gmail, only the data needed for that service is shared. You can disconnect anytime.
+- **Zero permission prompts** — bOS pre-configures Claude Code to auto-approve safe operations (file reading, editing, MCP tools). You see what's happening at every step, but you're never interrupted to click "approve". Destructive commands (like `rm -rf`) are always blocked.
+- **Phone access** — optionally connect Telegram to use bOS from your phone (say `/connect-mobile` after setup)
+
+---
+
+## Thank You
+
+You have the full version of bOS. Everything included:
+- 16 agents + custom agent builder
+- 22 skills
+- Cloud database support (optional, auto-detected)
+- All future updates
+
+Need help? Type `/help` in bOS or visit our community.
+
+---
+
+## FAQ
+
+**Do I need to know how to code?**
+No. bOS works through conversation — you just talk to it. During setup, bOS asks about your tech comfort level and adapts everything accordingly.
+
+**Can I use bOS from my phone?**
+Yes — via Telegram. After setup, say `/connect-mobile` and bOS walks you through connecting Telegram step by step. You'll be able to get morning briefings, log expenses, manage tasks, and more from your phone.
+
+**Does bOS scan my files without asking?**
+No. bOS always explains what it wants to check, where, and why — then asks for your consent. It only looks at file and folder names, never opens or reads your documents.
+
+**What does Claude Code cost?**
+Claude Code requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic.
+
+**How do I get updates?**
+Re-download from Gumroad. Your profile and data are preserved — only the agent files update.
+
+**Can I get a refund?**
+Yes — 30-day money-back guarantee through Gumroad. No questions asked.
+
+**What happens if I cancel Claude Code?**
+Your data stays safe — it's just files on your computer. You can still read everything in the `state/` folder with any text editor. You just won't be able to talk to your agents until you resubscribe. Nothing is lost.
+
+---
+
+*Built for ambitious people who want to run their life like a system.*

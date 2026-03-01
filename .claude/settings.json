@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "WebFetch",
+      "WebSearch",
+      "Bash(mkdir *)",
+      "Bash(chmod 600 .secrets/*)",
+      "Bash(chmod 700 .secrets)",
+      "Bash(ls *)",
+      "Bash(date *)",
+      "Bash(wc *)",
+      "Bash(pwd)",
+      "Bash(touch *)",
+      "mcp__*"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm *)",
+      "Bash(sudo *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(python*)",
+      "Bash(node -e *)",
+      "Bash(pbcopy*)"
+    ]
+  }
+}
