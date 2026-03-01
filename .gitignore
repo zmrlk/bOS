@@ -1,86 +1,36 @@
 # ============================================
 # bOS — .gitignore
-# Protects personal data while keeping product files shareable
+# Only excludes internal business docs and runtime artifacts.
+# All product files ship to users.
 # ============================================
 
 # ─────────────────────────────────────────────
-# CRITICAL — Secrets & credentials
+# INTERNAL — Business docs (not part of product)
 # ─────────────────────────────────────────────
-.secrets/
-vault.json
-*.key
-*.pem
-*.p12
-*.pfx
-*.cert
-*.crt
-*.env
-.env.*
-!.env.example
+gumroad/
 
 # ─────────────────────────────────────────────
-# SENSITIVE — Personal financial & profile data
+# RUNTIME — Generated during usage, not part of product
 # ─────────────────────────────────────────────
 profile.md
-state/finances.md
-
-# ─────────────────────────────────────────────
-# PRIVATE — Personal state files
-# ─────────────────────────────────────────────
-state/tasks.md
-state/pipeline.md
-state/habits.md
-state/decisions.md
-state/weekly-log.md
-state/goals.md
-state/daily-log.md
-state/projects.md
-state/context-bus.md
+.secrets/
 state/.setup-progress.md
 state/.mobile-setup-progress.md
 state/.maintenance-log.md
 state/archive/
 state/.backup/
 state/n8n-templates/
-!state/SCHEMAS.md
-!state/.gitkeep
 
 # ─────────────────────────────────────────────
-# AGENT MEMORY — Persistent agent learning
+# EXPORTS & BACKUPS — User-generated
 # ─────────────────────────────────────────────
-agent-memory/
+bos-export-*.md
 
 # ─────────────────────────────────────────────
 # OS ARTIFACTS
 # ─────────────────────────────────────────────
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
 Thumbs.db
-
-# Editor swap files
-*.swp
-*.swo
-*~
-.*.swp
-
-# ─────────────────────────────────────────────
-# CLAUDE CODE — Local-only settings
-# ─────────────────────────────────────────────
-.claude/settings.local.json
-
-# ─────────────────────────────────────────────
-# EXPORTS & BACKUPS — User-generated, not for repo
-# ─────────────────────────────────────────────
-bos-export-*.md
-*.backup
-*.bak
-*.log
-
-# ─────────────────────────────────────────────
-# INTERNAL — Business docs not for repo
-# ─────────────────────────────────────────────
-gumroad/
