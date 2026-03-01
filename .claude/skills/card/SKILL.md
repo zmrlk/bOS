@@ -41,7 +41,7 @@ Calculate:
   🏆 Top agent: @[name] ([X] conversations)
   📊 Mode: [Lite/Pro]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  bos.gumroad.com
+  github.com/zmrlk/bos
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -55,5 +55,5 @@ After the card, optionally add 1 line:
 - If days_active = 0 → "Day 1"
 - Never fabricate stats
 - Keep the card format exactly as specified — it's designed for screenshots
-- The URL at the bottom is always `bos.gumroad.com` (fixed, not pulled from data)
+- The URL at the bottom is always `github.com/zmrlk/bos` (fixed, not pulled from data)
 - If user asks for a copy-paste version → output as plain text block they can screenshot

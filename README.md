@@ -14,7 +14,7 @@ bOS turns Claude into a team of personalized AI agents that manage your life, wo
 
 ## Requirements
 
-- **[Claude Code](https://claude.ai/code)** — Claude's official AI coding tool
+- **[Claude Code](https://claude.ai/code)** — Claude's AI coding tool (CLI, desktop app, or VS Code extension)
   - Requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic
   - Think of it as the engine that powers bOS. You need both.
 - That's it. Everything else is optional.
@@ -23,19 +23,21 @@ bOS turns Claude into a team of personalized AI agents that manage your life, wo
 
 | Environment | Best for | How to start |
 |------------|----------|-------------|
-| **Terminal (CLI)** | Full power, all features | Install Claude Code, open Terminal, type `claude` |
-| **VS Code extension** | Developers, side-by-side editing | Install "Claude Code" extension from VS Code marketplace |
-| **Web (claude.ai)** | Quick access, easy connector setup | Open claude.ai — but limited (no local file access) |
+| **Claude Code Desktop** | Everyone — the easiest way | Download the [desktop app](https://claude.ai/code), open it, select the bOS folder |
+| **Terminal (CLI)** | Full power, advanced users | Open Terminal, type `claude`, press Enter |
+| **VS Code / Cursor** | Developers, side-by-side editing | Install "Claude Code" extension from marketplace |
 
-bOS works best in **Terminal or VS Code** (full file access, all superpowers). The web version is great for connecting services (Gmail, Calendar) but can't scan your files.
+**Recommended for most people: Claude Code Desktop.** It's a regular app — no terminal needed. Just open it, select the bOS folder, and start talking.
+
+All three options give you the same full bOS experience (all agents, all skills, all superpowers).
 
 ---
 
 ## Quick Start
 
-1. Download bOS from Gumroad
+1. Download bOS from [GitHub](https://github.com/zmrlk/bos)
 2. Open the bOS folder in Claude Code
-   *(First time? Open Terminal, type `claude`, press Enter. Drag the bOS folder into the terminal window and press Enter.)*
+   *(Easiest: open Claude Code Desktop → select the bOS folder. Or in Terminal: type `claude`, drag the bOS folder in, press Enter.)*
 3. Say "hi"
 4. bOS introduces itself, asks your name, and guides you through setup (under 5 minutes, mostly clicking)
 
@@ -192,13 +194,10 @@ Yes — via Telegram. After setup, say `/connect-mobile` and bOS walks you throu
 No. bOS always explains what it wants to check, where, and why — then asks for your consent. It only looks at file and folder names, never opens or reads your documents.
 
 **What does Claude Code cost?**
-Claude Code requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic.
+Claude Code requires a Claude Pro ($20/mo) or Max ($100/mo) subscription from Anthropic. The desktop app, terminal CLI, and VS Code extension are all free — you just need the subscription.
 
 **How do I get updates?**
 Automatically. Open bOS — it checks for updates and asks if you want to install. Say "zaktualizuj" and it's done. Your data stays safe.
-
-**Can I get a refund?**
-Yes — 30-day money-back guarantee through Gumroad. No questions asked.
 
 **What happens if I cancel Claude Code?**
 Your data stays safe — it's just files on your computer. You can still read everything in the `state/` folder with any text editor. You just won't be able to talk to your agents until you resubscribe. Nothing is lost.

@@ -213,7 +213,7 @@ bOS auto-detects MCP connectors: Desktop Commander (files), Google Calendar, Gma
 **Key rules:**
 - **Graceful degradation:** MCP unavailable → fall back silently. Hint once: "Tip: connect [name] for [benefit]. /check to set up."
 - **Email:** Gmail easiest (marketplace). Outlook → `outlook-mcp`. Other providers → `email-mcp` (generic IMAP/SMTP). Detect and adapt.
-- **Environment:** CLI = full power. VS Code/Cursor = same. Web (claude.ai) = no local files, limited.
+- **Environment:** Desktop app = full power (GUI, best for non-technical). CLI = full power. VS Code/Cursor = same. Web (claude.ai) = no local files, limited.
 - **Non-technical users struggling with MCP:** "Możesz podłączyć [connector] na claude.ai/settings/connectors — kliknij i zaloguj się."
 - **Installation:** stdio/npx → install automatically. Marketplace → one-line instruction.
 
