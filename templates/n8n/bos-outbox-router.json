@@ -1,0 +1,175 @@
+{
+  "name": "bOS Outbox — Reply Router",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [{ "mode": "everyMinute", "value": 1 }]
+        },
+        "operation": "select",
+        "schema": "public",
+        "table": "messages",
+        "filters": {
+          "conditions": [
+            { "column": "status", "operator": "eq", "value": "reply_pending" }
+          ]
+        },
+        "limit": 10
+      },
+      "id": "poll-replies",
+      "name": "Poll Pending Replies",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            { "outputIndex": 0, "value": "telegram" },
+            { "outputIndex": 1, "value": "email" },
+            { "outputIndex": 2, "value": "slack" },
+            { "outputIndex": 3, "value": "discord" },
+            { "outputIndex": 4, "value": "whatsapp" }
+          ]
+        },
+        "fallbackOutput": "extra",
+        "mode": "rules",
+        "field": "channel"
+      },
+      "id": "router",
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $json.raw_metadata ? JSON.parse($json.raw_metadata).chat_id : '' }}",
+        "text": "={{ $json.response }}"
+      },
+      "id": "send-telegram",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [750, 100],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_ME@example.com",
+        "toEmail": "={{ $json.sender_id }}",
+        "subject": "={{ 'Re: ' + ($json.subject || 'bOS Reply') }}",
+        "text": "={{ $json.response }}"
+      },
+      "id": "send-email",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [750, 250],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_ME",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.raw_metadata ? JSON.parse($json.raw_metadata).channel : '' }}",
+        "text": "={{ $json.response }}"
+      },
+      "id": "send-slack",
+      "name": "Send Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [750, 400],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_ME",
+          "name": "Slack OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "messages",
+        "filters": {
+          "conditions": [
+            { "column": "id", "operator": "eq", "value": "={{ $json.id }}" }
+          ]
+        },
+        "columns": "status",
+        "values": "replied"
+      },
+      "id": "mark-replied",
+      "name": "Mark as Replied",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1000, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Poll Pending Replies": {
+      "main": [
+        [{ "node": "Route by Channel", "type": "main", "index": 0 }]
+      ]
+    },
+    "Route by Channel": {
+      "main": [
+        [{ "node": "Send Telegram", "type": "main", "index": 0 }],
+        [{ "node": "Send Email", "type": "main", "index": 0 }],
+        [{ "node": "Send Slack", "type": "main", "index": 0 }],
+        [{ "node": "Mark as Replied", "type": "main", "index": 0 }],
+        [{ "node": "Mark as Replied", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [{ "node": "Mark as Replied", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [{ "node": "Mark as Replied", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Slack": {
+      "main": [
+        [{ "node": "Mark as Replied", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Polls for reply_pending messages in the inbox and routes responses back through the original channel. Supports Telegram, Email, Slack. Discord and WhatsApp send nodes need manual addition.",
+    "setup_steps": [
+      "1. Add all channel credentials used by your inbox workflows",
+      "2. Add Supabase credentials",
+      "3. Configure email 'from' address",
+      "4. Activate workflow"
+    ]
+  }
+}

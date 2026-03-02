@@ -8,7 +8,10 @@
 --   2. schema-business.sql    (if Business pack active)
 --   3. schema-health.sql      (if Health pack active)
 --   4. schema-learning.sql    (if Learning pack active)
---   5. schema-security.sql    ← this file (always last)
+--   5. schema-inbox.sql       (v0.6.0 — Unified Inbox)
+--   6. schema-schedules.sql   (v0.6.0 — Cron Schedules)
+--   7. schema-sync.sql        (v0.6.0 — Hybrid Sync)
+--   8. schema-security.sql    ← this file (always last)
 
 -- ============================================
 -- HELPER: enable RLS + create authenticated-user policies
@@ -197,6 +200,39 @@ END;
 $$;
 
 -- ============================================
+-- v0.6.0 FEATURE TABLES
+-- (schema-inbox.sql, schema-schedules.sql, schema-sync.sql)
+-- ============================================
+-- These tables define RLS locally in their own schema files,
+-- but we also apply via the central function for consistency.
+
+DO $$
+DECLARE
+    tbl TEXT;
+BEGIN
+    FOR tbl IN
+        SELECT unnest(ARRAY[
+            'messages',
+            'schedules',
+            'sync_log',
+            'sync_state'
+        ])
+    LOOP
+        IF EXISTS (
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_name = tbl
+        ) THEN
+            PERFORM _bos_enable_rls_for_table(tbl);
+        ELSE
+            RAISE NOTICE 'Skipping % — table not found (v0.6.0 feature not installed)', tbl;
+        END IF;
+    END LOOP;
+END;
+$$;
+
+-- ============================================
 -- ANON ROLE — block all anonymous access
 -- ============================================
 -- Belt-and-suspenders: even if a policy bug slips through,
@@ -219,7 +255,9 @@ BEGIN
             -- health
             'workouts', 'meals',
             -- learning
-            'reading_log', 'study_sessions'
+            'reading_log', 'study_sessions',
+            -- v0.6.0 features
+            'messages', 'schedules', 'sync_log', 'sync_state'
           )
     LOOP
         EXECUTE format('REVOKE ALL ON %I FROM anon', tbl);
@@ -244,7 +282,8 @@ $$;
 --     'tasks', 'daily_logs', 'decisions', 'weekly_logs', 'expenses', 'memory',
 --     'finances', 'leads', 'projects', 'contacts', 'communications',
 --     'subscriptions', 'invoices', 'time_entries', 'content_calendar',
---     'workouts', 'meals', 'reading_log', 'study_sessions'
+--     'workouts', 'meals', 'reading_log', 'study_sessions',
+--     'messages', 'schedules', 'sync_log', 'sync_state'
 --   )
 -- ORDER BY tablename;
 

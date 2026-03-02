@@ -1,0 +1,75 @@
+{
+  "name": "bOS Inbox — Discord",
+  "nodes": [
+    {
+      "parameters": {
+        "event": "messageCreate"
+      },
+      "id": "discord-trigger",
+      "name": "Discord Trigger",
+      "type": "n8n-nodes-base.discordTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "credentials": {
+        "discordBotApi": {
+          "id": "REPLACE_ME",
+          "name": "Discord Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $input.all();\nreturn items.map(item => {\n  const d = item.json;\n  if (d.author?.bot) return null;\n  return {\n    json: {\n      channel: 'discord',\n      sender_id: d.author?.id || 'unknown',\n      sender_name: d.author?.username || 'unknown',\n      body: d.content || '',\n      raw_metadata: JSON.stringify({ channel_id: d.channel_id, guild_id: d.guild_id, message_id: d.id }),\n      status: 'unread'\n    }\n  };\n}).filter(Boolean);"
+      },
+      "id": "transform",
+      "name": "Filter & Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "messages",
+        "columns": "channel,sender_id,sender_name,body,raw_metadata,status"
+      },
+      "id": "supabase-insert",
+      "name": "Save to Inbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [{ "node": "Filter & Transform", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filter & Transform": {
+      "main": [
+        [{ "node": "Save to Inbox", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Listens to Discord messages and saves them to the unified inbox. Bot messages filtered out. Replace credentials.",
+    "setup_steps": [
+      "1. Create Discord Bot at discord.com/developers",
+      "2. Add bot to your server with MESSAGE_CONTENT intent",
+      "3. Add Discord Bot credentials in n8n",
+      "4. Add Supabase credentials in n8n",
+      "5. Activate workflow"
+    ]
+  }
+}

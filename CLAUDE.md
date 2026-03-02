@@ -174,6 +174,11 @@ When the user types any of these (with or without `/`), execute the correspondin
 | `a` | `/analyze` | Data analysis |
 | `i` | `/invoice` | Invoicing |
 | `tt` | `/timetrack` | Time tracking |
+| `cn` | `/connect` | Manage MCP connections |
+| `in` | `/inbox` | Unified inbox |
+| `sc` | `/schedule` | Cron schedules |
+| `mp` | `/marketplace` | Skill marketplace |
+| `sy` | `/sync` | Hybrid sync |
 
 ### Natural language routing to skills
 When the user says something that maps directly to a skill, run it without asking:
@@ -222,6 +227,12 @@ When the user says something that maps directly to a skill, run it without askin
 | "sprawdź pipeline" / "verify" / "dane klientów" | `/verify` |
 | "konkurencja" / "competitor" / "analiza rynku" | `/competitive` |
 | "repurpose" / "przetwórz content" / "multi-platform" | `/repurpose` |
+| "połącz" / "connect" / "MCP" / "connector" / "podłącz" / "integration" | `/connect` |
+| "outlook" / "gmail" / "email setup" / "poczta" | `/connect email` |
+| "inbox" / "wiadomości" / "messages" / "skrzynka" / "nieprzeczytane" | `/inbox` |
+| "schedule" / "harmonogram" / "cron" / "automate" / "automatyzacja" | `/schedule` |
+| "marketplace" / "sklep" / "skills store" / "nowe skille" | `/marketplace` |
+| "sync" / "synchronizuj" / "synchronizacja" / "cloud sync" | `/sync` |
 
 **Rules:**
 - These are SUGGESTIONS, not hard locks. If the user clearly means something else by "plan" → route normally.
@@ -246,14 +257,29 @@ Conflict Resolution Framework (in @boss agent file) handles DISAGREEMENTS betwee
 
 ## MCP AWARENESS
 
-bOS auto-detects MCP connectors: Desktop Commander (files), Google Calendar, Gmail/Outlook/IMAP (email), Supabase (Pro mode), Notion, Figma, Canva, Control your Mac, iMessage.
+bOS uses MCP (Model Context Protocol) connectors to access external tools. Full catalog with vetted installation commands: `.claude/skills/connect/mcp-catalog.md`. Management skill: `/connect`.
+
+**Connection methods (in order of preference):**
+1. **Marketplace** — one-click toggle in Claude Desktop or claude.ai/settings/connectors
+2. **HTTP remote** — `claude mcp add --transport http [name] [url]` (most cloud services)
+3. **stdio local** — `claude mcp add --transport stdio [name] -- npx -y [package]` (local tools)
+4. **Import from Claude Desktop** — `claude mcp add-from-claude-desktop`
+
+**Email quick reference (most requested):**
+- Gmail → Marketplace toggle (1 click)
+- Outlook/Hotmail → `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`
+- Company Outlook → `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --org-mode`
+- Other IMAP → `claude mcp add email -- npx -y mcp-mail-manager`
 
 **Key rules:**
-- **Graceful degradation:** MCP unavailable → fall back silently. Hint once: "Tip: connect [name] for [benefit]. /check to set up."
-- **Email:** Gmail easiest (marketplace). Outlook → `outlook-mcp`. Other providers → `email-mcp` (generic IMAP/SMTP). Detect and adapt.
-- **Environment:** Desktop app = full power (GUI, best for non-technical). CLI = full power. VS Code/Cursor = same. Web (claude.ai) = no local files, limited.
-- **Non-technical users struggling with MCP:** "Możesz podłączyć [connector] na claude.ai/settings/connectors — kliknij i zaloguj się."
-- **Installation:** stdio/npx → install automatically. Marketplace → one-line instruction.
+- **Graceful degradation:** MCP unavailable → fall back silently. Hint once: "Tip: /connect [name] to add it."
+- **Catalog first:** Check mcp-catalog.md before searching the internet for MCPs.
+- **Internet discovery:** After personalization, use WebSearch + Reddit + X for finding new/niche MCPs and community skills.
+- **Environment:** Desktop app = full power. CLI = full power. VS Code/Cursor = same. Web (claude.ai) = no local files, limited.
+- **Non-technical users:** Never say "MCP". Use "connection" or "extension". Guide to claude.ai/settings/connectors.
+- **After install:** `/mcp` for OAuth authentication. `claude mcp list` to verify.
+- **Tool Search:** Auto-activates when many MCPs would pollute context (>10% of window). No manual config needed.
+- **Security:** Only install MCPs scoring ≥8/10 on the security checklist. See mcp-catalog.md.
 
 ---
 
@@ -776,6 +802,9 @@ State tracked in `state/*.md` files:
 - `network.md` — relationship CRM from /network (small file)
 - `invoices.md` — invoices and payment tracking (small file)
 - `time-log.md` — project time entries (growing file)
+- `inbox.md` — unified inbox messages from all channels (growing file)
+- `schedules.md` — cron schedules for automated skill execution (small file)
+- `marketplace.md` — installed marketplace skills tracking (small file)
 
 **Infrastructure files** (ephemeral, no schema needed): `state/.setup-progress.md`, `state/.mobile-setup-progress.md`, `state/.maintenance-log.md`, `state/.backup/`, `state/.webhooks.md`
 
@@ -795,7 +824,7 @@ This is automatic — no setup needed.
 
 ### Smart Context Loading
 
-Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md, time-log.md) use a Summary + Active + Archive structure (see `state/SCHEMAS.md`).
+Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md, time-log.md, inbox.md) use a Summary + Active + Archive structure (see `state/SCHEMAS.md`).
 
 **Tier 1 (every session — fast):** Read first 25 lines of each growing file (= Summary section). Read small files (habits, goals, decisions, projects, pipeline) in full. Total: ~200 lines instead of potentially thousands.
 
@@ -813,6 +842,8 @@ Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly
 | /review-week completes | @boss | weekly-log.md |
 | /timetrack logs time | @coo | time-log.md |
 | Monthly maintenance | @boss | all growing files |
+| /inbox receives message | @boss | inbox.md |
+| /schedule add or modify | @boss | schedules.md |
 
 **Lazy Summary rules:**
 - Per-write: do NOT update Summary. Only modify the Active section.
@@ -922,6 +953,9 @@ Each state file has owners who can write and readers who can only read:
 | network.md | @mentor (via /network) | @boss, @coach |
 | invoices.md | @cfo | @sales, @boss |
 | time-log.md | @coo | @cfo, @devlead |
+| inbox.md | @boss (via /inbox) | all |
+| schedules.md | @boss (via /schedule) | all |
+| marketplace.md | @boss (via /marketplace) | all, /evolve |
 | .webhooks.md | @boss (via /webhooks) | @cto |
 
 **Coordinator notes:**
@@ -938,6 +972,42 @@ Each state file has owners who can write and readers who can only read:
 **Archival rule:** At the start of each month, @boss moves entries older than 2 months from tasks.md, weekly-log.md, daily-log.md, context-bus.md, and time-log.md to `state/archive/[filename]-[YYYY-MM].md`. Keep current + previous month active.
 
 **Backup rule:** Before ANY profile.md modification, copy it to `state/.backup/profile-[timestamp].md`. Keep last 3 backups, delete older ones.
+
+---
+
+## HYBRID SYNC PROTOCOL
+
+bOS supports a hybrid memory model: local files (always) + Supabase cloud (when connected). The protocol ensures data integrity across both layers.
+
+### Write Protocol (Dual-Write)
+1. **Always write locally first** — `state/*.md` files are the fast, reliable source of truth
+2. **If Supabase MCP connected** → also write to the corresponding Supabase table
+3. **Update sync metadata** on the local file: `<!-- synced: YYYY-MM-DD HH:MM -->`
+4. **If Supabase write fails** → local write still succeeds. Mark file as `local-ahead`. Retry at session-end.
+
+### Read Protocol
+1. **Read local** (fast, always available)
+2. **Session-start**: compare `<!-- synced: -->` timestamps to Supabase `updated_at`
+3. **If remote is newer** → pull silently (merge new records)
+4. **If local is newer** → mark for session-end push
+
+### Conflict Resolution
+- **< 5 minutes difference** between local and remote changes → last-write-wins (automatic)
+- **>= 5 minutes difference** → ask user: "Keep local" / "Keep remote" / "Merge manually"
+
+### Sync Triggers
+| Trigger | Action |
+|---------|--------|
+| Session start | Quick timestamp comparison (zero extra reads if synced) |
+| Session end | Batch push all modified files |
+| `/sync` (manual) | Full bidirectional sync |
+| Monthly maintenance | Full sync + integrity check |
+
+### Trackable Files
+Tasks, daily-log, finances, decisions, weekly-log, pipeline, projects, invoices, time-log, inbox, schedules — all map to corresponding Supabase tables. See `/sync status` for current state.
+
+### For Agents
+Agents do NOT need to know about sync. They write to local files as normal. @boss handles sync transparently at session-start and session-end.
 
 ---
 
@@ -1013,6 +1083,15 @@ bOS auto-updates from GitHub (`zmrlk/bos`). Users never download or run scripts 
 - If `profile-template.md` has new fields → adds them to user's `profile.md` with empty values (never removes existing data)
 - Reports: "bOS zaktualizowany z [old] do [new]. Twoje dane są nienaruszone."
 
+### Post-Update Data Migration
+New features often need user data. @boss runs a 3-phase migration (details in boss.md → Update Protocol Step 6):
+1. **Auto-fill** — scan system for answers to new fields, fill silently
+2. **Classify gaps** — BLOCKING (feature broken without) vs ENRICHING (better with) vs COSMETIC (nice-to-have)
+3. **Ask user** — batch BLOCKING+ENRICHING questions (max 5). User can: "Teraz" / "Przypomnij później" (3 sessions) / "Pomiń"
+- COSMETIC fields → progressive profiling only, never prompted
+- Migration runs ONCE per version, tracked in agent memory
+- Never blocks normal usage
+
 ### Fallback (offline)
 If GitHub is unreachable, `update.sh` is included for manual updates: `bash update.sh /path/to/existing/bOS` from a new download.
 
@@ -1069,7 +1148,7 @@ DECISION: [GO/NO-GO/CONDITIONAL + reasoning]
 bOS can fire webhooks on key events, enabling integration with n8n, Zapier, Make, or custom endpoints.
 
 **Supported events:**
-`task.completed`, `expense.logged`, `habit.milestone`, `energy.crash`, `budget.exceeded`, `sprint.completed`, `decision.review_due`, `invoice.created`, `invoice.overdue`, `invoice.paid`, `code.shipped`, `proposal.sent`, `timer.stopped`
+`task.completed`, `expense.logged`, `habit.milestone`, `energy.crash`, `budget.exceeded`, `sprint.completed`, `decision.review_due`, `invoice.created`, `invoice.overdue`, `invoice.paid`, `code.shipped`, `proposal.sent`, `timer.stopped`, `message.received`, `message.replied`, `schedule.created`, `skill.installed`
 
 **Configuration:** Stored in `state/.webhooks.md` (infrastructure file). Managed via `/webhooks`.
 

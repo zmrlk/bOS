@@ -1,0 +1,101 @@
+{
+  "name": "bOS Cron — Morning Briefing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every Day 8:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{ $env.ANTHROPIC_API_KEY }}" },
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-sonnet-4-6"
+            },
+            {
+              "name": "max_tokens",
+              "value": "2048"
+            },
+            {
+              "name": "system",
+              "value": "You are bOS morning briefing agent. Generate a concise morning briefing. Include: date, top 3 priorities, weather note, motivational one-liner. Keep it under 300 words. Respond in the user's language."
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\":\"user\",\"content\":\"/morning\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "claude-api",
+      "name": "Generate Briefing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "REPLACE_ME",
+        "text": "={{ $json.content[0].text }}"
+      },
+      "id": "send-telegram",
+      "name": "Send via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [750, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Day 8:00": {
+      "main": [
+        [{ "node": "Generate Briefing", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Briefing": {
+      "main": [
+        [{ "node": "Send via Telegram", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Warsaw"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Sends morning briefing at 8:00 via Telegram. Uses Claude API to generate the briefing. Set ANTHROPIC_API_KEY as environment variable in n8n.",
+    "setup_steps": [
+      "1. Set ANTHROPIC_API_KEY in n8n environment variables",
+      "2. Add Telegram Bot credentials",
+      "3. Set chatId to your Telegram user ID",
+      "4. Adjust cron time if needed (default: 8:00 Warsaw)",
+      "5. Activate workflow"
+    ]
+  }
+}

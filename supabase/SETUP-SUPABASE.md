@@ -33,12 +33,20 @@
 
 For each active pack, create a **New Query** and run the corresponding schema:
 
-| Pack | File | Tables added |
+| Pack / Feature | File | Tables added |
 |------|------|-------------|
 | Business | `schema-business.sql` | finances, leads, projects, contacts, communications, subscriptions, invoices, time_entries, content_calendar |
 | Health | `schema-health.sql` | workouts, meals |
 | Learning | `schema-learning.sql` | reading_log, study_sessions |
 | Life | *(no extra tables — uses core tables)* | — |
+
+### v0.6.0 Feature Schemas (recommended — run all)
+
+| Feature | File | Tables added |
+|---------|------|-------------|
+| Unified Inbox | `schema-inbox.sql` | messages |
+| Cron Schedules | `schema-schedules.sql` | schedules |
+| Hybrid Sync | `schema-sync.sql` | sync_log, sync_state |
 
 **Don't know which packs you'll use?** Run all of them. Empty tables cost nothing.
 
@@ -119,14 +127,18 @@ If all queries return expected results, you're ready!
 ## Schema Overview
 
 ```
-schema-core.sql      → tasks, daily_logs, decisions, weekly_logs, expenses, memory
-schema-business.sql  → finances, leads, projects, contacts, communications,
-                       subscriptions, invoices, time_entries, content_calendar
-schema-health.sql    → workouts, meals
-schema-learning.sql  → reading_log, study_sessions
-views.sql            → v_monthly_summary, v_pipeline_summary,
-                       v_weekly_completion, v_project_hours
-seed-data.sql        → starter wisdom for all packs
+schema-core.sql       → tasks, daily_logs, decisions, weekly_logs, expenses, memory
+schema-business.sql   → finances, leads, projects, contacts, communications,
+                        subscriptions, invoices, time_entries, content_calendar
+schema-health.sql     → workouts, meals
+schema-learning.sql   → reading_log, study_sessions
+schema-inbox.sql      → messages (v0.6.0)
+schema-schedules.sql  → schedules (v0.6.0)
+schema-sync.sql       → sync_log, sync_state (v0.6.0)
+schema-security.sql   → RLS policies for ALL tables (run last)
+views.sql             → v_monthly_summary, v_pipeline_summary,
+                        v_weekly_completion, v_project_hours
+seed-data.sql         → starter wisdom for all packs
 ```
 
 ---
@@ -161,5 +173,8 @@ seed-data.sql        → starter wisdom for all packs
 | Energy tracking | Weekly log only | Daily logs with trends |
 | Workout tracking | Markdown habits file | Full exercise log with history |
 | Reading log | None | Books, ratings, key ideas |
+| Unified inbox | Local markdown | Full message history, search, filters |
+| Scheduled skills | Local markdown | Persistent cron jobs, run history |
+| Hybrid sync | N/A | Offline-first with automatic cloud sync |
 | Dashboard views | None | 4 auto-calculated views |
 | Data export | Copy-paste | SQL export, CSV, API |

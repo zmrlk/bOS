@@ -1,0 +1,88 @@
+{
+  "name": "bOS Cron — Custom Skill",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "REPLACE_CRON_EXPRESSION" }]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Custom Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{ $env.ANTHROPIC_API_KEY }}" },
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "claude-sonnet-4-6" },
+            { "name": "max_tokens", "value": "2048" },
+            { "name": "system", "value": "REPLACE_SYSTEM_PROMPT" },
+            { "name": "messages", "value": "[{\"role\":\"user\",\"content\":\"REPLACE_SKILL_COMMAND\"}]" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "claude-api",
+      "name": "Run Skill",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "REPLACE_CHAT_ID",
+        "text": "={{ $json.content[0].text }}"
+      },
+      "id": "send-telegram",
+      "name": "Deliver Result",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [750, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Custom Schedule": {
+      "main": [
+        [{ "node": "Run Skill", "type": "main", "index": 0 }]
+      ]
+    },
+    "Run Skill": {
+      "main": [
+        [{ "node": "Deliver Result", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Warsaw"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Template for custom scheduled skills. Replace: CRON_EXPRESSION, SYSTEM_PROMPT, SKILL_COMMAND, CHAT_ID.",
+    "placeholders": {
+      "REPLACE_CRON_EXPRESSION": "Standard cron (e.g., '0 12 * * *' = noon daily, '0 9 * * 1-5' = weekdays 9am)",
+      "REPLACE_SYSTEM_PROMPT": "System prompt for the skill context",
+      "REPLACE_SKILL_COMMAND": "The /skill command to execute (e.g., /home, /task, /budget)",
+      "REPLACE_CHAT_ID": "Telegram chat ID for delivery"
+    }
+  }
+}

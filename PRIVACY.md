@@ -39,6 +39,9 @@ Daily activity tracked in local markdown files:
 | `state/context-bus.md` | Cross-agent context signals |
 | `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
 | `state/time-log.md` | Time tracking entries — project, duration, description |
+| `state/inbox.md` | Messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) — sender, subject, status |
+| `state/schedules.md` | Automated skill schedules — which skills run when, delivery channel |
+| `state/marketplace.md` | Installed marketplace skills — skill name, version, install date |
 
 ### Agent memory (`~/.claude/agent-memory/`)
 Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.
@@ -89,6 +92,8 @@ When you run `/scan-context` or `/evolve` (with your consent), bOS may search fo
 **Lite Mode (default):** Everything stays on your computer. `profile.md`, state files, `.secrets/` — all local. Nothing leaves your machine.
 
 **Pro Mode (Supabase connected):** Your task data, financial logs, habits, and agent memory get stored in a Supabase database. This is a cloud database — you set it up yourself with your own account. bOS uses your own database, not a shared one.
+
+**Hybrid Sync (v0.6.0+):** When Supabase is connected, bOS uses a dual-write protocol — data is always written locally first, then pushed to Supabase. If you're offline, everything works normally. Changes sync automatically when you reconnect. Conflict resolution: small differences are auto-merged, larger conflicts ask you to decide. Sync metadata (timestamps, not content) is tracked in `sync_log` and `sync_state` Supabase tables.
 
 In both modes, your secrets vault stays local. It never syncs to Supabase.
 
@@ -253,6 +258,20 @@ If you use `/network`, bOS stores names, context (how you know someone), and fol
 ## Journal entries (journal.md)
 
 If you use `/reflect`, bOS stores your micro-journal entries (a question and your answer) in `state/journal.md`. These are private reflections. After 30+ entries, @coach may identify patterns during your weekly review — but this analysis stays local.
+
+---
+
+## Unified Inbox data
+
+If you use `/inbox`, bOS collects messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) via n8n workflows. Messages are stored in `state/inbox.md` (Lite mode) or the `messages` Supabase table (Pro mode). Message data includes: sender name, channel, subject/preview, and timestamps. Full message bodies are stored only in Pro mode. Messages can be archived or deleted via `/inbox archive`.
+
+## Scheduled skill data
+
+If you use `/schedule`, bOS stores your automation schedules in `state/schedules.md` (Lite mode) or the `schedules` Supabase table (Pro mode). This includes: which skills run, when (cron expression), and where they deliver (in-app, Telegram, email). No personal data is stored in schedules — only configuration.
+
+## Marketplace data
+
+If you use `/marketplace`, bOS tracks which skills you've installed in `state/marketplace.md`. This includes: skill name, version, and install date. No personal data is shared with the skill registry — bOS fetches the catalog from GitHub (public repo) without sending any user information.
 
 ---
 

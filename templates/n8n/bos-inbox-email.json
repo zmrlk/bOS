@@ -1,0 +1,76 @@
+{
+  "name": "bOS Inbox — Email",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [{ "mode": "everyMinute", "value": 5 }]
+        },
+        "simple": false
+      },
+      "id": "email-trigger",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "credentials": {
+        "imap": {
+          "id": "REPLACE_ME",
+          "name": "Email IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $input.all();\nreturn items.map(item => {\n  const d = item.json;\n  return {\n    json: {\n      channel: 'email',\n      sender_id: d.from?.value?.[0]?.address || d.from || 'unknown',\n      sender_name: d.from?.value?.[0]?.name || d.from || 'unknown',\n      subject: d.subject || '(no subject)',\n      body: (d.text || d.html || '').substring(0, 2000),\n      raw_metadata: JSON.stringify({ message_id: d.messageId, date: d.date, to: d.to }),\n      status: 'unread'\n    }\n  };\n});"
+      },
+      "id": "transform",
+      "name": "Transform Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "messages",
+        "columns": "channel,sender_id,sender_name,subject,body,raw_metadata,status"
+      },
+      "id": "supabase-insert",
+      "name": "Save to Inbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [{ "node": "Transform Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transform Email": {
+      "main": [
+        [{ "node": "Save to Inbox", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Polls email via IMAP every 5 minutes and saves new messages to the unified inbox. Replace credentials before activating.",
+    "setup_steps": [
+      "1. Add IMAP credentials (host, port, user, password) in n8n",
+      "2. Add Supabase credentials in n8n",
+      "3. Activate workflow"
+    ]
+  }
+}

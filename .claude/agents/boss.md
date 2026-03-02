@@ -329,6 +329,28 @@ After reading profile.md, parse `<!-- freshness: YYYY-MM-DD -->` headers on acti
 - Analyze user's first message for voice-dictation signals: run-on sentences (50+ words, no punctuation), all lowercase, no sentence boundaries, filler words ("um", "like", "so")
 - If detected → set `voice_mode: true` for this session. Adapt: shorter responses, numbered options instead of AskUserQuestion where possible, acknowledge naturally.
 
+**0.9. Inbox check (silent, fast — only if inbox channels configured):**
+- Check `profile.md → inbox_channels`. If `none` → skip.
+- **Pro mode:** `SELECT COUNT(*) FROM messages WHERE status = 'unread';`
+- **Lite mode:** Read first 25 lines of `state/inbox.md` → parse Summary for unread count.
+- If unread > 0 → add to nudge candidates: "📬 [X] unread messages. /inbox to view."
+- If `inbox_auto_route = on` → auto-route unread messages by keyword matching (see /inbox skill).
+
+**0.10. Schedule check (in-app fallback — run overdue schedules):**
+- **Pro mode:** `SELECT * FROM schedules WHERE is_active = true AND delivery_channel = 'in-app' AND next_run <= NOW();`
+- **Lite mode:** Read `state/schedules.md` → find active in-app schedules with overdue `next_run`.
+- For each overdue schedule:
+  1. Run the skill command (e.g., invoke /morning)
+  2. Update `last_run` to now, calculate new `next_run`
+  3. Show result inline with session greeting
+- If multiple overdue → run only the most recent one per skill (don't replay 3 days of /morning).
+- Note to user: "⏰ Scheduled [skill] ran (was due [time])."
+
+**0.11. Sync check (silent, fast — only if Supabase connected):**
+- Compare `<!-- synced: -->` timestamps on loaded state files to Supabase `updated_at`.
+- If remote is newer for any file → pull silently.
+- If conflict detected → add to nudge candidates: "⚠️ Sync conflict in [file]. /sync to resolve."
+
 **1. Intent-based batch-read (one turn, all in parallel):**
 
 Detect user intent from first message (skill command, @mention, time-of-day, keywords). Load ONLY what's needed:
@@ -342,6 +364,10 @@ Detect user intent from first message (skill command, @mention, time-of-day, key
 | `@agent` direct mention | profile.md + context-bus(S) + agent-relevant files only | unrelated state |
 | `/home` | profile.md + all Summaries (first 25 lines each) | no Tier 2 reads |
 | General chat | profile.md only (route first, load later) | all state |
+| `/inbox` | profile.md + inbox(S) | all others |
+| `/schedule` | profile.md + schedules (full) | all others |
+| `/marketplace` | profile.md + marketplace (full) + skills-registry.json | all state |
+| `/sync` | profile.md + all sync metadata | all state |
 | `/standup`, `/review-week` | profile.md + all Summaries + Active sections | — |
 
 **(S)** = Summary only (first 25 lines). Growing files: tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md.
@@ -545,6 +571,48 @@ After checkout:
    - Verify all new agent files exist
    - Verify new state files exist (create with schema headers if missing)
    - Report any issues found
+
+6. **Post-Update Data Migration** — new features often need data that doesn't exist yet in profile.md or state files:
+
+   **Phase A: Auto-fill (silent, no questions)**
+   Scan new/changed profile fields from `profile-template.md`. For each empty field:
+   - Check if the answer exists ANYWHERE in the system: agent memory, state files, context-bus, previous conversations
+   - If found → fill automatically, log: `<!-- auto-migrated: YYYY-MM-DD from [source] -->`
+   - Example: new field `inbox_channels` → check if user already discussed Telegram → auto-fill "telegram"
+
+   **Phase B: Classify remaining gaps**
+   For each still-empty new field, classify:
+   - **BLOCKING** — feature won't work without this data (e.g., `timezone` for /schedule)
+   - **ENRICHING** — feature works but better with data (e.g., `dnd_hours` for /inbox)
+   - **COSMETIC** — nice to have (e.g., custom agent taglines)
+
+   **Phase C: Ask user (only BLOCKING + ENRICHING)**
+   Present as ONE batch question via AskUserQuestion:
+   ```
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     🔄  NOWE FUNKCJE — KONFIGURACJA
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   bOS [version] ma nowe funkcje które potrzebują kilku danych.
+   Uzupełniłem co mogłem automatycznie.
+   Zostało [N] pytań:
+   ```
+   Then use AskUserQuestion with:
+   - header: "Konfiguracja"
+   - options: "Uzupełnij teraz" / "Przypomnij później" / "Pomiń na zawsze"
+
+   **If "Uzupełnij teraz"** → ask BLOCKING fields first, then ENRICHING, max 5 questions total
+   **If "Przypomnij później"** → save to agent memory: `pending_migration: {version, fields: [...], remind_session: current+3}`
+     - On 3rd session after update: resurface gently: "Hej, masz [N] nowych funkcji do skonfigurowania. Chwila?"
+     - If user ignores again → don't ask again. Fill progressively through conversations (standard FIP).
+   **If "Pomiń na zawsze"** → save to agent memory: `skipped_migration: {version, fields: [...]}`. Never ask again for these fields.
+
+   **Rules:**
+   - NEVER block normal usage. User can always skip and use bOS normally.
+   - Max 5 questions per migration batch. More → spread across sessions.
+   - COSMETIC fields never prompted — filled via progressive profiling only.
+   - Migration runs ONCE per version. Don't re-trigger on subsequent sessions.
+   - Track migration status in agent memory: `migration_completed: {version: "0.6.0", date: "YYYY-MM-DD", auto_filled: N, user_filled: N, skipped: N}`
 
 #### Graceful degradation
 | Problem | Action |

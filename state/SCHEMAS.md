@@ -572,3 +572,119 @@ Small file (read in full). Owner: @mentor.
 - Sorted by follow-up date (most overdue first)
 - Natural language input supported: "Spotkałem się z Anią" → parse + log
 - /morning surfaces overdue inner-circle follow-ups as nudges
+
+---
+
+## inbox.md
+
+Growing file (Summary/Active/Archive format). Owner: @boss.
+
+### Summary Template (first 25 lines)
+```
+# Inbox
+
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Unread | X |
+| Total active | X |
+| Channels | telegram, email |
+| Last message | YYYY-MM-DD HH:MM from [sender] via [channel] |
+
+---
+```
+
+### Schema
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| ID | number | yes | Auto-increment message ID |
+| Channel | text | yes | Source: telegram / email / slack / discord / whatsapp |
+| Sender | text | yes | Sender name or ID |
+| Subject/Preview | text | yes | Email subject or message preview (60 chars) |
+| Status | text | yes | unread / read / routed / replied / archived |
+| Routed to | @agent | no | Which agent handles this message |
+| Date | YYYY-MM-DD HH:MM | yes | When message was received |
+
+### Format example:
+```
+## Active
+
+| ID | Channel | Sender | Subject/Preview | Status | Routed to | Date |
+|----|---------|--------|-----------------|--------|-----------|------|
+| 5 | telegram | Jan K. | Hej, masz chwilę na call? | unread | — | 2026-03-02 14:30 |
+| 4 | email | newsletter@ai.com | Weekly AI digest | read | — | 2026-03-02 08:00 |
+| 3 | slack | Anna M. | Czy masz aktualizację projektu? | routed | @coo | 2026-03-01 16:45 |
+```
+
+### Rules:
+- Single table, newest message on top
+- @boss is primary writer (via /inbox skill and session-start auto-check)
+- Status transitions: unread → read → routed/replied/archived
+- Archive: Messages older than 30 days AND status = replied/archived → state/archive/inbox-YYYY-MM.md
+- In Pro mode, inbox.md is a fallback view — primary data in Supabase `messages` table
+
+---
+
+## schedules.md
+
+Small file (read in full). Owner: @boss.
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Name | text | yes | Schedule name (unique identifier) |
+| Skill | text | yes | Skill command to execute (e.g., /morning) |
+| Cron | text | yes | Cron expression (minute hour day month weekday) |
+| Channel | text | yes | Delivery: in-app / telegram / email / slack |
+| Active | yes/no/paused | yes | Current status |
+| Last run | YYYY-MM-DD HH:MM | no | Last execution time |
+| Next run | YYYY-MM-DD HH:MM | no | Calculated next execution |
+
+### Format example:
+```
+# Schedules
+
+| Name | Skill | Cron | Channel | Active | Last run | Next run |
+|------|-------|------|---------|--------|----------|----------|
+| morning | /morning | 0 8 * * * | telegram | yes | 2026-03-02 08:00 | 2026-03-03 08:00 |
+| evening | /evening | 0 21 * * * | in-app | yes | 2026-03-01 21:00 | 2026-03-02 21:00 |
+| standup | /standup | 0 9 * * 1 | in-app | paused | 2026-02-24 09:00 | — |
+```
+
+### Rules:
+- @boss is primary writer (via /schedule skill)
+- "In-app" schedules checked by @boss at session-start (overdue = run immediately)
+- External delivery (telegram, email, slack) requires n8n workflows from templates/n8n/
+- Paused schedules keep their config but don't execute
+
+---
+
+## marketplace.md
+
+Small file (read in full). Owner: @boss.
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Skill ID | text | yes | Registry identifier |
+| Command | text | yes | Skill command (e.g., /pomodoro) |
+| Version | semver | yes | Installed version |
+| Installed | YYYY-MM-DD | yes | Installation date |
+| Source | text | yes | official / community |
+| Last updated | YYYY-MM-DD | no | Last update date |
+
+### Format example:
+```
+# Marketplace — Installed Skills
+
+| Skill ID | Command | Version | Installed | Source | Last updated |
+|----------|---------|---------|-----------|--------|--------------|
+| pomodoro | /pomodoro | 1.0.0 | 2026-03-02 | official | 2026-03-02 |
+```
+
+### Rules:
+- @boss is primary writer (via /marketplace skill)
+- Only tracks MARKETPLACE-installed skills (not built-in bOS skills)
+- Used by /evolve to check for updates
+- Used by /marketplace update to compare versions

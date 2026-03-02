@@ -1,0 +1,61 @@
+{
+  "name": "bOS Inbox — Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "messages",
+        "columns": "channel,sender_id,sender_name,body,raw_metadata,status",
+        "values": "={{ JSON.stringify({ channel: 'telegram', sender_id: String($json.message.from.id), sender_name: ($json.message.from.first_name || '') + ' ' + ($json.message.from.last_name || ''), body: $json.message.text || '[media]', raw_metadata: JSON.stringify({ chat_id: $json.message.chat.id, message_id: $json.message.message_id, date: $json.message.date }), status: 'unread' }) }}"
+      },
+      "id": "supabase-insert",
+      "name": "Save to Inbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [{ "node": "Save to Inbox", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Receives Telegram messages and saves them to the unified inbox (Supabase messages table). Replace credentials before activating.",
+    "setup_steps": [
+      "1. Create Telegram bot via @BotFather",
+      "2. Add Telegram Bot credentials in n8n",
+      "3. Add Supabase credentials in n8n",
+      "4. Activate workflow"
+    ]
+  }
+}

@@ -78,8 +78,29 @@ AskUserQuestion:
 - "Create custom skills" (build the custom ones)
 - "Skip for now"
 
-**Step 0D: Fetch skills from GitHub catalog**
-If user chose install:
+**Step 0D: Marketplace integration**
+Before fetching from GitHub directly, check the marketplace registry:
+1. Load `skills-registry.json` (GitHub fetch: `git show origin/main:skills-registry.json` → local fallback)
+2. Cross-reference registry skills with user's profile:
+   - Match `category` to `active_packs`
+   - Match `compatible_agents` to `active_agents`
+   - Match `tags` to user's interests and primary_goal
+3. Check `state/marketplace.md` for already-installed marketplace skills
+4. For skills in registry that match user profile but aren't installed → add to recommendations
+5. Present marketplace recommendations alongside custom skill suggestions:
+   ```
+   🏪 FROM MARKETPLACE (1-click install):
+   1. ⭐ /[command] — [description] (by [author])
+   2. ⭐ /[command] — [description]
+
+   🔧 CUSTOM (I can build these):
+   3. 🔧 /[name] — [what it would do]
+   ```
+6. If user picks marketplace skill → run `/marketplace install [id]`
+7. If user picks custom → run `/build-agent` or create skill inline
+
+**Step 0E: Fetch skills from GitHub catalog (fallback)**
+If marketplace registry unavailable OR user chose install from non-registry skills:
 - `git show origin/main:.claude/skills/` → list available skills
 - For each recommended skill not installed locally → fetch from `origin/main`
 - Install: copy SKILL.md to local `.claude/skills/[name]/`

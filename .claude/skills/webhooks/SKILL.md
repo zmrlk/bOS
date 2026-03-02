@@ -78,6 +78,12 @@ Last 10 fires (auto-trimmed).
    - "sprint.completed" (description: "Gdy sprint się zakończy")
    - "decision.review_due" (description: "Gdy nadejdzie termin review decyzji")
 
+3. If user needs inbox/invoice events, offer third set:
+   - "message.received" (description: "Gdy nowa wiadomość trafi do inbox")
+   - "message.replied" (description: "Gdy odpowiesz na wiadomość")
+   - "invoice.created" (description: "Gdy stworzysz fakturę")
+   - "invoice.overdue" (description: "Gdy faktura będzie zaległa")
+
 3. Ask for webhook URL (typed input): "Podaj URL webhooka (np. n8n, Make, Zapier):"
 
 4. Use `AskUserQuestion`:
@@ -125,6 +131,14 @@ Last 10 fires (auto-trimmed).
 | `energy.crash` | Energy drop ≥ 3 points | `{from, to, date}` |
 | `sprint.completed` | Sprint week ends | `{planned_sp, completed_sp, velocity}` |
 | `decision.review_due` | Review date reached | `{title, decided_at, verdict}` |
+| `invoice.created` | New invoice generated | `{invoice_number, client, amount, currency}` |
+| `invoice.overdue` | Invoice past due date | `{invoice_number, client, amount, days_overdue}` |
+| `invoice.paid` | Invoice marked as paid | `{invoice_number, client, amount, paid_date}` |
+| `code.shipped` | Code pipeline completed | `{project, branch, quality_score}` |
+| `proposal.sent` | Proposal sent to client | `{client, project, amount}` |
+| `timer.stopped` | Time tracker stopped | `{project, duration, description}` |
+| `message.received` | New message in inbox | `{channel, sender, preview}` |
+| `message.replied` | Reply sent via channel | `{channel, sender, response_preview}` |
 
 ## Context-Bus Signals
 

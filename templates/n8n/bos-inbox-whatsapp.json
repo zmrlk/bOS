@@ -1,0 +1,85 @@
+{
+  "name": "bOS Inbox — WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bos-whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = $input.first().json.body;\nconst entry = body?.entry?.[0];\nconst changes = entry?.changes?.[0];\nconst msg = changes?.value?.messages?.[0];\nif (!msg) return [];\nconst contact = changes?.value?.contacts?.[0];\nreturn [{\n  json: {\n    channel: 'whatsapp',\n    sender_id: msg.from || 'unknown',\n    sender_name: contact?.profile?.name || msg.from || 'unknown',\n    body: msg.text?.body || msg.type || '[media]',\n    raw_metadata: JSON.stringify({ wamid: msg.id, timestamp: msg.timestamp, type: msg.type }),\n    status: 'unread'\n  }\n}];"
+      },
+      "id": "transform",
+      "name": "Parse WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "messages",
+        "columns": "channel,sender_id,sender_name,body,raw_metadata,status"
+      },
+      "id": "supabase-insert",
+      "name": "Save to Inbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'ok' }) }}"
+      },
+      "id": "respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [750, 500]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          { "node": "Parse WhatsApp", "type": "main", "index": 0 },
+          { "node": "Respond OK", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parse WhatsApp": {
+      "main": [
+        [{ "node": "Save to Inbox", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Receives WhatsApp Business API webhooks and saves messages to the unified inbox. Requires Meta Business platform setup.",
+    "setup_steps": [
+      "1. Set up WhatsApp Business API on Meta Business Platform",
+      "2. Configure webhook URL to point to this n8n workflow",
+      "3. Add Supabase credentials in n8n",
+      "4. Set verify token in Meta dashboard",
+      "5. Activate workflow"
+    ]
+  }
+}

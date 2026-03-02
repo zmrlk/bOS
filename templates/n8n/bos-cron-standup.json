@@ -1,0 +1,88 @@
+{
+  "name": "bOS Cron — Monday Standup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Monday 9:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{ $env.ANTHROPIC_API_KEY }}" },
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "claude-sonnet-4-6" },
+            { "name": "max_tokens", "value": "2048" },
+            { "name": "system", "value": "You are bOS standup coordinator. Generate a Monday team standup. Each active agent reports their status in 2-3 sentences. End with week's top 3 priorities. Keep it under 400 words." },
+            { "name": "messages", "value": "[{\"role\":\"user\",\"content\":\"/standup\"}]" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "claude-api",
+      "name": "Generate Standup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "REPLACE_ME",
+        "text": "={{ $json.content[0].text }}"
+      },
+      "id": "send-telegram",
+      "name": "Send via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [750, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Monday 9:00": {
+      "main": [
+        [{ "node": "Generate Standup", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Standup": {
+      "main": [
+        [{ "node": "Send via Telegram", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Warsaw"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Sends Monday standup at 9:00 via Telegram.",
+    "setup_steps": [
+      "1. Set ANTHROPIC_API_KEY in n8n environment variables",
+      "2. Add Telegram Bot credentials",
+      "3. Set chatId",
+      "4. Activate workflow"
+    ]
+  }
+}

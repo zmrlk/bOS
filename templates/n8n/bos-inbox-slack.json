@@ -1,0 +1,76 @@
+{
+  "name": "bOS Inbox — Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["message"],
+        "channelId": "REPLACE_ME"
+      },
+      "id": "slack-trigger",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_ME",
+          "name": "Slack OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $input.all();\nreturn items.map(item => {\n  const d = item.json;\n  if (d.bot_id) return null;\n  return {\n    json: {\n      channel: 'slack',\n      sender_id: d.user || 'unknown',\n      sender_name: d.user_profile?.real_name || d.user || 'unknown',\n      body: d.text || '',\n      raw_metadata: JSON.stringify({ channel: d.channel, ts: d.ts, thread_ts: d.thread_ts }),\n      status: 'unread'\n    }\n  };\n}).filter(Boolean);"
+      },
+      "id": "transform",
+      "name": "Filter & Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "messages",
+        "columns": "channel,sender_id,sender_name,body,raw_metadata,status"
+      },
+      "id": "supabase-insert",
+      "name": "Save to Inbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_ME",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [{ "node": "Filter & Transform", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filter & Transform": {
+      "main": [
+        [{ "node": "Save to Inbox", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_meta": {
+    "description": "bOS v0.6.0 — Listens to Slack channel messages and saves them to the unified inbox. Bot messages are filtered out. Replace credentials and channel ID.",
+    "setup_steps": [
+      "1. Create Slack App with bot token (chat:read, channels:history)",
+      "2. Add Slack OAuth2 credentials in n8n",
+      "3. Set channelId to the channel you want to monitor",
+      "4. Add Supabase credentials in n8n",
+      "5. Activate workflow"
+    ]
+  }
+}

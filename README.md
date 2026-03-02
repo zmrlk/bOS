@@ -61,32 +61,41 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ---
 
-## What's New in v0.5.0
+## What's New in v0.6.0
 
-### Zero Permission Prompts
-**bOS auto-configures Claude Code permissions for frictionless operation. Safe operations run without interruption. Dangerous commands stay blocked.** - IMPORTANT!**
+### Unified Inbox (/inbox)
+Messages from Telegram, Email, Slack, Discord, and WhatsApp — all in one place. Route messages to agents, reply through the original channel. Works in Lite mode (local markdown) and Pro mode (Supabase). Auto-routing sends invoices to @cfo, meetings to @coo, bugs to @devlead.
+
+### Cron Schedules (/schedule)
+Automate your rituals. Schedule /morning, /evening, /standup, or any skill to run on a cron. Delivered via Telegram, email, or in-app (free, no n8n needed). @boss checks for overdue in-app schedules every session.
+
+### Skill Marketplace (/marketplace)
+Browse and install official bOS skills from the GitHub registry. 10 skills available at launch (pomodoro, contract, pitch, meal-plan, meditation, and more). Security validation before every install. Community skills coming in v0.7.0.
+
+### Hybrid Sync (/sync)
+Offline-first with cloud sync. Local files are always the fast source of truth. When Supabase is connected, changes push automatically. Conflict resolution: <5 min = auto-merge, >=5 min = you decide. Works transparently — agents don't need to know about sync.
+
+### Post-Update Data Migration
+After updates, bOS auto-fills new fields from existing data. What it can't figure out, it asks — with options to answer now, be reminded in 3 sessions, or skip forever. No more empty fields after version bumps.
+
+### Webhook Events Expanded
+New events: `message.received`, `message.replied`, `schedule.created`, `skill.installed`. Total: 17 webhook event types for n8n/Zapier/Make integration.
+
+---
+
+## What Was New in v0.5.0
 
 ### File Date Awareness
-bOS now checks how old your files are before making recommendations. Old project files won't trigger false suggestions. Active tools get priority. Abandoned projects are flagged, not integrated.
+bOS checks how old your files are before making recommendations. Old project files won't trigger false suggestions. Active tools get priority.
 
 ### Intelligent Evolution (/evolve)
-The `/evolve` skill now audits your profile first — matching skills to who you are (freelancer, student, developer, etc.) before suggesting new tools. It can also create custom skills tailored to your data and workflow.
+Profile-driven skill matching. `/evolve` audits your profile first, then suggests tools and skills that match who you are.
 
 ### Cross-Agent Signal System
-Agents now communicate through mandatory signals. When your budget gets tight, ALL agents know. When stress is high, your finance agent watches for impulse spending. When your schedule fills up, the system alerts you before you're overcommitted. 22 mandatory signal types ensure nothing falls through the cracks.
+22 mandatory signal types. Budget tight → ALL agents know. Stress high → @finance watches for impulse spending. Schedule fills up → alert before overcommit.
 
-### Smarter UX (Less Typing)
-Evening reviews now generate options from your actual tasks instead of asking you to type. The "Rule of Generated Options" means bOS pulls from your data whenever possible — you click instead of type.
-
-### Subscriptions & Benefits Discovery
-bOS learns about your benefit cards (Multisport, Medicover), streaming subscriptions, and tool access. This prevents recommending things you already have and unlocks hidden value from employer benefits.
-
-### Recommendation Impact Assessment
-Every recommendation that costs money, time, or affects your health now gets checked by the relevant agent first. No more surprise bills from tool suggestions.
-
-### Capacity Aggregation
-@coo now tracks ALL time commitments across agents — workouts, meal prep, study sessions, client meetings, work tasks. If you're over 80% committed, you get warned before overcommitting.
-
+### Smarter UX, Subscriptions Discovery, Impact Assessment, Capacity Aggregation, Zero Permission Prompts
+Generated options from your data (click > type). Benefit card detection. Every paid recommendation checked by @finance. All time commitments tracked across agents. Auto-configured permissions.
 
 ---
 
@@ -176,6 +185,10 @@ You can also just talk naturally — say "good morning" and bOS starts your brie
 | `/card` | — | Generate a shareable profile card |
 | `/export` | — | Export all your data |
 | `/delete-my-data` | — | Delete all personal data |
+| `/inbox` | `in` | Unified inbox — messages from all channels |
+| `/schedule` | `sc` | Schedule skills to run automatically |
+| `/marketplace` | `mp` | Browse and install skills from registry |
+| `/sync` | `sy` | Sync local data with cloud |
 | `/connect-mobile` | — | Set up phone access via Telegram |
 | `/build-agent` | — | Create a custom agent |
 | `/evolve` | — | Self-improve — discover new tools and capabilities |
@@ -227,17 +240,22 @@ Your data (profile, tasks, finances, habits, goals) is never touched — only th
 
 You have the full version of bOS. Everything included:
 - 17 agents + custom agent builder
-- 43 skills
+- 49 skills (including /inbox, /schedule, /marketplace, /sync)
+- Unified inbox — all channels in one place
+- Cron schedules — automate any skill
+- Skill marketplace — install new skills from registry
+- Hybrid sync — offline-first with cloud backup
 - Full code pipeline (/code — write, review, secure, ship)
 - Professional tools (/invoice, /timetrack, /proposal, /competitive, /analyze)
 - Content engine (/design, /repurpose — one piece → all platforms)
 - Agent collaboration (Structured Debate protocol)
 - Cross-agent signal system (22 mandatory signals)
+- 17 webhook event types (n8n, Zapier, Make)
 - Capacity aggregation across all life domains
 - Intelligent self-evolution with profile-driven skill matching
-- Webhook integrations (n8n, Zapier, Make)
 - Predictive nudges (energy crash prediction, proactive load reduction)
 - Cloud database support (optional, auto-detected)
+- Post-update data migration (smooth version upgrades)
 - All future updates
 
 Need help? Type `/help` in bOS or visit our community.

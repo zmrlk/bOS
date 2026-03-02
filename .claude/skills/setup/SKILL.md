@@ -115,6 +115,10 @@ Show:
   ✅ Write posts, emails, sales scripts
   ✅ Search the internet for info
   ✅ Read and organize your files
+  ✅ Collect messages from all channels
+  ✅ Automate your daily rituals
+  ✅ Install new skills from marketplace
+  ✅ Sync data across devices
   ✅ Learn and improve with every chat
   ✅ Adapt to your style
 
@@ -1007,7 +1011,12 @@ Check all available MCP connectors and show results.
 | Control your Mac | Try simple AppleScript | Sterowanie komputerem | Mac Control MCP |
 | iMessage | Try reading messages | Messages | iMessage MCP |
 
-**Email detection priority:** Check Gmail first, then Outlook, then generic IMAP. Show whichever is connected. If none → show ❌ Email and during MCP setup offer, ask which email provider the user uses (Gmail, Outlook, WP, Yahoo, other) and install the right connector — bOS does the installation itself where possible.
+**Email detection priority:** Check Gmail first, then Outlook, then generic IMAP. Show whichever is connected. If none → show ❌ Email and during MCP setup offer, use the Email Setup Guide from `.claude/skills/connect/mcp-catalog.md`:
+- Gmail → Marketplace toggle (1 click)
+- Outlook/Hotmail → `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server`
+- Company Outlook → `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --org-mode`
+- Other (WP, Yahoo) → `claude mcp add email -- npx -y mcp-mail-manager`
+bOS does the installation itself — user just confirms.
 
 **Show results adapted to tech_comfort:**
 
@@ -1055,10 +1064,10 @@ Check all available MCP connectors and show results.
 
 **Rules:** Never show "MCP" or connector technical names to non-technical users. Just ✅ or ❌. No error messages.
 
-### 5C. Smart Discovery — search the internet for extensions
+### 5C. Smart Discovery — catalog + internet search for extensions
 
 After collecting user data (packs, tools, tech_comfort, scan results),
-bOS searches the internet for MCP servers and skills matched to the user.
+bOS first checks the vetted MCP catalog (`.claude/skills/connect/mcp-catalog.md`) for matching connectors, then searches the internet for anything not in the catalog.
 
 **IMPORTANT:** All rules from Step 5B about hiding "MCP" terminology from non-technical users apply here too. Use "extensions" or "connections" when presenting to "not technical" and "I use apps" users. Only show "MCP" to "I code" users.
 
@@ -1287,6 +1296,8 @@ bOS stores your tasks, finances, progress, and notes. The user chooses where.
   → Cloud sync, Telegram shared state,
     real-time, API access, 500MB free
     Schema auto-generated from supabase/*.sql
+    /sync for conflict resolution & versioning
+    /inbox multi-device, /schedule across devices
 ```
 
 Use `AskUserQuestion`:
@@ -1772,7 +1783,10 @@ This flag tells `/morning` to surface ONE deferred item per session over the nex
 - Session 2: If user skipped Telegram in 5E → "You can message bOS from your phone. /connect-mobile"
 - Session 2: If user skipped Supabase in 5D → "Data is on your computer. When you want cloud backup — /check"
 - Session 3: If missing connectors → "I can connect to your calendar/email — /check"
-- Session 4+: Agent calibration prompts happen naturally through First Interaction Protocols
+- Session 4: If Supabase connected → "Set up your inbox channels for messages from all platforms. /inbox setup"
+- Session 5: "Automate your morning and evening briefings. /schedule add"
+- Session 5: "Discover new skills for your workflow. /marketplace"
+- Session 6+: Agent calibration prompts happen naturally through First Interaction Protocols
 
 ### Closing
 
