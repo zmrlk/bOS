@@ -51,11 +51,11 @@ Pick what you need help with. bOS activates the right agents.
 
 | Area | Agents | What they do |
 |------|--------|-------------|
-| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales | Strategy, planning, tech, finances, marketing, sales |
-| 🧭 **Life** | @coach, @organizer, @finance | Goals, daily planning, personal budget |
-| 💪 **Health** | @trainer, @diet, @wellness | Workouts, nutrition, sleep & recovery |
-| 📚 **Learning** | @teacher, @mentor, @reader | Skills, career growth, reading |
-| 🤖 **Always on** | @boss | Routes your questions to the right agent |
+| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales | Strategy, decisions, sprint planning, tech, finances, marketing, sales |
+| 🧭 **Life** | @coach, @organizer, @finance | Goals, journaling, daily planning, budgeting, decision journal |
+| 💪 **Health** | @trainer, @diet, @wellness | Workouts, nutrition, habits, energy science, sleep & recovery |
+| 📚 **Learning** | @teacher, @mentor, @reader | Learning roadmaps, career growth, networking CRM, reading |
+| 🤖 **Always on** | @boss | Routes, orchestrates, webhooks, predictive nudges |
 
 Plus: `/build-agent` to create any custom agent you need.
 
@@ -103,10 +103,13 @@ For 24/7 access (even when your computer is off). Say `/connect-mobile` after se
 |------|------|---------|
 | Morning | Priorities + quick win | `/morning` or just `m` |
 | Anytime | Dashboard at a glance | `/home` or just `h` |
+| Anytime | Deep work session | `/focus` or just `f` |
 | Anytime | Talk to your agents | Just type |
 | Evening | Reflect + plan tomorrow | `/evening` or just `e` |
+| Evening | Micro-journal | `/reflect` or just `r` |
 | Sunday | Plan the week | `/plan-week` or just `p` |
 | Friday | Weekly review | `/review-week` or just `w` |
+| Monthly | Budget review | `/budget` or just `b` |
 
 You can also just talk naturally — say "good morning" and bOS starts your briefing. Say "50 zł lunch" and it logs the expense. No commands to memorize.
 
@@ -125,6 +128,17 @@ You can also just talk naturally — say "good morning" and bOS starts your brie
 | `/goal` | `g` | Set, review, and track goals |
 | `/task` | `t` | Manage tasks — add, complete, prioritize |
 | `/expense` | `x` | Log an expense |
+| `/focus` | `f` | Deep work session — pick a task, lock in, get it done |
+| `/reflect` | `r` | Micro-journal — a daily question to reflect on |
+| `/budget` | `b` | Build and manage your budget (50/30/20) |
+| `/habit` | — | Track habits — streaks, milestones, personal bests |
+| `/decide` | — | Decision journal — structured analysis + GO/NO-GO verdict |
+| `/energy-map` | — | Visualize your energy patterns across the week |
+| `/network` | — | Relationship CRM — track contacts and follow-ups |
+| `/sprint` | — | Sprint planning — story points, velocity, burndown |
+| `/money-flow` | — | Cash flow visualization — see where your money goes |
+| `/webhooks` | — | Connect bOS to external tools (n8n, Zapier, Make) |
+| `/learn-path` | — | AI learning roadmap — topic to mastery with milestones |
 | `/workout` | — | Log a workout |
 | `/eval` | — | Evaluate a project opportunity |
 | `/scan` | — | Scan your computer to learn about you |
@@ -174,7 +188,10 @@ Your data (profile, tasks, finances, habits, goals) is never touched — only th
 
 You have the full version of bOS. Everything included:
 - 16 agents + custom agent builder
-- 22 skills
+- 33 skills
+- Agent collaboration (Structured Debate protocol)
+- Webhook integrations (n8n, Zapier, Make)
+- Predictive nudges (energy crash prediction, proactive load reduction)
 - Cloud database support (optional, auto-detected)
 - All future updates
 
@@ -188,7 +205,7 @@ Need help? Type `/help` in bOS or visit our community.
 No. bOS works through conversation — you just talk to it. During setup, bOS asks about your tech comfort level and adapts everything accordingly.
 
 **Can I use bOS from my phone?**
-Yes — via Telegram. After setup, say `/connect-mobile` and bOS walks you through connecting Telegram step by step. You'll be able to get morning briefings, log expenses, manage tasks, and more from your phone.
+Yes — two ways. The easiest is Remote Control: run `claude remote-control` in your terminal, scan the QR code, and you have full bOS access from the Claude app. Or connect a Telegram bot for 24/7 access — say `/connect-mobile` after setup.
 
 **Does bOS scan my files without asking?**
 No. bOS always explains what it wants to check, where, and why — then asks for your consent. It only looks at file and folder names, never opens or reads your documents.
@@ -201,6 +218,14 @@ Automatically. Open bOS — it checks for updates and asks if you want to instal
 
 **What happens if I cancel Claude Code?**
 Your data stays safe — it's just files on your computer. You can still read everything in the `state/` folder with any text editor. You just won't be able to talk to your agents until you resubscribe. Nothing is lost.
+
+---
+
+**What are webhooks?**
+bOS can notify external tools (like n8n, Zapier, or Make) when things happen — task completed, budget exceeded, habit milestone hit. Say `/webhooks` to set it up. Completely optional.
+
+**What's a sprint?**
+If you like structured productivity, `/sprint` adds story points and velocity tracking to your weekly planning. Think Scrum, but for your personal life. Optional — everything works without it.
 
 ---
 

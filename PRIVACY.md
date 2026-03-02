@@ -26,19 +26,24 @@ Daily activity tracked in local markdown files:
 |------|-------------|
 | `state/tasks.md` | Your tasks and to-dos |
 | `state/finances.md` | Income, expenses, buffer balance |
-| `state/habits.md` | Habit streaks, daily tracking |
+| `state/habits.md` | Habit streaks, milestones, personal bests |
 | `state/pipeline.md` | Leads, clients (if Business pack active) |
-| `state/decisions.md` | Key decisions with reasoning |
+| `state/decisions.md` | Key decisions with reasoning and review dates |
 | `state/weekly-log.md` | Weekly review entries |
 | `state/goals.md` | Long-term goals and milestones |
 | `state/daily-log.md` | Daily energy, sleep, mood |
 | `state/projects.md` | Active projects and hours (if Business pack active) |
+| `state/journal.md` | Micro-journal entries from /reflect (questions + your answers) |
+| `state/network.md` | Relationship contacts — names, context, follow-up dates |
 | `state/context-bus.md` | Cross-agent context signals |
 
 ### Agent memory (`~/.claude/agent-memory/`)
 Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.
 
 This is stored in `~/.claude/agent-memory/` — separate from bOS itself, managed by Claude Code.
+
+### Webhook configuration (`state/.webhooks.md`)
+If you use `/webhooks` to connect bOS to external tools (n8n, Zapier, Make), the webhook URLs and event mappings are stored in this file. bOS never logs full webhook URLs in cross-agent signals (they may contain tokens). Webhook execution is fire-and-forget — bOS sends a JSON payload when events occur but does not store responses.
 
 ### Secrets vault (`.secrets/vault.json`)
 API keys and credentials you store via `/vault`. Stored locally only, protected so only your account can read them. Never sent anywhere.
@@ -121,6 +126,8 @@ If you activate the Health pack, bOS may store:
 - Workout logs (type, duration, exercises)
 - Meal logs (description, calories — only if you choose to track)
 - Sleep quality and energy levels
+- Habit streaks, milestones, and personal bests
+- Energy patterns (day-of-week analysis from your daily logs)
 
 This data is stored locally (Lite mode) or in your own Supabase database (Pro mode). It is not shared with health platforms, insurance companies, or anyone else.
 
@@ -193,10 +200,34 @@ Telegram is a convenience layer — don't share sensitive information (passwords
 
 ---
 
+## Webhooks and external integrations
+
+If you configure webhooks via `/webhooks`, bOS sends event data (like "task completed" or "budget exceeded") to URLs you specify. This means data leaves your machine and goes to whatever service you connected (n8n, Zapier, Make, or a custom endpoint).
+
+**What gets sent:** Event type, timestamp, and relevant data (task name, expense amount, habit streak, etc.). Test payloads are clearly marked with `"test": true`.
+
+**What does NOT get sent:** Your full profile, passwords, health details, journal entries, or any data beyond the specific event.
+
+**You control everything:** You choose which events to hook, where they go, and you can remove them anytime with `/webhooks remove`.
+
+---
+
+## Relationship data (network.md)
+
+If you use `/network`, bOS stores names, context (how you know someone), and follow-up dates in `state/network.md`. This is private — bOS never shares contact information outside the local system. No data from network.md is sent to external services (unless you configure a webhook for it).
+
+---
+
+## Journal entries (journal.md)
+
+If you use `/reflect`, bOS stores your micro-journal entries (a question and your answer) in `state/journal.md`. These are private reflections. After 30+ entries, @coach may identify patterns during your weekly review — but this analysis stays local.
+
+---
+
 ## What bOS does NOT do
 
 - bOS does not sell your data. All your information stays on your computer (or in your own private database if you connect one). There is no central server, no analytics, no tracking.
-- It does not share your information with third parties.
+- It does not share your information with third parties (unless you explicitly configure webhooks to external services).
 - It does not send your files anywhere without your explicit action.
 - It does not track you across websites or apps.
 - It does not store payment card numbers or bank credentials.
