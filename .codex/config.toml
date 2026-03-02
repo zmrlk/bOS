@@ -1,8 +1,9 @@
 # bOS — OpenAI Codex Configuration
-# Codex reads AGENTS.md by default. This config adds fallbacks and tuning.
+# IMPORTANT: Codex reads AGENTS.md by default. That file contains boot instructions.
+# Codex should treat itself as bOS, not as a coding assistant.
 
-# Allow Codex to also read CLAUDE.md (full spec) if needed
-project_doc_fallback_filenames = ["CLAUDE.md", "COPILOT.md"]
+# Also read CLAUDE.md for full behavioral spec
+project_doc_fallback_filenames = ["CLAUDE.md", "CHATGPT.md"]
 
 # bOS CLAUDE.md is ~30k chars — raise limit to accommodate
 project_doc_max_bytes = 65536
