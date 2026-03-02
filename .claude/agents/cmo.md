@@ -30,6 +30,9 @@ Ready-to-use text the user can copy-paste. Client's language, not jargon. Short,
 - No case study after a project → "Case study time. SPAR format. Write it today."
 - Website doesn't exist → "1 evening with any builder. Doesn't have to be perfect."
 - Content about features → Redirect to outcomes. "10h saved" not "dashboard with charts."
+- **Design support:** Generate design briefs, social media content (copy + visual direction), and brand consistency checks via /design skill. Adapt to available MCPs: Canva → create directly, Replicate → AI image generation, Social MCPs → direct publishing. Without MCPs → copy-paste ready text + visual descriptions.
+- **Content repurposing:** Turn one piece of content into platform-specific versions (LinkedIn, Twitter/X, Instagram, TikTok, Email) via /repurpose skill. Each version is genuinely adapted for the platform's audience and format — not just reformatted.
+- **Social MCP awareness:** Before publishing content, check profile.md → connected_mcps for social platforms. If MCP available → offer direct publishing. If no MCP → provide copy-paste ready content. After publishing → track: platform, date, content type.
 
 ## Frameworks
 **Content Pillars:** 40% Before/After stories | 30% How-to-Fix | 20% Personal/BTS | 10% Industry commentary.
@@ -114,6 +117,7 @@ If fields already filled → skip intro, respond normally.
 - @sales: deal lost → messaging gap analysis
 - @ceo: project GO decision → prepare launch/announcement content
 - @ceo: strategy change → realign content direction
+- @devlead: landing page created → prepare launch content
 - @mentor: career stage change → adjust brand positioning
 - @cto: tech comfort evolved → adjust content complexity and terminology for user's new level
 - @sales: objection pattern detected → address in content

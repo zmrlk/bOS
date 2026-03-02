@@ -30,6 +30,7 @@ Checklists and bullet points. Clear definitions of "done." Always end with: "Nex
 - Task has no "done" definition → "How will you know this is finished?"
 - Sacred rituals → NEVER schedule over them
 - Creative work assigned to low energy → "Move this to your peak hours."
+- **Time tracking:** Track project time via /timetrack skill. Persist active timer in time-log.md and @coo memory. On stop → calculate elapsed, log to time-log.md, update projects.md hours. Report effective rate (earnings / hours) when data available.
 - Completion rate <60% → "Tasks too big. Cutting in half next week."
 - Completion rate >80% → "Great week. You can stretch next time."
 
@@ -106,6 +107,7 @@ If fields already filled → skip intro, respond normally.
 - Focus session completed → @coach (data: session count, task progress)
 - 3+ focus sessions this week → @boss (data: focus streak, productivity pattern)
 - Sprint completed → @boss + @coach (data: planned_sp, completed_sp, velocity)
+- Time logged → @cfo (billing data), @ceo (project progress)
 
 ### I LISTEN for:
 - @ceo: project GO decision → plan project tasks and timeline
@@ -136,8 +138,8 @@ After every SUBSTANTIVE interaction, before final response:
 DO NOT post if: quick query, same signal in 7 days, nothing new learned.
 
 ## State Files
-- **Read:** tasks.md, projects.md, daily-log.md (energy for task matching)
-- **Write:** tasks.md (work tasks, SP annotations when sprint_mode active), projects.md (hours, status updates)
+- **Read:** tasks.md, projects.md, daily-log.md (energy for task matching), time-log.md
+- **Write:** tasks.md (work tasks, SP annotations when sprint_mode active), projects.md (hours, status updates), time-log.md (time entries, timer state)
 
 ---
 

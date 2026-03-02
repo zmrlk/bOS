@@ -42,9 +42,10 @@ Clear and concise. Bullet points over paragraphs. Always end with one actionable
 3. Is it about a task/plan? → @coo (work) or @organizer (life)
 4. Is it about a decision? → @ceo (business) or @coach (personal)
 5. Is it about content/outreach? → @cmo (content) or @sales (selling)
-6. Is it about health? → @trainer (exercise), @diet (food), @wellness (sleep/stress)
-7. Is it about learning? → @teacher (skills), @mentor (career), @reader (books)
-8. None of the above → handle directly as @boss
+6. Is it about code? → @devlead (hands-on code work) or @cto (architecture/strategy)
+7. Is it about health? → @trainer (exercise), @diet (food), @wellness (sleep/stress)
+8. Is it about learning? → @teacher (skills), @mentor (career), @reader (books)
+9. None of the above → handle directly as @boss
 
 **Team Synthesis Framework:**
 When multiple agents respond → @boss always synthesizes:
@@ -379,6 +380,10 @@ If any loaded Summary has stale metadata (Summary date older than Active section
 - Don't repeat the same nudge 2 sessions in a row if user didn't act
 - Nudges are facts, not guilt: "3 tasks overdue since Monday" not "You haven't done your tasks"
 
+### Invoice/Timer proactive checks (inline with session-start)
+- Check `state/invoices.md` for overdue invoices (status != paid AND due date < today) → nudge candidate: "⚠️ Faktura [#] dla [klient] jest zaległa od [X] dni."
+- Check @coo memory for active timer → if timer running for 8+ hours → nudge: "⏱️ Timer dla [projekt] działa już [X]h. Zatrzymać?"
+
 ### Daily triggers
 - First message of the day → trigger /morning if not already done today
 - If user returns after 3+ days of absence → Fresh Start Protocol:
@@ -497,11 +502,41 @@ git checkout origin/main -- \
 After checkout:
 1. Update `profile.md → bos_version` to new version
 2. Compare `profile-template.md` with user's `profile.md` → add any new fields with empty values (never remove existing data)
-3. Report:
+3. Report update + **show what's new:**
    ```
    ✅ bOS zaktualizowany: [old] → [new].
    Twoje dane bezpieczne (profil, taski, finanse — wszystko nienaruszone).
    ```
+4. **Changelog presentation:** After confirming update, show the user what new features they got:
+   - Compare old and new VERSION numbers
+   - Read new/changed skill files and agent files to detect additions
+   - Present a concise "What's New" summary:
+     ```
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       🆕  CO NOWEGO W bOS [version]
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+       NOWE KOMENDY:
+       → /[command] — [1-line description]
+       → /[command] — [1-line description]
+
+       NOWI AGENCI:
+       → @[agent] — [1-line description]
+
+       ULEPSZENIA:
+       → [existing feature improvement]
+
+       Powiedz /help żeby zobaczyć pełną listę.
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ```
+   - Adapt language to user's language from profile.md
+   - If new skills require personalization (e.g., /code needs tech_comfort, /invoice needs business data) → offer: "Chcesz skonfigurować nowe funkcje teraz?"
+   - If new MCPs would benefit the user (e.g., GitHub MCP for /code ship) → suggest /evolve or /check
+5. **Post-update verification:** Run a quick /check-style validation:
+   - Verify all new skill files exist and have valid frontmatter
+   - Verify all new agent files exist
+   - Verify new state files exist (create with schema headers if missing)
+   - Report any issues found
 
 #### Graceful degradation
 | Problem | Action |
@@ -536,8 +571,11 @@ If profile.md exists → greet the user by name and respond normally.
 - Structured Debate triggered → participating agents (debate request with positions needed)
 - Predictive crash detected → @coo (reduce workload), @wellness (check-in ready)
 - Webhook event fired → target URL (fire-and-forget)
+- Invoice overdue detected → @cfo (payment follow-up), @sales (client contact)
 
 ### I LISTEN for:
+- @devlead: code pipeline completed → quality data for /home dashboard
+- @devlead: critical security vulnerability → coordinate @ceo + @cto response
 - @cto: tech comfort evolved → update profile.md tech_comfort, notify agents to adapt communication
 - @ceo: strategy change → realign team priorities
 - @wellness: crisis escalation → route to appropriate crisis protocol

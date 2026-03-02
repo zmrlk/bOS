@@ -115,7 +115,19 @@ Use the canonical context-bus format from CLAUDE.md.
 - Check context-bus.md for existing signals before writing duplicates
 - Max 2 signals per /evening session
 
-### Step 2B: Reflect suggestion (optional)
+### Step 2B: Timer check (if Business pack active)
+
+Check state/time-log.md Summary for active timer. If timer running:
+
+Use `AskUserQuestion`:
+- header: "Timer"
+- options:
+  - "Zatrzymaj timer" (description: "[projekt] — działa od [czas]")
+  - "Zostaw na jutro" (description: "Timer będzie kontynuowany")
+
+If "Zatrzymaj" → execute /timetrack stop logic inline (calculate elapsed, log, update projects.md).
+
+### Step 2C: Reflect suggestion (optional)
 
 If Life pack active AND user hasn't done /reflect today (check journal.md for today's date):
 
@@ -127,6 +139,8 @@ Use `AskUserQuestion`:
 
 If "Tak" → execute /reflect inline, then return to Step 3.
 If "Nie dziś" → continue.
+
+**Note:** Step numbering shifted — Step 2B = Timer check, Step 2C = Reflect suggestion.
 
 ### Step 3: Close
 ```

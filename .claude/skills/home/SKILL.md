@@ -176,6 +176,62 @@ Show only if `profile.md → sprint_mode = active` AND @coo memory has `current_
 
 ---
 
+## Block: CODE (if @devlead active / Business pack with coding projects)
+
+Show only if user has used /code or has coding projects in projects.md:
+
+```
+  </> CODE
+  ┌─────────────────────────────────┐
+  │  Last review: [score]/10        │
+  │  Quality trend: [↑/↓/→]        │
+  │  Active project: [name]         │
+  └─────────────────────────────────┘
+```
+
+- Pull from @devlead memory (last review score, quality trend)
+- If no code data yet → skip this block entirely
+
+---
+
+## Block: INVOICES (Business pack with invoices)
+
+Show only if `state/invoices.md` has entries:
+
+```
+  🧾  INVOICES
+  ┌─────────────────────────────────┐
+  │  📬 Outstanding: [N] ([amount]) │
+  │  🔴 Overdue: [N] ([amount])     │
+  │  💰 Paid this month: [amount]   │
+  └─────────────────────────────────┘
+```
+
+- Pull from state/invoices.md
+- If no invoices → skip block entirely
+- Overdue = status != paid AND due date < today
+
+---
+
+## Block: TIME (if /timetrack used)
+
+Show only if `state/time-log.md` has entries:
+
+```
+  ⏱️  TIME
+  ┌─────────────────────────────────┐
+  │  This week: [X]h               │
+  │  Active timer: [project] [Xh]  │
+  │  Top project: [name] ([X]h)    │
+  └─────────────────────────────────┘
+```
+
+- Pull from state/time-log.md Summary
+- If active timer running → show with elapsed time
+- If no time data → skip block entirely
+
+---
+
 ## Block: LEARNING (Learning pack only)
 
 ```

@@ -104,7 +104,8 @@ If `work_style` is empty → skip this step (standard plan).
 - Open business tasks
 - Any follow-ups due? (check pipeline.md → follow-up dates per @sales Day 0/3/7/14 framework)
 - Any deadlines within 3 days?
-- **Invoices:** Check finances.md for overdue or due-today invoices → "⚠️ Faktura [klient] — płatna dziś/zaległa [X dni]"
+- **Invoices:** Check state/invoices.md for overdue or due-today invoices → "⚠️ Faktura [#] [klient] — płatna dziś/zaległa [X dni]"
+- **Active timer:** Check state/time-log.md Summary for active timer → if running → "⏱️ Timer dla [projekt] działa od [czas]. Kontynuujesz czy zatrzymać?"
 
 ### If Life pack active:
 - Today's #1 priority (matched to energy level)

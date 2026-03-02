@@ -135,6 +135,25 @@ Based on user's workflow:
 - Missing email integration? → find and suggest
 - Uses a tool bOS doesn't know about? → research it, find MCP or workaround
 
+**2E. Social Media & Business MCP Discovery:**
+
+When profile.md `active_platforms` includes social platforms without corresponding MCPs:
+- WebSearch "[platform] MCP server Claude [current year]" for each platform
+- Apply full 8-point security checklist (same as Phase 1A)
+- Score ≥8 → include in Phase 3 proposals
+
+**Discovery patterns:**
+| User has | Search for | Benefit |
+|----------|-----------|---------|
+| LinkedIn in active_platforms, no LinkedIn MCP | LinkedIn MCP | Direct posting, analytics, connection management |
+| Instagram in active_platforms, no Instagram MCP | Instagram MCP | Photo/story publishing, analytics, comments |
+| TikTok in active_platforms, no TikTok MCP | TikTok MCP | Video metadata, analytics, trending hashtags |
+| Facebook in active_platforms, no Meta MCP | Meta/Facebook MCP | Page posting, ad management, audience insights |
+| /design used, no Replicate MCP | Replicate MCP | AI image generation (FLUX, Stable Diffusion) |
+| /code used, no GitHub MCP | GitHub MCP | Issue creation, PR management from /code ship |
+| Enterprise pipeline needs | HubSpot MCP | Advanced CRM (replaces pipeline.md) |
+| /invoice used, wants payment links | Stripe MCP | Payment links in invoices |
+
 ### Phase 3: PRESENT — Show findings to user
 
 **Present findings (max 5 items, prioritized):**

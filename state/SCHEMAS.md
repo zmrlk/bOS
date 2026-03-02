@@ -205,7 +205,7 @@ Active section: lines XX-YY
 
 | Field | Value |
 |-------|-------|
-| Week goal | Launch product landing page |
+| Week goal | Launch landing page |
 | Planned | 12 |
 | Done | 9 |
 | Rate | 75% |
@@ -453,6 +453,88 @@ Small file (read in full). Owner: @coach.
 - One entry per day (if user runs /reflect twice → update, don't duplicate)
 - After 30+ entries → @coach triggers pattern analysis during /review-week
 - Never delete entries — this is a personal journal
+
+---
+
+## invoices.md
+
+Small file (read in full). Owner: @cfo.
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Invoice # | INV-XXX | yes | Auto-increment invoice number |
+| Date | YYYY-MM-DD | yes | Invoice creation date |
+| Client | text | yes | Client/company name |
+| Project | text | no | Related project |
+| Amount | number | yes | Invoice amount |
+| Currency | text | yes | Currency code (PLN, USD, EUR) |
+| Status | text | yes | draft / sent / paid / overdue |
+| Due date | YYYY-MM-DD | yes | Payment due date |
+| Paid date | YYYY-MM-DD | no | Date payment received |
+
+### Format example:
+```
+# Invoices
+
+| Invoice # | Date | Client | Project | Amount | Currency | Status | Due date | Paid date |
+|-----------|------|--------|---------|--------|----------|--------|----------|-----------|
+| INV-001 | 2026-03-01 | Acme Corp | Website | 5000 | PLN | sent | 2026-03-15 | — |
+| INV-002 | 2026-03-05 | StartupXYZ | Audit | 2000 | PLN | draft | 2026-03-19 | — |
+```
+
+### Rules:
+- @cfo is primary writer (via /invoice skill)
+- Invoice numbers auto-increment: find highest INV-XXX, increment by 1
+- Status transitions: draft → sent → paid (or overdue if past due date)
+- Never delete invoices — only update status
+- Overdue = status != paid AND due date < today
+
+---
+
+## time-log.md
+
+Growing file (Summary/Active/Archive format). Owner: @coo.
+
+### Summary Template (first 25 lines)
+```
+# Time Log
+
+## Summary
+<!-- AUTO-UPDATED by @coo at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| This week total | Xh |
+| Active timer | [project] since [time] / none |
+
+---
+```
+
+### Schema
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Date | YYYY-MM-DD | yes | Entry date |
+| Project | text | yes | Project name (from projects.md) |
+| Duration | Xh Xm | yes | Time spent |
+| Description | text | no | What was done |
+| Agent | @name | no | Which agent/skill logged this |
+
+### Format example:
+```
+## Active
+
+| Date | Project | Duration | Description | Agent |
+|------|---------|----------|-------------|-------|
+| 2026-03-01 | Client Project | 2h 30m | Dashboard redesign | @devlead |
+| 2026-03-01 | Side Project | 1h 15m | Landing page copy | @cmo |
+```
+
+### Rules:
+- @coo is primary writer (via /timetrack skill)
+- Active timer state stored in Summary section + @coo memory
+- On /timetrack stop → calculate elapsed, append to Active section, update projects.md hours
+- Archive: Entries older than 2 months → state/archive/time-log-YYYY-MM.md
 
 ---
 

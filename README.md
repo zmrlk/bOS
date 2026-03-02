@@ -51,7 +51,7 @@ Pick what you need help with. bOS activates the right agents.
 
 | Area | Agents | What they do |
 |------|--------|-------------|
-| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales | Strategy, decisions, sprint planning, tech, finances, marketing, sales |
+| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales, @devlead | Strategy, decisions, sprint planning, tech, finances, marketing, sales, code quality |
 | 🧭 **Life** | @coach, @organizer, @finance | Goals, journaling, daily planning, budgeting, decision journal |
 | 💪 **Health** | @trainer, @diet, @wellness | Workouts, nutrition, habits, energy science, sleep & recovery |
 | 📚 **Learning** | @teacher, @mentor, @reader | Learning roadmaps, career growth, networking CRM, reading |
@@ -150,6 +150,15 @@ You can also just talk naturally — say "good morning" and bOS starts your brie
 | `/connect-mobile` | — | Set up phone access via Telegram |
 | `/build-agent` | — | Create a custom agent |
 | `/evolve` | — | Self-improve — discover new tools and capabilities |
+| `/code` | `c` | Code pipeline — write, review, secure, ship |
+| `/analyze` | `a` | Data analysis — CSV, JSON, pipeline stats |
+| `/invoice` | `i` | Invoice management — create, track, remind |
+| `/timetrack` | `tt` | Time tracking — start, stop, log, report |
+| `/proposal` | — | Generate personalized client proposals |
+| `/design` | — | Design briefs, social media content, brand check |
+| `/verify` | — | Pipeline data verification and enrichment |
+| `/competitive` | — | Competitive analysis — pricing, positioning, threats |
+| `/repurpose` | — | Content repurposing — one piece → all platforms |
 | `/help` | — | Show available commands and agents |
 | `/setup` | — | Guided onboarding (runs automatically on first use) |
 
@@ -187,8 +196,11 @@ Your data (profile, tasks, finances, habits, goals) is never touched — only th
 ## Thank You
 
 You have the full version of bOS. Everything included:
-- 16 agents + custom agent builder
-- 33 skills
+- 17 agents + custom agent builder
+- 43 skills
+- Full code pipeline (/code — write, review, secure, ship)
+- Professional tools (/invoice, /timetrack, /proposal, /competitive, /analyze)
+- Content engine (/design, /repurpose — one piece → all platforms)
 - Agent collaboration (Structured Debate protocol)
 - Webhook integrations (n8n, Zapier, Make)
 - Predictive nudges (energy crash prediction, proactive load reduction)

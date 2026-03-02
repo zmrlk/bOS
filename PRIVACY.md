@@ -36,6 +36,8 @@ Daily activity tracked in local markdown files:
 | `state/journal.md` | Micro-journal entries from /reflect (questions + your answers) |
 | `state/network.md` | Relationship contacts — names, context, follow-up dates |
 | `state/context-bus.md` | Cross-agent context signals |
+| `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
+| `state/time-log.md` | Time tracking entries — project, duration, description |
 
 ### Agent memory (`~/.claude/agent-memory/`)
 Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.

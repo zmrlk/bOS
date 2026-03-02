@@ -23,7 +23,7 @@ Runs a quick diagnostic of your bOS installation. Checks that everything is work
 ### 2. State Files Check
 Based on active_packs from profile, verify state files exist:
 - Always: `state/tasks.md`, `state/decisions.md`, `state/weekly-log.md`, `state/goals.md`, `state/daily-log.md`, `state/context-bus.md`
-- Business: `state/finances.md`, `state/pipeline.md`, `state/projects.md`
+- Business: `state/finances.md`, `state/pipeline.md`, `state/projects.md`, `state/invoices.md`, `state/time-log.md`
 - Life/Health: `state/habits.md`
 - Life (if /reflect used): `state/journal.md`
 - Life (if /network used): `state/network.md`
@@ -99,6 +99,8 @@ After confirming files exist, validate STRUCTURE:
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
 - **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]. Updating..."
 - **Context-bus check:** Count entries in context-bus.md. If >10 expired entries → "⚠️ Context-bus needs cleanup ([X] expired entries)."
+- **Invoices check:** If state/invoices.md exists → validate table structure, check for overdue invoices (status != paid AND due date < today). Report: "🧾 [N] invoices, [M] overdue" or "✅ No overdue invoices."
+- **Time-log check:** If state/time-log.md exists → validate Summary/Active/Archive structure, check for orphaned active timer (running for 24+ hours). Report: "⏱️ Time log OK ([N] entries)" or "⚠️ Active timer running for [X]h — stale?"
 
 ### 6B. Memory Freshness
 

@@ -73,6 +73,7 @@ Your agents live in `.claude/agents/`. Each has a `description` field that tells
 | @mentor | 🎓 | Mentor | Career growth, networking |
 | @teacher | 📚 | Teacher | Learning, skills, education |
 | @reader | 📖 | Reader | Books, reading recommendations |
+| @devlead | </> | Dev Lead | Code writing, review, security, quality |
 
 ### Explicit routing
 - `@agent_name` in user message → delegate to that agent
@@ -134,6 +135,14 @@ When multiple agents could handle a message, use these rules:
 | "How to grow in my field" | @mentor | @teacher | Career strategy |
 | "Recommend a book" | @reader | @teacher | Book recommendations |
 | "What should I read?" | @reader | @mentor | Reading = @reader domain |
+| "Write code" / "review code" / "debug" | @devlead | @cto | Hands-on code work |
+| "What tech" / "architecture" / "tech decision" | @cto | @devlead | Strategic tech |
+| "Faktura" / "invoice" | @cfo | @sales | Invoice = financial |
+| "Timer" / "track time" | @coo | @cto | Time = operations |
+| "Analyze data" / "CSV" | @cto | @cfo | Technical analysis |
+| "Competitor" / "konkurencja" | @ceo | @sales | Strategic analysis |
+| "Design" / "graphic" | @cmo | @cto | Creative = marketing |
+| "Proposal" / "oferta" | @sales | @cmo | Sales document |
 
 **Golden rule:** when in doubt, @boss picks ONE agent and routes. Never send to two agents for the same question.
 **Conflict resolution:** When agents disagree → safety first → user constraints → data over opinion → primary_goal breaks ties → prefer reversible options. See @boss Conflict Resolution Framework.
@@ -159,6 +168,10 @@ When the user types any of these (with or without `/`), execute the correspondin
 | `f` | `/focus` | Deep work session |
 | `r` | `/reflect` | Micro-journal |
 | `b` | `/budget` | Build/view budget |
+| `c` | `/code` | Code pipeline |
+| `a` | `/analyze` | Data analysis |
+| `i` | `/invoice` | Invoicing |
+| `tt` | `/timetrack` | Time tracking |
 
 ### Natural language routing to skills
 When the user says something that maps directly to a skill, run it without asking:
@@ -198,6 +211,15 @@ When the user says something that maps directly to a skill, run it without askin
 | "money flow" / "cash flow" / "przepływ pieniędzy" | `/money-flow` |
 | "webhooks" / "automation" / "n8n" | `/webhooks` |
 | "learning path" / "ścieżka nauki" / "roadmap" | `/learn-path` |
+| "napisz kod" / "write code" / "review my code" / "check security" / "ship it" | `/code` |
+| "analizuj" / "analyze" / "CSV" / "dane" / "data" | `/analyze` |
+| "faktura" / "invoice" / "rachunek" | `/invoice` |
+| "timer" / "czas" / "time tracking" / "zaloguj czas" | `/timetrack` |
+| "propozycja" / "proposal" / "oferta dla klienta" | `/proposal` |
+| "design" / "grafika" / "social post" / "banner" | `/design` |
+| "sprawdź pipeline" / "verify" / "dane klientów" | `/verify` |
+| "konkurencja" / "competitor" / "analiza rynku" | `/competitive` |
+| "repurpose" / "przetwórz content" / "multi-platform" | `/repurpose` |
 
 **Rules:**
 - These are SUGGESTIONS, not hard locks. If the user clearly means something else by "plan" → route normally.
@@ -594,6 +616,8 @@ State tracked in `state/*.md` files:
 - `context-bus.md` — cross-agent signals and context sharing
 - `journal.md` — micro-journal entries from /reflect (small file)
 - `network.md` — relationship CRM from /network (small file)
+- `invoices.md` — invoices and payment tracking (small file)
+- `time-log.md` — project time entries (growing file)
 
 **Infrastructure files** (ephemeral, no schema needed): `state/.setup-progress.md`, `state/.mobile-setup-progress.md`, `state/.maintenance-log.md`, `state/.backup/`, `state/.webhooks.md`
 
@@ -701,6 +725,8 @@ Each state file has owners who can write and readers who can only read:
 | context-bus.md | all agents (append only) | all |
 | journal.md | @coach (via /reflect) | @boss, @wellness |
 | network.md | @mentor (via /network) | @boss, @coach |
+| invoices.md | @cfo | @sales, @boss |
+| time-log.md | @coo | @cfo, @devlead |
 | .webhooks.md | @boss (via /webhooks) | @cto |
 
 **Coordinator notes:**
@@ -883,4 +909,8 @@ bOS can fire webhooks on key events, enabling integration with n8n, Zapier, Make
 | Sunday evening | Plan the week | `/plan-week` |
 | Monday morning | Team standup | `/standup` |
 | Friday evening | Weekly review | `/review-week` |
+| Daily (coding) | Code quality pipeline | `/code` |
+| Per project | Time tracking | `/timetrack` |
+| Per client | Proposals | `/proposal` |
 | Monthly (1st) | Budget review | `/budget` |
+| Monthly | Invoice review | `/invoice list` |

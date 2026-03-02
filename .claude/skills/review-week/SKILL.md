@@ -73,6 +73,9 @@ After user responds, combine their reflection with the data to give:
 **If Business active:**
 - Pipeline status (new leads, closed deals, follow-ups due)
 - Revenue this week vs goal
+- **Time report:** Pull from state/time-log.md — hours by project this week, effective rate (if hourly rate in profile.md)
+- **Invoice status:** Pull from state/invoices.md — outstanding, overdue, paid this month
+- **Code quality trend:** Pull from @devlead memory — average review score, trend (if /code was used this week)
 
 **If Health active:**
 - Workouts completed vs planned
