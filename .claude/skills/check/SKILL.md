@@ -94,6 +94,19 @@ After confirming files exist, validate STRUCTURE:
 - Report: ✅ State files healthy or ⚠️ [file] may need repair: [issue]
 - Auto-repair if possible (add missing headers, fix table alignment)
 
+### 5B. Cross-Platform Files Check
+- Verify cross-platform instruction files exist:
+  - `AGENTS.md` — cross-platform architecture brief
+  - `GEMINI.md` — symlink to AGENTS.md (for Google Antigravity)
+  - `.cursorrules` — Cursor IDE instructions
+  - `.windsurfrules` — Windsurf/Codeium instructions
+  - `.github/copilot-instructions.md` — GitHub Copilot instructions
+  - `.codex/config.toml` — OpenAI Codex configuration
+  - `.agents/skills/` — symlinked skills directory (for Antigravity)
+- Verify GEMINI.md is a symlink to AGENTS.md (not a copy)
+- Verify `.agents/skills/` contains symlinks matching `.claude/skills/` entries
+- Report: ✅ Cross-platform files OK or ❌ Missing: [list]
+
 ### 6. System Health
 - **Maintenance check:** Read `state/.maintenance-log.md`. If last maintenance was 30+ days ago OR file is empty/has zero entries → "⚠️ Maintenance overdue. Run /morning to trigger monthly cleanup."
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
@@ -134,6 +147,7 @@ Count Agent Calibrations entries by freshness (using "Last updated" column).
   📁 State files ........ ✅ / ❌
   🔌 Superpowers ........ ✅ [X] active
   🤖 Agents ............. ✅ [X] active
+  🌐 Cross-platform ..... ✅ / ❌ [X] missing
   🧠 Memory freshness ... ✅ / ⚠️ [X] stale / ❌ [X] expired
   📊 Mode ............... Lite / Pro
 

@@ -31,6 +31,21 @@ bOS turns Claude into a team of personalized AI agents that manage your life, wo
 
 All three options give you the same full bOS experience (all agents, all skills, all superpowers).
 
+### Cross-Platform Support
+
+bOS is built for Claude Code but includes instruction files for other AI coding platforms. If you open the bOS folder in another tool, it will understand the architecture and can help you navigate and modify the codebase:
+
+| Platform | Instruction file | What it reads |
+|----------|-----------------|---------------|
+| **Claude Code** | `CLAUDE.md` | Full behavioral specification (source of truth) |
+| **OpenAI Codex** | `AGENTS.md` | Architecture overview + `.codex/config.toml` for settings |
+| **Google Antigravity** | `GEMINI.md` | Architecture overview + `.agents/skills/` for skill discovery |
+| **Cursor** | `.cursorrules` | Architecture overview, conventions, key file locations |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Architecture overview, rules, coding conventions |
+| **Windsurf (Codeium)** | `.windsurfrules` | Quick reference to all directories and conventions |
+
+**Note:** Only Claude Code can *run* bOS (agents, skills, MCP connections, persistent state). Other platforms can read, understand, and modify the codebase — but they can't execute skills or route between agents. Think of it as: Claude Code = full operating system, other platforms = read/edit access to the source code.
+
 ---
 
 ## Quick Start

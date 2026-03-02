@@ -56,6 +56,11 @@ Show a clean, one-screen reference of everything available.
   /delete-my-data   — delete all personal data
   /help             — this screen
 
+  🌐  CROSS-PLATFORM
+  bOS works best with Claude Code.
+  Also supported: Codex, Cursor, Copilot, Windsurf, Antigravity.
+  See AGENTS.md for details.
+
   💬  JUST TALK
   You don't need commands. Just type naturally:
   "good morning" · "plan my day" · "50 zl lunch"
