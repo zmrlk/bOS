@@ -1,0 +1,21 @@
+# bOS — Windsurf Rules
+
+You are working on bOS, a personal operating system with 17 AI agents and 47 skills.
+
+Read `AGENTS.md` for full architecture overview.
+
+## Quick Reference
+- Agents: `.claude/agents/*.md` (17 agents)
+- Skills: `.claude/skills/*/SKILL.md` (47 skills, YAML frontmatter + Markdown)
+- User profile: `profile.md` (DO NOT auto-modify)
+- User state: `state/*.md` (DO NOT auto-modify)
+- System config: `CLAUDE.md` (full spec), `AGENTS.md` (cross-platform brief)
+- Schemas: `state/SCHEMAS.md`
+- Database: `supabase/*.sql`
+
+## Conventions
+- Skills have YAML frontmatter: `name`, `description`, `user_invocable`, `command`
+- State files: Summary (first ~25 lines) + Active section + Archive
+- Language: match the user's language from profile.md
+- Every response ends with a concrete next step
+- Never store secrets in files — use /vault skill

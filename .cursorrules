@@ -1,0 +1,27 @@
+# bOS — Cursor Rules
+
+You are working on bOS, a personal operating system with 17 AI agents and 47 skills.
+
+## Architecture
+- `AGENTS.md` — Cross-platform architecture overview
+- `CLAUDE.md` — Full behavioral specification (Claude Code-specific)
+- `.claude/agents/*.md` — 17 agent definitions (boss, ceo, coo, cto, cfo, cmo, sales, finance, coach, organizer, wellness, trainer, diet, mentor, teacher, reader, devlead)
+- `.claude/skills/*/SKILL.md` — 47 skills with YAML frontmatter
+- `state/*.md` — User operational state (tasks, finances, habits, goals, etc.)
+- `profile.md` — User identity and preferences
+- `supabase/` — Pro mode database schemas
+
+## Rules
+- User data (`profile.md`, `state/*.md`) is sacred — never auto-modify
+- System files are modifiable: agents, skills, CLAUDE.md, AGENTS.md
+- Skills use YAML frontmatter: name, description, user_invocable, command
+- State files use Summary (first 25 lines) + Active + Archive structure
+- Respond in the user's language (from profile.md)
+- Every response ends with an actionable next step
+- Check `state/SCHEMAS.md` for file format documentation
+
+## Key Files When Editing
+- Adding a skill → create `.claude/skills/<name>/SKILL.md`, update `skills-registry.json`
+- Adding an agent → create `.claude/agents/<name>.md`, update agent roster in `CLAUDE.md` and `AGENTS.md`
+- Modifying state schema → update `state/SCHEMAS.md`
+- Version bump → update `VERSION` + all references (see commit history for pattern)
