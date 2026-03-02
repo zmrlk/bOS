@@ -77,7 +77,7 @@
     "timezone": "Europe/Warsaw"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Template for custom scheduled skills. Replace: CRON_EXPRESSION, SYSTEM_PROMPT, SKILL_COMMAND, CHAT_ID.",
+    "description": "bOS v0.6.1 — Template for custom scheduled skills. Replace: CRON_EXPRESSION, SYSTEM_PROMPT, SKILL_COMMAND, CHAT_ID.",
     "placeholders": {
       "REPLACE_CRON_EXPRESSION": "Standard cron (e.g., '0 12 * * *' = noon daily, '0 9 * * 1-5' = weekdays 9am)",
       "REPLACE_SYSTEM_PROMPT": "System prompt for the skill context",

@@ -1,4 +1,4 @@
--- bOS v0.6.0 — Unified Inbox Schema
+-- bOS v0.6.1 — Unified Inbox Schema
 -- Stores messages from all channels (Telegram, Email, Slack, Discord, WhatsApp)
 
 CREATE TABLE IF NOT EXISTS messages (

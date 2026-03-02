@@ -89,7 +89,7 @@
     "timezone": "Europe/Warsaw"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Sends morning briefing at 8:00 via Telegram. Uses Claude API to generate the briefing. Set ANTHROPIC_API_KEY as environment variable in n8n.",
+    "description": "bOS v0.6.1 — Sends morning briefing at 8:00 via Telegram. Uses Claude API to generate the briefing. Set ANTHROPIC_API_KEY as environment variable in n8n.",
     "setup_steps": [
       "1. Set ANTHROPIC_API_KEY in n8n environment variables",
       "2. Add Telegram Bot credentials",

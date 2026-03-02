@@ -1,4 +1,4 @@
--- bOS v0.6.0 — Cron Schedules Schema
+-- bOS v0.6.1 — Cron Schedules Schema
 -- Stores scheduled skill executions
 
 CREATE TABLE IF NOT EXISTS schedules (

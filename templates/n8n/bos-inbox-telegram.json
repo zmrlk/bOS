@@ -50,7 +50,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Receives Telegram messages and saves them to the unified inbox (Supabase messages table). Replace credentials before activating.",
+    "description": "bOS v0.6.1 — Receives Telegram messages and saves them to the unified inbox (Supabase messages table). Replace credentials before activating.",
     "setup_steps": [
       "1. Create Telegram bot via @BotFather",
       "2. Add Telegram Bot credentials in n8n",

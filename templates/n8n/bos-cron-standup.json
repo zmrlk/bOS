@@ -77,7 +77,7 @@
     "timezone": "Europe/Warsaw"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Sends Monday standup at 9:00 via Telegram.",
+    "description": "bOS v0.6.1 — Sends Monday standup at 9:00 via Telegram.",
     "setup_steps": [
       "1. Set ANTHROPIC_API_KEY in n8n environment variables",
       "2. Add Telegram Bot credentials",

@@ -1,4 +1,4 @@
--- bOS v0.6.0 — Hybrid Sync Schema
+-- bOS v0.6.1 — Hybrid Sync Schema
 -- Tracks sync state between local files and Supabase
 
 CREATE TABLE IF NOT EXISTS sync_log (

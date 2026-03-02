@@ -612,7 +612,7 @@ After checkout:
    - Max 5 questions per migration batch. More → spread across sessions.
    - COSMETIC fields never prompted — filled via progressive profiling only.
    - Migration runs ONCE per version. Don't re-trigger on subsequent sessions.
-   - Track migration status in agent memory: `migration_completed: {version: "0.6.0", date: "YYYY-MM-DD", auto_filled: N, user_filled: N, skipped: N}`
+   - Track migration status in agent memory: `migration_completed: {version: "0.6.1", date: "YYYY-MM-DD", auto_filled: N, user_filled: N, skipped: N}`
 
 #### Graceful degradation
 | Problem | Action |

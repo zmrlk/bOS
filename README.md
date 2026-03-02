@@ -61,7 +61,7 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ---
 
-## What's New in v0.6.0
+## What's New in v0.6.1
 
 ### Unified Inbox (/inbox)
 Messages from Telegram, Email, Slack, Discord, and WhatsApp — all in one place. Route messages to agents, reply through the original channel. Works in Lite mode (local markdown) and Pro mode (Supabase). Auto-routing sends invoices to @cfo, meetings to @coo, bugs to @devlead.

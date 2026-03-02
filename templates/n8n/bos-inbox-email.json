@@ -66,7 +66,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Polls email via IMAP every 5 minutes and saves new messages to the unified inbox. Replace credentials before activating.",
+    "description": "bOS v0.6.1 — Polls email via IMAP every 5 minutes and saves new messages to the unified inbox. Replace credentials before activating.",
     "setup_steps": [
       "1. Add IMAP credentials (host, port, user, password) in n8n",
       "2. Add Supabase credentials in n8n",

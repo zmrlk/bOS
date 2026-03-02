@@ -73,7 +73,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Receives WhatsApp Business API webhooks and saves messages to the unified inbox. Requires Meta Business platform setup.",
+    "description": "bOS v0.6.1 — Receives WhatsApp Business API webhooks and saves messages to the unified inbox. Requires Meta Business platform setup.",
     "setup_steps": [
       "1. Set up WhatsApp Business API on Meta Business Platform",
       "2. Configure webhook URL to point to this n8n workflow",

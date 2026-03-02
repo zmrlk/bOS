@@ -166,7 +166,7 @@ Before installing ANY skill, run this checklist:
 | `security_score` >= 8 | ✅ | Warn if < 8 |
 | Author is `official` or verified | ✅ | Extra warning |
 
-**Official skills (v0.6.0):** Always pass — they're from the bOS repo itself.
+**Official skills (v0.6.1):** Always pass — they're from the bOS repo itself.
 **Community skills (v0.7.0+):** Full scan + user review option.
 
 ---
@@ -191,7 +191,7 @@ Located at project root: `skills-registry.json`
 
 ```json
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "last_updated": "2026-03-02",
   "skills": [
     {
@@ -243,7 +243,7 @@ Phase 0D in /evolve checks `skills-registry.json` for skills that match the user
 
 ---
 
-## v0.6.0 Scope
+## v0.6.1 Scope
 
 - Official skills ONLY (from `zmrlk/bos` repo)
 - No community submissions yet

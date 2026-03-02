@@ -164,7 +164,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Polls for reply_pending messages in the inbox and routes responses back through the original channel. Supports Telegram, Email, Slack. Discord and WhatsApp send nodes need manual addition.",
+    "description": "bOS v0.6.1 — Polls for reply_pending messages in the inbox and routes responses back through the original channel. Supports Telegram, Email, Slack. Discord and WhatsApp send nodes need manual addition.",
     "setup_steps": [
       "1. Add all channel credentials used by your inbox workflows",
       "2. Add Supabase credentials",

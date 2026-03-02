@@ -64,7 +64,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Listens to Slack channel messages and saves them to the unified inbox. Bot messages are filtered out. Replace credentials and channel ID.",
+    "description": "bOS v0.6.1 — Listens to Slack channel messages and saves them to the unified inbox. Bot messages are filtered out. Replace credentials and channel ID.",
     "setup_steps": [
       "1. Create Slack App with bot token (chat:read, channels:history)",
       "2. Add Slack OAuth2 credentials in n8n",

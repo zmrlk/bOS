@@ -40,7 +40,7 @@ For each active pack, create a **New Query** and run the corresponding schema:
 | Learning | `schema-learning.sql` | reading_log, study_sessions |
 | Life | *(no extra tables — uses core tables)* | — |
 
-### v0.6.0 Feature Schemas (recommended — run all)
+### v0.6.1 Feature Schemas (recommended — run all)
 
 | Feature | File | Tables added |
 |---------|------|-------------|
@@ -132,9 +132,9 @@ schema-business.sql   → finances, leads, projects, contacts, communications,
                         subscriptions, invoices, time_entries, content_calendar
 schema-health.sql     → workouts, meals
 schema-learning.sql   → reading_log, study_sessions
-schema-inbox.sql      → messages (v0.6.0)
-schema-schedules.sql  → schedules (v0.6.0)
-schema-sync.sql       → sync_log, sync_state (v0.6.0)
+schema-inbox.sql      → messages (v0.6.1)
+schema-schedules.sql  → schedules (v0.6.1)
+schema-sync.sql       → sync_log, sync_state (v0.6.1)
 schema-security.sql   → RLS policies for ALL tables (run last)
 views.sql             → v_monthly_summary, v_pipeline_summary,
                         v_weekly_completion, v_project_hours

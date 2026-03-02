@@ -93,7 +93,7 @@ When you run `/scan-context` or `/evolve` (with your consent), bOS may search fo
 
 **Pro Mode (Supabase connected):** Your task data, financial logs, habits, and agent memory get stored in a Supabase database. This is a cloud database — you set it up yourself with your own account. bOS uses your own database, not a shared one.
 
-**Hybrid Sync (v0.6.0+):** When Supabase is connected, bOS uses a dual-write protocol — data is always written locally first, then pushed to Supabase. If you're offline, everything works normally. Changes sync automatically when you reconnect. Conflict resolution: small differences are auto-merged, larger conflicts ask you to decide. Sync metadata (timestamps, not content) is tracked in `sync_log` and `sync_state` Supabase tables.
+**Hybrid Sync (v0.6.1+):** When Supabase is connected, bOS uses a dual-write protocol — data is always written locally first, then pushed to Supabase. If you're offline, everything works normally. Changes sync automatically when you reconnect. Conflict resolution: small differences are auto-merged, larger conflicts ask you to decide. Sync metadata (timestamps, not content) is tracked in `sync_log` and `sync_state` Supabase tables.
 
 In both modes, your secrets vault stays local. It never syncs to Supabase.
 

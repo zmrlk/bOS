@@ -63,7 +63,7 @@
     "executionOrder": "v1"
   },
   "_meta": {
-    "description": "bOS v0.6.0 — Listens to Discord messages and saves them to the unified inbox. Bot messages filtered out. Replace credentials.",
+    "description": "bOS v0.6.1 — Listens to Discord messages and saves them to the unified inbox. Bot messages filtered out. Replace credentials.",
     "setup_steps": [
       "1. Create Discord Bot at discord.com/developers",
       "2. Add bot to your server with MESSAGE_CONTENT intent",
