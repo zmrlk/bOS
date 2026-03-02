@@ -63,6 +63,9 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ## What's New in v0.5.0
 
+### Zero Permission Prompts
+**bOS auto-configures Claude Code permissions for frictionless operation. Safe operations run without interruption. Dangerous commands stay blocked.** - IMPORTANT!**
+
 ### File Date Awareness
 bOS now checks how old your files are before making recommendations. Old project files won't trigger false suggestions. Active tools get priority. Abandoned projects are flagged, not integrated.
 
@@ -84,8 +87,6 @@ Every recommendation that costs money, time, or affects your health now gets che
 ### Capacity Aggregation
 @coo now tracks ALL time commitments across agents — workouts, meal prep, study sessions, client meetings, work tasks. If you're over 80% committed, you get warned before overcommitting.
 
-### Zero Permission Prompts
-bOS auto-configures Claude Code permissions for frictionless operation. Safe operations run without interruption. Dangerous commands stay blocked.
 
 ---
 
