@@ -41,6 +41,7 @@ Batch WebSearch queries based on profile.md:
 - User's packs with gaps → "Claude MCP [domain: fitness/finance/productivity/learning]"
 - Aggregators → WebFetch "mcp.so", "glama.ai/mcp" for latest listings
 - Community → "best new MCP servers Claude Code reddit" (current year)
+- Voice/dictation → "Claude MCP voice dictation speech-to-text [current year]" (for voice mode users)
 
 **Security filter (MANDATORY — same checklist as setup 5C):**
 

@@ -96,17 +96,46 @@ Pick the highest-priority undone task for today. If no tasks → show primary_go
 ```
   🔥  STREAKS
   ┌─────────────────────────────────┐
-  │  🏋️ Workout   ▰▰▰▰▱  4 days   │
-  │  📖 Reading   ▰▰▱▱▱  2 days   │
-  │  💤 Sleep 7h+ ▰▰▰▱▱  3 days   │
-  │  🧘 Mindful   ▰▱▱▱▱  1 day    │
+  │  🏋️ Workout   ▰▰▰▰▱  4 days  🏆 12  │
+  │  📖 Reading   ▰▰▱▱▱  2 days  🏆  5  │
+  │  💤 Sleep 7h+ ▰▰▰▱▱  3 days  🏆  8  │
+  │  🧘 Mindful   ▰▱▱▱▱  1 day   🏆  3  │
+  │  🎯 Focus     ▰▰▰▱▱  3 sess  🏆  7  │
   └─────────────────────────────────┘
 ```
 
 - Show only habits that have at least 1 entry
 - Progress bar: ▰ = active day, ▱ = missed, show last 5 days
+- 🏆 = personal best streak (from habits.md Best column)
+- Focus sessions: show this week's count from @coo memory → focus_sessions_this_week
 - Max 5 habits shown
 - If no habits tracked yet → skip this block entirely (don't show empty)
+
+---
+
+## Block: SPRINT BURNDOWN (if sprint_mode active)
+
+Show only if `profile.md → sprint_mode = active` AND @coo memory has `current_sprint`:
+
+```
+  🏃  SPRINT — Week of [date]
+  ┌─────────────────────────────────┐
+  │  Committed: [X] SP              │
+  │  Completed: [Y] SP              │
+  │  Remaining: [Z] SP              │
+  │                                 │
+  │  Day 1  ████████████  12 SP     │
+  │  Day 2  ██████████░░  10 SP     │
+  │  Day 3  ████████░░░░   8 SP ←   │
+  │  Day 4  ······░░░░░░  (ideal)   │
+  │  Day 5  ··········░░  (ideal)   │
+  └─────────────────────────────────┘
+```
+
+- SP data from @coo memory → current_sprint
+- ← marks current day
+- Dots (·) for future ideal line
+- If no active sprint → skip this block entirely
 
 ---
 

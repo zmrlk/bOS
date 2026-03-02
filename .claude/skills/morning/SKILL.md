@@ -45,6 +45,28 @@ While processing energy answer, load data in one batch of tool calls. Use **Summ
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn (tasks, daily_logs, leads, habits).
 
+## Step 1A: Proactive Checks (after data loading, before pattern insight)
+
+**Decision review check** (from @ceo memory → pending_reviews):
+If any decision has `review_date` ≤ today → nudge:
+```
+📋 Decision review due: "[title]" — decided [date]. Still the right call?
+```
+Offer: AskUserQuestion "Review now" / "Remind me tomorrow" / "Decision still stands"
+
+**Network nudge** (from @mentor — inner circle overdue):
+If network.md has inner circle contacts with follow-up date 7+ days past → nudge (max 1):
+```
+👥 Dawno nie rozmawiałeś z [Name]. Napisz dziś?
+```
+
+**Crash prediction** (requires 60+ days daily-log data, from @boss Predictive Nudges):
+If @boss detects crash probability based on sprint length vs avg crash pattern:
+```
+⚡ Heads up: your pattern suggests lower energy today. Lighter plan.
+```
+→ Auto-reduce task suggestions to match predicted energy.
+
 ## Step 1B: Pattern Insight (if 7+ entries in daily-log, runs after Step 1 data loading)
 
 **After Step 1 data loading, check @boss agent memory for patterns (from Pattern Analysis Protocol).**

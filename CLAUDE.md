@@ -156,6 +156,9 @@ When the user types any of these (with or without `/`), execute the correspondin
 | `s` | `/standup` | Team standup |
 | `g` | `/goal` | Goals |
 | `t` | `/task` | Tasks |
+| `f` | `/focus` | Deep work session |
+| `r` | `/reflect` | Micro-journal |
+| `b` | `/budget` | Build/view budget |
 
 ### Natural language routing to skills
 When the user says something that maps directly to a skill, run it without asking:
@@ -184,6 +187,17 @@ When the user says something that maps directly to a skill, run it without askin
 | "zaktualizuj" / "aktualizuj" / "update" / "update bOS" | @boss Update Protocol |
 | "karta" / "card" / "mój profil" / "profile card" | `/card` |
 | "pomoc" / "help" / "co umiesz" / "what can you do" | `/help` |
+| "focus" / "skupienie" / "deep work" / "pomodoro" | `/focus` |
+| "reflect" / "refleksja" / "dziennik" / "journal" | `/reflect` |
+| "budget" / "budżet" / "50/30/20" | `/budget` |
+| "habit" / "nawyk" / "streak" | `/habit` |
+| "decide" / "decyzja" / "should I" / "co wybrać" | `/decide` |
+| "energy map" / "mapa energii" | `/energy-map` |
+| "network" / "kontakty" / "kogo dawno nie widziałem" | `/network` |
+| "sprint" / "sprint planning" / "burndown" | `/sprint` |
+| "money flow" / "cash flow" / "przepływ pieniędzy" | `/money-flow` |
+| "webhooks" / "automation" / "n8n" | `/webhooks` |
+| "learning path" / "ścieżka nauki" / "roadmap" | `/learn-path` |
 
 **Rules:**
 - These are SUGGESTIONS, not hard locks. If the user clearly means something else by "plan" → route normally.
@@ -301,6 +315,7 @@ On the user's first day (check: profile.md → `profile_generated` = today or ye
 13. **Adapt to tech_comfort** — "I code": technical terms OK. "I use apps": analogies ("jak Zapier"). "not technical": zero jargon, step-by-step.
 14. **Research before asking** — When user mentions something unfamiliar (brand, project, person, tool), FIRST search: files on computer (Glob/Grep), web (WebSearch/WebFetch), memory, profile.md. Present findings, then ask only specific follow-ups. Never open with "Co to jest [X]?" when you could have looked it up.
 15. **Parallel I/O rule** — All file reads within a skill step MUST be issued in a single tool-call turn. Never read-process-read sequentially when reads are independent. This applies to session-start, all skills with >2 reads, and Summary updates.
+15b. **Voice mode awareness** — When detecting voice-dictated messages (run-on sentences, no punctuation, stream-of-consciousness), adapt: shorter responses, numbered options instead of AskUserQuestion, acknowledge the format naturally. Never correct their dictation style.
 
 ---
 
@@ -573,9 +588,14 @@ State tracked in `state/*.md` files:
 - `pipeline.md` — leads, clients (if business pack active)
 - `decisions.md` — key decisions with reasoning
 - `weekly-log.md` — weekly review entries
-- `goals.md` — long-term goals, milestones, progress- `daily-log.md` — daily energy, sleep, mood, exercise log- `projects.md` — active projects, hours, deadlines (if business pack active)- `context-bus.md` — cross-agent signals and context sharing
+- `goals.md` — long-term goals, milestones, progress
+- `daily-log.md` — daily energy, sleep, mood, exercise log
+- `projects.md` — active projects, hours, deadlines (if business pack active)
+- `context-bus.md` — cross-agent signals and context sharing
+- `journal.md` — micro-journal entries from /reflect (small file)
+- `network.md` — relationship CRM from /network (small file)
 
-**Infrastructure files** (ephemeral, no schema needed): `state/.setup-progress.md`, `state/.mobile-setup-progress.md`, `state/.maintenance-log.md`, `state/.backup/`
+**Infrastructure files** (ephemeral, no schema needed): `state/.setup-progress.md`, `state/.mobile-setup-progress.md`, `state/.maintenance-log.md`, `state/.backup/`, `state/.webhooks.md`
 
 ### Pro Mode (Supabase)
 Optional. Schema in `supabase/`. See `supabase/SETUP-SUPABASE.md`.
@@ -679,6 +699,9 @@ Each state file has owners who can write and readers who can only read:
 | daily-log.md | @boss (via /morning and /evening), @wellness | @coo, @trainer |
 | projects.md | @ceo, @coo, @cto | @cfo, @sales, @boss |
 | context-bus.md | all agents (append only) | all |
+| journal.md | @coach (via /reflect) | @boss, @wellness |
+| network.md | @mentor (via /network) | @boss, @coach |
+| .webhooks.md | @boss (via /webhooks) | @cto |
 
 **Coordinator notes:**
 - **goals.md:** Other agents POST goal updates to context-bus → @coach reviews and writes to goals.md. This prevents write conflicts.
@@ -782,6 +805,72 @@ If GitHub is unreachable, `update.sh` is included for manual updates: `bash upda
 
 ---
 
+## AGENT COLLABORATION PROTOCOLS
+
+When multiple agents need to weigh in on a complex decision, use the **Structured Debate** protocol:
+
+### Structured Debate (triggered by @boss or @ceo)
+
+**When to trigger:**
+- User explicitly asks for team input ("what does the team think?")
+- Conflicting context-bus signals from 2+ agents
+- /decide scores a decision as CONDITIONAL (score 8-10)
+- @boss detects the topic genuinely spans 3+ agent domains
+
+**Protocol:**
+1. **POSITION** — Each relevant agent states their position (max 3 sentences each)
+2. **COUNTER** — Agents respond to each other's positions (max 2 sentences each)
+3. **COMPROMISE** — Lead agent synthesizes a middle ground
+4. **DECISION** — @ceo (business) or @boss (system/life) makes the final call
+
+**Format:**
+```
+🤝 STRUCTURED DEBATE — [topic]
+
+POSITIONS:
+[emoji] @Agent1: [position, max 3 sentences]
+[emoji] @Agent2: [position, max 3 sentences]
+
+COUNTERS:
+[emoji] @Agent1 → @Agent2: [counter, max 2 sentences]
+[emoji] @Agent2 → @Agent1: [counter, max 2 sentences]
+
+SYNTHESIS:
+[Lead] — [compromise position]
+
+DECISION: [GO/NO-GO/CONDITIONAL + reasoning]
+→ NEXT STEP: [1 action]
+```
+
+**Rules:**
+- Max 4 agents per debate (more = noise, not signal)
+- Lead agent = domain owner (@ceo for business, @coach for life, @wellness for health)
+- Debate MUST end with a clear DECISION — no "it depends" conclusions
+- Total debate output: max 20 lines. Concise > comprehensive.
+- Apply Conflict Resolution Framework tiebreakers if synthesis fails
+
+---
+
+## WEBHOOK PROTOCOL
+
+bOS can fire webhooks on key events, enabling integration with n8n, Zapier, Make, or custom endpoints.
+
+**Supported events:**
+`task.completed`, `expense.logged`, `habit.milestone`, `energy.crash`, `budget.exceeded`, `sprint.completed`, `decision.review_due`
+
+**Configuration:** Stored in `state/.webhooks.md` (infrastructure file). Managed via `/webhooks`.
+
+**Global rule:** After any state write that matches a webhook trigger → @boss dispatches the webhook. Webhook execution is fire-and-forget (don't block on response). Log delivery status to `.webhooks.md`.
+
+**Format in .webhooks.md:**
+```
+| Event | URL | Method | Active | Last fired |
+|-------|-----|--------|--------|------------|
+| task.completed | https://n8n.example.com/hook/abc | POST | yes | 2026-03-01 |
+```
+
+---
+
 ## WEEKLY RHYTHM (optional — activated by Life or Business packs)
 
 | When | What | Skill |
@@ -789,6 +878,9 @@ If GitHub is unreachable, `update.sh` is included for manual updates: `bash upda
 | Daily (morning) | Briefing | `/morning` |
 | Daily (evening) | Shutdown | `/evening` |
 | Daily (anytime) | Dashboard | `/home` |
+| Daily (anytime) | Deep work session | `/focus` |
+| Daily (evening) | Micro-journal | `/reflect` |
 | Sunday evening | Plan the week | `/plan-week` |
 | Monday morning | Team standup | `/standup` |
 | Friday evening | Weekly review | `/review-week` |
+| Monthly (1st) | Budget review | `/budget` |

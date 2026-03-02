@@ -115,6 +115,19 @@ Use the canonical context-bus format from CLAUDE.md.
 - Check context-bus.md for existing signals before writing duplicates
 - Max 2 signals per /evening session
 
+### Step 2B: Reflect suggestion (optional)
+
+If Life pack active AND user hasn't done /reflect today (check journal.md for today's date):
+
+Use `AskUserQuestion`:
+- header: "Reflect"
+- options:
+  - "Tak, szybki wpis (/reflect)" (description: "1 pytanie, 2 minuty")
+  - "Nie dziś" (description: "Kontynuuj zamknięcie dnia")
+
+If "Tak" → execute /reflect inline, then return to Step 3.
+If "Nie dziś" → continue.
+
 ### Step 3: Close
 ```
 "Logged. Tomorrow starts with [#1 priority].

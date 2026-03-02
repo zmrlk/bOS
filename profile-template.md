@@ -86,6 +86,7 @@
 | **Work style** | (sprinter / procrastinator / steady / perfectionist / scattered) |
 | **ADHD indicators** | (yes / no / suspected) |
 | **Work location** | (remote / office / hybrid) |
+| **Sprint mode** | (off / active) |
 
 ---
 

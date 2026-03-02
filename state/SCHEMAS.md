@@ -144,17 +144,18 @@ Active section: lines XX-YY
 | Habit | text | yes | Habit name |
 | Owner | @agent | yes | Which agent tracks this |
 | Streak | number | yes | Current consecutive days |
+| Best | number | yes | Personal best streak (all-time high) |
 | Last done | YYYY-MM-DD | yes | Last completion date |
 | Target | text | no | Frequency goal (daily/3x week/etc.) |
 
 ### Format example:
 ```
-| Habit | Owner | Streak | Last done | Target |
-|-------|-------|--------|-----------|--------|
-| Morning workout | @trainer | 5 | 2026-03-01 | daily |
-| Read 20 pages | @reader | 12 | 2026-03-01 | daily |
-| Log expenses | @finance | 3 | 2026-02-28 | daily |
-| Meal prep | @diet | 2 | 2026-02-27 | 2x week |
+| Habit | Owner | Streak | Best | Last done | Target |
+|-------|-------|--------|------|-----------|--------|
+| Morning workout | @trainer | 5 | 14 | 2026-03-01 | daily |
+| Read 20 pages | @reader | 12 | 12 | 2026-03-01 | daily |
+| Log expenses | @finance | 3 | 7 | 2026-02-28 | daily |
+| Meal prep | @diet | 2 | 4 | 2026-02-27 | 2x week |
 ```
 
 ### Rules:
@@ -347,7 +348,7 @@ Active section: lines XX-YY
 **Reasoning:** [Why this option]
 **Owner:** @[agent who made the recommendation]
 **Status:** active / reversed / superseded
-**Review date:** [When to revisit, if applicable]
+**Review date:** YYYY-MM-DD [When to revisit — required for GO/CONDITIONAL decisions]
 ```
 
 ### Rules:
@@ -355,6 +356,7 @@ Active section: lines XX-YY
 - Newest decision on top
 - Major decisions also saved to agent memory (summary)
 - Never delete decisions — mark as reversed/superseded with reason
+- **Review date** is required for all GO and CONDITIONAL decisions. @ceo tracks pending reviews in memory: `pending_reviews: [{title, review_date}]`. /morning checks for reviews due today. /review-week shows upcoming reviews in next 7 days.
 
 ---
 
@@ -421,3 +423,70 @@ Status: pending | acknowledged | acted-on | expired
 - @boss processes `calibration` signals: updates profile.md or reposts as targeted signals
 - After acting on a signal, update Status to `acted-on`
 - Monthly: archive expired and acted-on entries to state/archive/context-bus-YYYY-MM.md
+
+---
+
+## journal.md
+
+Small file (read in full). Owner: @coach.
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Date | YYYY-MM-DD | yes | Entry date |
+| Q# | number | yes | Question ID from /reflect pool |
+| Question | text | yes | The reflection question asked |
+| Answer | text | yes | User's free-form response |
+
+### Format example:
+```
+# Journal
+
+| Date | Q# | Question | Answer |
+|------|-----|----------|--------|
+| 2026-03-02 | 14 | Co dziś poszło lepiej niż się spodziewałeś? | Udało mi się skończyć prezentację w godzinę |
+| 2026-03-01 | 7 | Za co jesteś dziś wdzięczny? | Za dobrą rozmowę z Anią |
+```
+
+### Rules:
+- Single table, newest entry on top
+- @coach is primary writer (via /reflect skill)
+- One entry per day (if user runs /reflect twice → update, don't duplicate)
+- After 30+ entries → @coach triggers pattern analysis during /review-week
+- Never delete entries — this is a personal journal
+
+---
+
+## network.md
+
+Small file (read in full). Owner: @mentor.
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| Name | text | yes | Person's name |
+| Tier | inner/active/extended | yes | Relationship tier (inner 5, active 50, extended 500) |
+| Context | text | yes | How you know them / relationship context |
+| Last contact | YYYY-MM-DD | yes | Last meaningful interaction |
+| Follow-up | YYYY-MM-DD | no | When to reach out next (auto-calculated from tier) |
+| Notes | text | no | Conversation starters, shared interests, updates |
+
+### Format example:
+```
+# Network
+
+| Name | Tier | Context | Last contact | Follow-up | Notes |
+|------|------|---------|-------------|-----------|-------|
+| Ania K. | inner | Best friend, co-founder ideas | 2026-03-01 | 2026-03-15 | Interested in AI |
+| Marek W. | active | Ex-colleague, design | 2026-02-10 | 2026-03-10 | Moved to Berlin |
+| Jan N. | extended | Met at conference | 2026-01-05 | 2026-04-05 | Works at Google |
+```
+
+### Follow-up pipeline:
+- **Inner (5):** Every 2 weeks
+- **Active (50):** Every 1-2 months
+- **Extended (500):** Every 3-6 months
+
+### Rules:
+- @mentor is primary writer (via /network skill)
+- Sorted by follow-up date (most overdue first)
+- Natural language input supported: "Spotkałem się z Anią" → parse + log
+- /morning surfaces overdue inner-circle follow-ups as nudges

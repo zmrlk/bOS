@@ -38,6 +38,16 @@ Categories: food, transport, tools, entertainment, health, education, housing, b
 [If impulse flag detected]: ⚠️ Was this planned or impulse? No judgment, just tracking."
 ```
 
+### Budget threshold check (after logging)
+
+If @finance memory has `monthly_budget_thresholds` for this category:
+1. Calculate: this month's total for category (from finances.md Active section)
+2. Compare against budget:
+   - **>80%**: "⚠️ [Category]: [X]% budżetu ([spent]/[budget] [currency]). Uważaj."
+   - **>100%**: "🚨 [Category]: przekroczony budżet! [spent]/[budget] [currency] (+[overage])."
+   - Post context-bus signal: @finance → @boss + @coach (constraint)
+3. If no budget set for category → skip silently
+
 ### Impulse detection
 Flag as potential impulse if:
 - Category is entertainment, tools, or other

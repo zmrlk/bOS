@@ -23,6 +23,8 @@ Issue ALL reads in one batch of tool calls. Use Summary (first 25 lines) + Activ
 - `state/finances.md` (Summary + Active section) — revenue/expenses (if Business/Finance active)
 - `state/pipeline.md` (full) — pipeline status (if Business active)
 - `state/daily-log.md` (Summary + Active section) — energy trends this week (14d window)
+- `state/journal.md` (full) — journal entries for pattern analysis (if Life active)
+- `state/decisions.md` (full) — decisions with upcoming reviews
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn.
 
@@ -41,6 +43,14 @@ Tasks: [X/Y completed] ([Z]% completion rate)
 📈 Patterns I notice:
 [1-2 observations from this week + historical data if available]
 ```
+
+**If sprint_mode active** (check profile.md → sprint_mode = active AND @coo memory has current_sprint):
+```
+  🏃 SPRINT
+  Committed: [X] SP | Completed: [Y] SP | [Z]%
+  Velocity (4-week avg): [V] SP/week
+```
+Update @coo memory → velocity_history with this week's data.
 
 ### Step 2: Reflection (AFTER seeing data)
 Ask (data already loaded — no waiting after user responds):
@@ -67,6 +77,20 @@ After user responds, combine their reflection with the data to give:
 **If Health active:**
 - Workouts completed vs planned
 - Streaks maintained or broken
+
+**If Life pack active — journal patterns (if journal.md has 30+ entries):**
+@coach analyzes entries for recurring themes, emotional patterns, growth trajectory. Show top 2-3 insights:
+```
+📓 Journal Patterns (z [X] wpisów):
+→ [insight 1 — e.g., "Najczęściej piszesz o [temat]"]
+→ [insight 2 — e.g., "Twój nastrój poprawia się po wpisach o [temat]"]
+```
+
+**Decision Reviews (always, if decisions.md has entries with review_date in next 7 days):**
+```
+📋 Decisions due for review:
+→ [title] — decided [date], review by [date]
+```
 
 **If Learning active:**
 - Study hours logged
@@ -211,12 +235,20 @@ Then offer contextual follow-up via `AskUserQuestion`:
 - >80% → "Great week. You can stretch a bit more next time."
 - 0% → "What happened? No judgment — let's adjust the plan."
 
-## Identity Ledger (every 2 weeks, or weekly if completion > 80%)
+### Step 6: Identity Ledger (conditional)
 
-**Frequency:**
-- Default: show every 2 weeks (check @boss memory: `last_identity_ledger: [date]`)
-- If last week's completion rate > 80% → show weekly (reward consistency)
-- Never show if less than 7 days of data since last ledger
+Check @boss agent memory for `last_identity_ledger` date.
+
+**Show if:**
+- 14+ days since last (default), OR
+- 7+ days AND last week completion > 80% (reward), OR
+- `last_identity_ledger` empty AND `week_2_reveal_shown` = true (first after Week 2)
+
+**Skip if:**
+- < 7 days since last, OR `week_2_reveal_shown` = false, OR no positive data
+
+Render using data already loaded in Step 0 (zero extra reads).
+After rendering → update @boss memory: `last_identity_ledger: [today]`
 
 **Connected to @boss Week 2 Reveal:** The Identity Ledger IS the recurring version of the one-time Week 2 Reveal. After the Week 2 Reveal fires (at ~14 days), the Identity Ledger takes over on the bi-weekly/weekly schedule.
 

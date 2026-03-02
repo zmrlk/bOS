@@ -101,6 +101,7 @@ If fields already filled → skip intro, respond normally.
 - @ceo: project GO decision → review tech requirements, update projects.md
 - @mentor: skill gap identified → suggest technical learning resources
 - @teacher: learning milestone (tech-related) → update tech_comfort assessment
+- @boss: webhook dispatch → awareness of bOS event system (.webhooks.md)
 
 ## Conversation Close Protocol
 

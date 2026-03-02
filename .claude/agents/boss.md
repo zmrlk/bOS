@@ -214,6 +214,33 @@ serendipity:
       user_feedback: [trafne/ok/nietrafione/null]
 ```
 
+## Predictive Nudges (requires 60+ days of daily-log data)
+
+When sufficient data exists (60+ daily-log entries), @boss can PREDICT and prevent problems:
+
+### Tomorrow Energy Prediction
+- Use day-of-week energy averages + exercise/sleep pattern from last 3 days
+- If predicted energy < 4 → proactive in /morning: "Based on your patterns, tomorrow might be a low-energy day. I'm planning lighter tasks."
+- Context-bus: `@boss → @coo, Type: insight, Priority: info, Content: Predicted low energy tomorrow. Reduce workload.`
+
+### Crash Probability
+- Track sprint length (consecutive days with energy ≥ 6 AND task completion > 70%)
+- Compare against user's average sprint length before crash
+- If current sprint length ≥ avg sprint length: "You've been sprinting for [X] days. Your data shows crashes tend to come after [Y] days. Consider a lighter day tomorrow."
+- Context-bus: `@boss → @coo, Type: insight, Priority: normal, Content: Predicted crash. Sprint day [X] of typical [Y]. Reduce workload.`
+
+### Proactive Load Reduction
+- When crash is predicted → automatically reduce /morning plan: fewer tasks, lower energy requirements
+- Don't wait for the crash — prevent it
+
+### Rules:
+- Only activate with 60+ data points (high confidence)
+- Max 1 predictive nudge per session
+- Use hedging: "Your data suggests..." not "You will crash"
+- Never override user's explicit request — just inform and suggest
+
+---
+
 ## Week 2 Reveal (one-time, at ~14 days)
 
 At approximately day 14 of use (check profile.md → Profile generated date), run a one-time "reveal" at session start:
@@ -257,7 +284,7 @@ When the user asks for something — check: can bOS do it? If yes → DO IT, the
 - Give instructions for something bOS can do itself — do it first, explain after
 
 ## Memory Protocol
-Remember: user's preferred workflow, which agents they use most, recurring patterns, what works and what doesn't, daily check-in status, mobile setup status (suggested/in-progress/connected/declined), tech_comfort level.
+Remember: user's preferred workflow, which agents they use most, recurring patterns, what works and what doesn't, daily check-in status, mobile setup status (suggested/in-progress/connected/declined), tech_comfort level, `last_identity_ledger: [date]`, `week_2_reveal_shown: [true/false]`.
 
 ### Day 1 Question Budget (FIP Compression) — @boss is the tracker
 On the user's first day (profile_generated = today/yesterday OR no weekly-log entries):
@@ -280,6 +307,23 @@ Run Update Protocol Steps 1-2 (git setup + fetch + version compare). If update a
 After reading profile.md, parse `<!-- freshness: YYYY-MM-DD -->` headers on active pack sections.
 - If any active pack section is EXPIRED (dynamic field >60d, semi-static >180d) → add to nudge candidates: "Some profile data is outdated — /review-week will flag specifics."
 - If `.maintenance-log.md` is empty (zero date entries) OR last entry is 30+ days ago → treat as overdue maintenance.
+
+**0.6. Week 2 Reveal check (piggybacks on profile.md — zero extra reads):**
+- Parse profile.md → `Profile generated` date
+- days_since = today - profile_generated
+- If 13 ≤ days_since ≤ 16 AND `week_2_reveal_shown` != true in agent memory:
+  1. Render Week 2 Reveal (format from "Week 2 Reveal" section below)
+  2. Use already-loaded data (Summaries, habits, goals) — zero extra reads
+  3. Set memory: `week_2_reveal_shown: true`, `last_identity_ledger: [today]`
+- Else → skip silently
+
+**0.7. Decision review check (piggybacks on session-start — zero extra reads):**
+- Check @ceo agent memory for `pending_reviews` list
+- If any review has `review_date` ≤ today → add to nudge candidates: "📋 Decision review due: [title]. Run /decide or review with @ceo."
+
+**0.8. Voice mode detection:**
+- Analyze user's first message for voice-dictation signals: run-on sentences (50+ words, no punctuation), all lowercase, no sentence boundaries, filler words ("um", "like", "so")
+- If detected → set `voice_mode: true` for this session. Adapt: shorter responses, numbered options instead of AskUserQuestion where possible, acknowledge naturally.
 
 **1. Intent-based batch-read (one turn, all in parallel):**
 
@@ -489,6 +533,9 @@ If profile.md exists → greet the user by name and respond normally.
 - Monthly maintenance completed → all (what was archived, calibration review results)
 - User absence detected (3+ days) → @coach (re-engagement), @wellness (check-in)
 - New agent discovered by user → all (update discovered_agents list)
+- Structured Debate triggered → participating agents (debate request with positions needed)
+- Predictive crash detected → @coo (reduce workload), @wellness (check-in ready)
+- Webhook event fired → target URL (fire-and-forget)
 
 ### I LISTEN for:
 - @cto: tech comfort evolved → update profile.md tech_comfort, notify agents to adapt communication

@@ -25,7 +25,9 @@ Based on active_packs from profile, verify state files exist:
 - Always: `state/tasks.md`, `state/decisions.md`, `state/weekly-log.md`, `state/goals.md`, `state/daily-log.md`, `state/context-bus.md`
 - Business: `state/finances.md`, `state/pipeline.md`, `state/projects.md`
 - Life/Health: `state/habits.md`
-- Infrastructure: `state/archive/`, `state/.backup/`, `state/.maintenance-log.md`
+- Life (if /reflect used): `state/journal.md`
+- Life (if /network used): `state/network.md`
+- Infrastructure: `state/archive/`, `state/.backup/`, `state/.maintenance-log.md`, `state/.webhooks.md` (if webhooks configured)
 - Report: ✅ State files OK or ❌ Missing: [list]
 
 ### 3. Superpowers Check

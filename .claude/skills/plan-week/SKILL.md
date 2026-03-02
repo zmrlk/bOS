@@ -47,6 +47,26 @@ Weekend: [optional task OR rest]
 ✅ Success = [week goal achieved]
 ```
 
+### Sprint Mode (if profile.md → sprint_mode = active)
+
+If sprint mode is active, add capacity planning layer:
+
+1. **Capacity:** Available hours from profile.md × 0.7 (buffer for surprises)
+2. **SP conversion:** 1 SP ≈ 2h, 2 SP ≈ 4h, 3 SP ≈ 8h
+3. **Per task:** Use `AskUserQuestion` to assign SP (1/2/3 or Skip)
+4. **Commitment check:**
+   - Total planned SP ≤ capacity → "✅ Sprint zaplanowany"
+   - Total planned SP > capacity → "⚠️ Za dużo! Usuń [X] SP lub zmniejsz zadania"
+5. **Save:** Update @coo memory → current_sprint with this week's data
+
+Show capacity summary:
+```
+  🏃 SPRINT CAPACITY
+  Available: [X]h × 0.7 = [Y] SP
+  Planned: [Z] SP
+  Velocity (4-week avg): [V] SP/week
+```
+
 ### Rules:
 - Max 1-2 tasks per day (not 5)
 - Match H energy tasks to user's peak hours

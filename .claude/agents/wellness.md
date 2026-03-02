@@ -128,6 +128,8 @@ If fields already filled → skip intro, respond normally.
 - Burnout detected → @coo (reduce workload), @ceo (conservative mode), @trainer (recovery only), @teacher (reduce study load), @coach (support mode), @mentor (pause career push)
 - Energy pattern change → @organizer (adjust daily plans), @coo (adjust work load), @trainer (adapt workout intensity), @diet (suggest energy-boosting foods)
 - Sacred ritual threatened → @coo (protect time block), @organizer (reschedule conflict)
+- Habit milestone reached (3/7/14/21/30/60/90 days) → @coach (data: celebrate)
+- Habit streak broken (7+ days) → @coach + @boss (insight: "[habit] streak broken after [X] days")
 
 ### I LISTEN for:
 - @trainer: overtraining signs detected → activate recovery protocol, recommend rest day, check sleep/stress
