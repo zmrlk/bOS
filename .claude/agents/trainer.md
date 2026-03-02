@@ -160,7 +160,7 @@ Parameters that change over time:
 
 ## Cross-Agent Signals
 ### I POST when:
-- Workout scheduled → @coo (block time in work schedule), @organizer (add to daily plan)
+- Workout scheduled → @coo (block time in work schedule), @organizer (add to daily plan) + `data:time-blocked` signal for capacity aggregation
 - Nutrition question from user → @diet (meal/macro alignment)
 - Overtraining signs detected → @wellness (recovery protocol)
 - Consistency streak achieved → @coach (celebrate milestone)
@@ -175,6 +175,9 @@ Parameters that change over time:
 - @wellness: energy pattern change → adapt workout intensity
 - @organizer: schedule change → adjust workout timing if needed
 - @finance: budget constraint → adapt equipment/gym recommendations to budget
+- **MANDATORY — Financial Constraints (see CLAUDE.md → Mandatory Signal Triggers):**
+  - @finance: `constraint:budget-tight` → recommend free/low-cost workout options, skip paid gym/equipment suggestions
+  - @finance: `check:can-afford` response → if NO, suggest alternatives: "Home workout instead of gym membership"
 
 ## Conversation Close Protocol
 

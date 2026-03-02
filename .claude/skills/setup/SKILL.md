@@ -260,130 +260,64 @@ Use `AskUserQuestion`:
 
 Save as `communication_style` in profile.md. Values: `direct` / `casual` / `detailed` / `motivational`
 
-### 2e. Permissions mode — how many approval prompts?
+### 2e. Permissions — auto-configured, zero friction
 
-bOS needs to read and write files, connect to services, search the internet.
-By default the system asks for permission for EVERY operation — which is safe, but causes A LOT of clicking "Yes, allow" over and over.
+**NO QUESTION ASKED.** bOS auto-enables trusted mode and writes settings.json.
 
-**Adapted to tech_comfort:**
+**Action 1: Write `.claude/settings.json` with full allowlist:**
 
-**"not technical":**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🔒  Permissions
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  To help you, I need to:
-  → Save your notes and progress
-  → Look up information online
-  → Connect to your calendar/email
-
-  You have two options:
-
-  SAFE MODE:
-  I ask for your permission every time.
-  Safe, but lots of clicking "Yes".
-
-  TRUSTED MODE:
-  I do things on my own, without asking.
-  Much smoother — zero interruptions.
-  I still ask before:
-  • Deleting files
-  • Installing new tools
-  • Sending messages
-  • Anything that costs money
-
-  You don't have to decide forever —
-  you can change anytime.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**"I use apps":**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🔒  Permissions
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  SAFE: Every operation = approval prompt.
-  Safe, lots of clicking.
-
-  TRUSTED: bOS acts on its own. Only asks
-  before destructive actions (delete,
-  install, send, pay).
-
-  Most users choose trusted —
-  bOS is like an assistant who acts,
-  not a program that keeps asking.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**"I code":**
-```
-  🔒  Permission mode:
-
-  STRICT: Every tool call requires approval
-  → Safe but high friction
-
-  SKIP-PERMISSIONS (--dangerously-skip-permissions):
-  → Auto-approves: Read, Write, Edit, Glob,
-    Grep, MCP calls, WebSearch, safe Bash
-  → Still asks for: rm, sudo, install,
-    push, destructive git ops, send/post
-
-  Equivalent to: claude --dangerously-skip-permissions
-  Stored in: .claude/settings.json allowedTools
-```
-
-Use `AskUserQuestion`:
-- header: "Permissions"
-- question: "How much freedom do you want to give me?"
-- options:
-  - "Trusted mode (Recommended)" (description: "I act on my own without interruptions. Only ask before deleting, installing, and sending. Most users choose this.")
-  - "Safe mode" (description: "I ask for permission on every operation. Safe but lots of clicking.")
-
-**If "Trusted mode":**
-Set `permissions_mode: trusted` in profile.md.
-Show:
-```
-✅ Trusted mode enabled.
-
-For this to work, next time
-launch bOS with the command:
-claude --dangerously-skip-permissions
-
-Or add it to your Claude Code settings
-to make it default.
-
-I still ask before:
-🗑️ Deleting files
-📦 Installing tools
-📤 Sending messages
-💳 Anything that costs money
-```
-
-For "I code" users, also show:
-```
-Or add to .claude/settings.json:
+```json
 {
   "permissions": {
-    "allow": ["Read", "Write", "Edit", "Glob",
-              "Grep", "WebSearch", "WebFetch",
-              "mcp__*", "Bash(mkdir)", "Bash(ls)",
-              "Bash(date)", "Bash(touch)", "Bash(wc)"]
+    "allow": [
+      "Read", "Write", "Edit", "Glob", "Grep",
+      "WebSearch", "WebFetch",
+      "mcp__*",
+      "Bash(mkdir *)", "Bash(ls *)", "Bash(date *)", "Bash(touch *)",
+      "Bash(wc *)", "Bash(cat *)", "Bash(head *)", "Bash(tail *)",
+      "Bash(stat *)", "Bash(sort *)", "Bash(cp *)", "Bash(mv *)",
+      "Bash(echo *)", "Bash(printf *)", "Bash(git status*)",
+      "Bash(git log*)", "Bash(git diff*)", "Bash(git branch*)",
+      "Bash(git show*)", "Bash(git fetch*)", "Bash(git checkout origin*)",
+      "Bash(npx *)", "Bash(which *)", "Bash(uname *)",
+      "Bash(test *)", "Bash([ *)"
+    ],
+    "deny": [
+      "Bash(rm *)", "Bash(sudo *)", "Bash(curl *)", "Bash(wget *)",
+      "Bash(python *)", "Bash(node -e*)", "Bash(pbcopy*)",
+      "Bash(git push*)", "Bash(git reset --hard*)"
+    ]
   }
 }
 ```
 
-**If "Safe mode":**
-Set `permissions_mode: strict` in profile.md.
-"OK — I'll ask for permission. You can change anytime by saying 'trusted mode' or 'change permissions'."
+**If settings.json already exists:** MERGE — add missing allow entries, don't remove existing ones. Preserve any MCP configs the user already has.
 
-**IMPORTANT: Transparency rules:**
-- NEVER hide the existence of this option — user MUST know
-- Explain WHAT the mode changes (fewer prompts) and what it DOESN'T change (destructive actions still require consent)
-- Don't push any option — user decides
-- If user chose "trusted" but later feels uncomfortable → immediately show how to switch back
-- Save choice in profile.md so agents know and don't suggest changes repeatedly
+**Action 2: Set `permissions_mode: trusted` in profile.md.**
+
+**Action 3: Inform the user (SHORT, adapted to tech_comfort):**
+
+**"not technical" / "I use apps":**
+```
+✅ Trusted mode — działam bez pytań o zgodę.
+
+Nadal pytam przed: 🗑️ usuwaniem | 📦 instalacją | 📤 wysyłaniem | 💳 płatnościami
+
+Powiedz "strict mode" jeśli chcesz więcej kontroli.
+```
+
+**"I code":**
+```
+✅ Trusted mode. settings.json written.
+Auto-approved: Read/Write/Edit/Glob/Grep/WebSearch/MCP/safe Bash.
+Still prompts: rm, sudo, push, install.
+Full skip: claude --dangerously-skip-permissions
+```
+
+**Rules:**
+- NEVER ask "which mode do you want?" — just enable trusted
+- If user says "strict mode" later → switch, update profile.md
+- settings.json is the source of truth for CLI permission behavior
 
 ### 2f. Packs — what should bOS help with
 

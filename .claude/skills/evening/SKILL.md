@@ -59,7 +59,18 @@ If "Coś innego" → ask open text.
 - Did user work out? → if not tracked: "Był trening dziś? (tak/nie/odpoczynek)"
 - Hydration/reading/other tracked habits → quick yes/no per habit
 
-Then ask open text: "Jaki #1 priorytet na jutro?"
+**Tomorrow's Priority (SELECTION, not typing):**
+1. Read state/tasks.md → get pending tasks for tomorrow + this week
+2. Generate top 3-5 most relevant tasks as AskUserQuestion options
+3. Add "Coś innego" as last option (opens text input only if selected)
+4. Pre-sort by: overdue first → high priority → energy-matched to morning peak
+
+Use `AskUserQuestion`:
+- header: "Jutro"
+- question: "Co jest #1 priorytetem na jutro?"
+- options: [generated from tasks.md, max 4] + "Coś innego"
+
+If "Coś innego" → ask open text. Otherwise → save selection as tomorrow's #1.
 
 ### Step 1B: Pattern Comparison (if 7+ entries in daily-log, runs after Step 1)
 

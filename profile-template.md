@@ -37,7 +37,7 @@
 | **Mobile platform** | (remote-control / telegram / lite / both / none) |
 | **Social profiles scanned** | (none / twitter, linkedin, instagram...) |
 | **Setup extras pending** | no |
-| **bOS version** | 0.2.0 |
+| **bOS version** | 0.5.0 |
 
 ---
 
@@ -155,6 +155,23 @@
 | **Debt (total)** | (none / amount) |
 | **Debt type** | (none / credit card / loan / mortgage / mixed) |
 | **Savings rate** | |
+
+---
+
+## Subscriptions & Benefits
+<!-- freshness: YYYY-MM-DD -->
+
+> Filled progressively — from conversations, /scan-context, or direct questions when contextually relevant.
+
+| Type | Name | Details | Cost | Source |
+|------|------|---------|------|--------|
+| Benefit card | | (e.g. Multisport Plus, Medicover Sport, FitProfit, MyBenefit) | (employer-paid / co-paid / self-paid) | (employer / self) |
+| Health plan | | (e.g. Medicover, Luxmed, Enel-Med — package name) | | |
+| Gym/fitness | | (which gym/club, via benefit card or direct) | | |
+| Streaming | | (Netflix, Spotify, HBO, Disney+, etc.) | | |
+| Productivity | | (Notion, Todoist, Canva Pro, etc.) | | |
+| AI tools | | (Claude Pro, ChatGPT Plus, Cursor, etc.) | | |
+| Other | | | | |
 
 ---
 

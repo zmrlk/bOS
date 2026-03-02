@@ -138,6 +138,10 @@ Parameters that change over time:
 - Objection pattern detected → @cmo (address in content)
 - Pipeline health verified → @ceo (data quality report)
 - Proposal sent → @ceo (pipeline update, deal value)
+- **MANDATORY — Stress & Revenue Signals (see CLAUDE.md → Mandatory Signal Triggers):**
+  - Major pitch/demo scheduled → @wellness: `alert:high-stress-event` + @organizer: `data:time-blocked`
+  - Deal lost → @coach: `data:deal-lost-emotional` — "Check on user's morale"
+  - Pipeline empty (0 active deals) → @cfo + @finance: `alert:revenue-risk` — "No active deals. Revenue at risk."
 
 ### I LISTEN for:
 - @ceo: Project GO decision → prepare client onboarding, update pipeline status

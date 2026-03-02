@@ -26,7 +26,66 @@ bOS is not static software — it's a **living system** that grows with the user
 
 ---
 
-## Evolution Cycle (5 phases)
+## Evolution Cycle (6 phases)
+
+### Phase 0: SKILL AUDIT — Match skills to user profile
+
+**This runs FIRST, before MCP discovery. The user's profile determines what skills they need.**
+
+**Step 0A: Read profile.md → determine skill needs**
+
+Map user_type + active_packs + primary_goal to skill categories:
+
+| Profile | Critical Skills | Nice-to-have |
+|---------|----------------|-------------|
+| Freelancer + Business | /invoice, /proposal, /competitive, /verify, /pipeline, /timetrack | /design, /repurpose |
+| Freelancer + Sales focus | + /pitch (custom), /follow-up (custom), /prospect (custom) | /contract (custom) |
+| Developer + Business | /code, /analyze, /invoice | /api (custom), /deploy (custom) |
+| Manager/Leader | /standup, /sprint, /task | /1-1 (custom), /feedback (custom) |
+| Student + Learning | /learn-path, /focus, /reflect | /study (custom), /exam-prep (custom) |
+| Employee + Career | /goal, /decide, /network | /cv (custom), /interview-prep (custom) |
+| Health pack active | /log-workout, /habit, /energy-map | /meal-plan (custom) |
+| Life pack active | /budget, /habit, /reflect, /focus, /network | /money-flow |
+
+**Step 0B: Check which skills user already has**
+- Read `.claude/skills/` directory → list installed skills
+- Compare to profile-recommended skills → identify GAPS
+
+**Step 0C: Present skill gaps using AskUserQuestion**
+
+```
+⏳ Analyzing your profile against available skills...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🧩  Skills matched to your profile
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Based on: [user_type] + [active_packs] + [primary_goal]
+
+  RECOMMENDED (you don't have these yet):
+  1. ⭐ /[skill] — [1 sentence why YOU specifically need it]
+  2. ⭐ /[skill] — [1 sentence why]
+  3. ⭐ /[skill] — [1 sentence why]
+
+  CUSTOM (I can CREATE these for you):
+  4. 🔧 /[name] — [what it would do, based on your data/tools]
+  5. 🔧 /[name] — [what it would do]
+```
+
+AskUserQuestion:
+- "Install recommended" (all standard skills from catalog)
+- "Let me pick" (checkboxes)
+- "Create custom skills" (build the custom ones)
+- "Skip for now"
+
+**Step 0D: Fetch skills from GitHub catalog**
+If user chose install:
+- `git show origin/main:.claude/skills/` → list available skills
+- For each recommended skill not installed locally → fetch from `origin/main`
+- Install: copy SKILL.md to local `.claude/skills/[name]/`
+- Verify: check frontmatter is valid
+
+---
 
 ### Phase 1A: DISCOVER — Search for new capabilities
 
@@ -63,6 +122,19 @@ Every MCP must pass ALL 8 criteria before being proposed:
 - <8: DO NOT PROPOSE — did not pass security audit
 
 **ABSOLUTE RULE:** Better to propose NOTHING than to propose something scoring <8/10. The user trusts us.
+
+**File date filter (MANDATORY before suggesting integrations):**
+Before proposing any MCP based on user's scanned files/tools:
+1. Check mtime of files that indicate tool usage
+2. If tool-related files are ALL >365 days old → SKIP this tool (user abandoned it)
+3. If tool-related files are 90-365 days old → ask: "[Tool] — last used [X] months ago. Still using it?"
+4. If tool-related files are <90 days old → treat as active, proceed with MCP suggestion
+
+**GitHub vs Local preference:**
+When checking user's projects/repos:
+1. If GitHub remote exists → check remote commit dates, NOT local file dates
+2. If no remote → use local mtime
+3. NEVER suggest integrations based on stale local files when fresh remote data exists
 
 **Typosquatting check (CRITICAL):** Before any npx installation, verify the package name matches the GitHub repo EXACTLY. Compare npm package name with GitHub repo URL. If mismatch → do NOT install, flag to user.
 
@@ -128,14 +200,44 @@ a shortcut /[name] so you can do it with one command.
 Want me to?
 ```
 
-**2D. Tool & Integration Discovery:**
+**2D. Custom Skill Creation (Profile + Data driven)**
+
+Based on user's scanned files, tools, and work patterns → suggest creating NEW skills:
+
+**Detection logic:**
+1. Check scanned files (from /scan-context memory) for data patterns:
+   - CSV/Excel files with client/sales data → suggest `/sales-report` skill
+   - Recurring invoice patterns → suggest `/recurring-invoice` skill
+   - Code repositories → suggest `/deploy` or `/test` skill
+   - Design files (Figma, Canva) → suggest `/asset-library` skill
+
+2. Check user's active tools (from profile.md → tools):
+   - Uses Notion → suggest `/sync-notion` skill (export tasks/notes)
+   - Uses specific CRM → suggest `/crm-sync` skill
+   - Uses accounting software → suggest `/book-keeping` skill
+
+3. Check user's pain points (from agent memory → repeated complaints):
+   - "I always forget to follow up" → create `/follow-up` skill
+   - "I spend too much on food" → create `/meal-budget` skill
+   - "I can't track my projects" → create `/project-dashboard` skill
+
+**When creating a custom skill:**
+1. Generate SKILL.md with proper frontmatter
+2. Define: trigger words, steps, state file integration, agent routing
+3. Present the skill blueprint to user via AskUserQuestion:
+   - "Create this skill" / "Modify first" / "Skip"
+4. If approved → save to `.claude/skills/[name]/SKILL.md`
+5. Add to CLAUDE.md natural language routing
+6. Monitor usage for 2 weeks → if unused, offer to remove
+
+**2E. Tool & Integration Discovery:**
 
 Based on user's workflow:
 - Missing calendar integration? → find and suggest
 - Missing email integration? → find and suggest
 - Uses a tool bOS doesn't know about? → research it, find MCP or workaround
 
-**2E. Social Media & Business MCP Discovery:**
+**2F. Social Media & Business MCP Discovery:**
 
 When profile.md `active_platforms` includes social platforms without corresponding MCPs:
 - WebSearch "[platform] MCP server Claude [current year]" for each platform
@@ -155,6 +257,15 @@ When profile.md `active_platforms` includes social platforms without correspondi
 | /invoice used, wants payment links | Stripe MCP | Payment links in invoices |
 
 ### Phase 3: PRESENT — Show findings to user
+
+**MANDATORY: Pricing & Impact Assessment (before presenting ANY suggestion)**
+
+For EVERY tool, MCP, or service suggestion:
+1. **Include pricing tier:** Free / Freemium (free tier + paid) / Paid only
+2. **Show monthly cost:** If paid → "[X]/mo" or "[X]/year". If freemium → "Free tier: [limits]. Paid: [X]/mo for [features]."
+3. **If cost >0:** Check profile.md → buffer status + monthly discretionary. If cost >5% of discretionary → flag: "⚠️ [X]% of your monthly discretionary."
+4. **Cross-domain check:** If the suggestion impacts health/business/capacity/life → include the relevant agent's assessment inline (see CLAUDE.md → Global Rule #13).
+5. **Never present a paid tool without the price visible.** The user must see cost BEFORE deciding.
 
 **Present findings (max 5 items, prioritized):**
 
@@ -216,13 +327,26 @@ When profile.md `active_platforms` includes social platforms without correspondi
   Actions: install / update / skip / remove
 ```
 
-**AskUserQuestion:**
+**AskUserQuestion (batch overview):**
 - header: "Improvements"
 - question: "What would you like to do?"
 - options:
   - "Apply all recommended" (description: "I'll install new extensions, update stale data, create shortcuts")
   - "Let me choose" (description: "I'll show a checklist to pick from")
   - "Not now" (description: "Come back to this later")
+
+**Per-suggestion AskUserQuestion (when "Let me choose" is selected):**
+
+For each suggestion (max 5), use AskUserQuestion:
+- header: "[Skill/MCP name]"
+- question: "[1 sentence what it does and why it matches YOUR profile]"
+- options:
+  - "Install" / "Create" (for skills/MCPs)
+  - "Tell me more" (expand explanation)
+  - "Not for me" (skip + learn preference)
+  - "Later" (defer to next evolve)
+
+This gives granular control AND teaches evolve what the user values.
 
 ### Phase 4: UPGRADE — Implement approved changes
 
@@ -388,3 +512,5 @@ When bOS detects a repeating pattern worth automating:
 8. **Log everything.** Every evolution cycle logged to agent memory for learning.
 9. **Re-verify regularly.** Connected ≠ safe forever. Monthly re-checks are mandatory.
 10. **Adapt language.** Present all findings in the user's language (from profile.md). Search queries stay English (MCP ecosystem is English-first).
+11. **Always show price.** Every suggestion that could cost money MUST include pricing info (free/freemium/paid + monthly cost). Never let a user install something without knowing the cost. If pricing is unclear → research it before presenting.
+12. **Cross-domain impact check.** If a suggestion impacts money → @cfo/@finance weighs in. If it impacts health → @wellness. If it impacts capacity → @coo. See CLAUDE.md → Global Rule #13.

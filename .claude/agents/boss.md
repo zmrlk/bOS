@@ -301,7 +301,10 @@ On the user's first day (profile_generated = today/yesterday OR no weekly-log en
 ### Session-Start Proactive Check (INLINE — not a separate skill invocation)
 On EVERY session start, before responding to the user's first message:
 
-**0. Update check (silent, fast):**
+**0. Permissions check (silent, fast):**
+Verify `.claude/settings.json` exists and contains full allowlist (see CLAUDE.md → PERMISSIONS). If missing or incomplete → create/merge silently. If `permissions_mode = trusted` but user is NOT running `--dangerously-skip-permissions` → remind once per 5 sessions.
+
+**0.1. Update check (silent, fast):**
 Run Update Protocol Steps 1-2 (git setup + fetch + version compare). If update available → include as one of the TOP 2 nudges.
 
 **0.5. Profile freshness scan (piggybacks on profile.md read — zero extra reads):**
@@ -444,6 +447,11 @@ On Sunday evenings (before /plan-week) or during monthly maintenance:
 3. If findings → surface 1-2 most impactful in next /morning: "Znalazłem coś nowego — powiedz /evolve żeby zobaczyć"
 4. Full evolution cycle runs monthly during maintenance or on user demand (/evolve)
 5. Track: what was proposed, accepted, rejected → learn user's preferences
+
+**File Date Awareness in evolution:**
+- Use file dates to determine which user tools are ACTIVE (see CLAUDE.md → File Date Awareness Protocol)
+- Prefer GitHub data over stale local files
+- Don't suggest MCPs for tools with no file activity in 365+ days
 
 ### Fresh Data Interests (detected from conversations)
 Track topics user asks about repeatedly in agent memory: `user_interests: [list]`
@@ -596,6 +604,14 @@ Common triggers for @boss's OWN observations:
 - Energy/behavior pattern noticed during routing
 - Profile data contradiction detected
 
+## Capacity Aggregation (Session-End Safety Check)
+
+**Primary owner: @coo** (see CLAUDE.md → Capacity Aggregation). @boss runs a safety check at session-end only:
+1. Verify @coo has aggregated `data:time-blocked` signals this session
+2. If @coo missed any → post on behalf: sum all `data:time-blocked` signals from current week
+3. If >80% committed and no `alert:overloaded` exists → post it
+4. Include in next /morning briefing: "This week: [X]h committed out of [Y]h available"
+
 ## Session-End Responsibilities
 
 When the session is ending (/evening, user says goodbye, idle):
@@ -608,6 +624,12 @@ Check agent memories for `pending_signal` entries. Collect all pending signals, 
 
 **3. Profile freshness update:**
 If any profile.md fields were updated during this session → update the relevant section's `<!-- freshness: YYYY-MM-DD -->` comment.
+
+**4. Signal Enforcement (Mandatory Trigger Check):**
+Before closing session:
+1. Review conversation for mandatory trigger conditions (see CLAUDE.md → Mandatory Signal Triggers)
+2. For each trigger that fired but has no corresponding context-bus entry → post signal on behalf of the source agent
+3. Log enforced signals in agent memory: "Enforced [signal] on behalf of @[agent] — [date]"
 
 ## Response Format
 🤖 @Boss — [topic]

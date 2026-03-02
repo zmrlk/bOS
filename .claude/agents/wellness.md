@@ -130,6 +130,9 @@ If fields already filled → skip intro, respond normally.
 - Sacred ritual threatened → @coo (protect time block), @organizer (reschedule conflict)
 - Habit milestone reached (3/7/14/21/30/60/90 days) → @coach (data: celebrate)
 - Habit streak broken (7+ days) → @coach + @boss (insight: "[habit] streak broken after [X] days")
+- **MANDATORY — Stress Financial Impact (see CLAUDE.md → Mandatory Signal Triggers):**
+  - High stress detected → @finance: `alert:stress-spending-risk` — "User is stressed. Watch for impulse spending patterns."
+  - Burnout detected → @finance + @cfo: `alert:burnout-financial-risk` — "Burnout may lead to income disruption. Protect buffer."
 
 ### I LISTEN for:
 - @trainer: overtraining signs detected → activate recovery protocol, recommend rest day, check sleep/stress

@@ -61,6 +61,34 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ---
 
+## What's New in v0.5.0
+
+### File Date Awareness
+bOS now checks how old your files are before making recommendations. Old project files won't trigger false suggestions. Active tools get priority. Abandoned projects are flagged, not integrated.
+
+### Intelligent Evolution (/evolve)
+The `/evolve` skill now audits your profile first — matching skills to who you are (freelancer, student, developer, etc.) before suggesting new tools. It can also create custom skills tailored to your data and workflow.
+
+### Cross-Agent Signal System
+Agents now communicate through mandatory signals. When your budget gets tight, ALL agents know. When stress is high, your finance agent watches for impulse spending. When your schedule fills up, the system alerts you before you're overcommitted. 22 mandatory signal types ensure nothing falls through the cracks.
+
+### Smarter UX (Less Typing)
+Evening reviews now generate options from your actual tasks instead of asking you to type. The "Rule of Generated Options" means bOS pulls from your data whenever possible — you click instead of type.
+
+### Subscriptions & Benefits Discovery
+bOS learns about your benefit cards (Multisport, Medicover), streaming subscriptions, and tool access. This prevents recommending things you already have and unlocks hidden value from employer benefits.
+
+### Recommendation Impact Assessment
+Every recommendation that costs money, time, or affects your health now gets checked by the relevant agent first. No more surprise bills from tool suggestions.
+
+### Capacity Aggregation
+@coo now tracks ALL time commitments across agents — workouts, meal prep, study sessions, client meetings, work tasks. If you're over 80% committed, you get warned before overcommitting.
+
+### Zero Permission Prompts
+bOS auto-configures Claude Code permissions for frictionless operation. Safe operations run without interruption. Dangerous commands stay blocked.
+
+---
+
 ## Superpowers
 
 bOS gets better with every tool you connect. These are optional — everything works without them, but each one unlocks new capabilities:
@@ -69,7 +97,7 @@ bOS gets better with every tool you connect. These are optional — everything w
 |-----------|-------------|---------------|
 | 📁 **Files & Desktop** | Scan your files, organize, understand your projects | Enable Desktop Commander connector |
 | 📅 **Calendar** | Morning briefings with today's meetings | Enable Google Calendar connector |
-| 📧 **Email** | Triage, follow-ups, drafts | Gmail, Outlook, or any provider (IMAP) |
+| 📧 **Email** | Triage, follow-ups, drafts, subscription detection | Gmail, Outlook, or any provider (IMAP) |
 | 🗄️ **Database** | Dashboards, analytics, long-term tracking | Connect free Supabase account |
 | 💻 **System Control** | Open apps, automate tasks on your Mac | Enable Control your Mac connector |
 | 📝 **Notion** | Sync with your second brain | Enable Notion connector |
@@ -111,7 +139,7 @@ For 24/7 access (even when your computer is off). Say `/connect-mobile` after se
 | Friday | Weekly review | `/review-week` or just `w` |
 | Monthly | Budget review | `/budget` or just `b` |
 
-You can also just talk naturally — say "good morning" and bOS starts your briefing. Say "50 zł lunch" and it logs the expense. No commands to memorize.
+You can also just talk naturally — say "good morning" and bOS starts your briefing. Say "50 zl lunch" and it logs the expense. No commands to memorize.
 
 ---
 
@@ -176,6 +204,7 @@ Or just talk naturally — "good morning", "50 zl lunch", "plan my day" all work
 - **You own everything** — it's just files in a folder. No lock-in. No subscription.
 - **Your data is private** — without optional cloud services, everything stays on your computer. When you connect services like Supabase or Gmail, only the data needed for that service is shared. You can disconnect anytime.
 - **Zero permission prompts** — bOS pre-configures Claude Code to auto-approve safe operations (file reading, editing, MCP tools). You see what's happening at every step, but you're never interrupted to click "approve". Destructive commands (like `rm -rf`) are always blocked.
+- **Cross-agent intelligence** — agents share context through mandatory signals. Your trainer knows about your diet. Your finance advisor knows about stress patterns. Everything connects.
 - **Phone access** — optionally connect Telegram to use bOS from your phone (say `/connect-mobile` after setup)
 
 ---
@@ -202,6 +231,9 @@ You have the full version of bOS. Everything included:
 - Professional tools (/invoice, /timetrack, /proposal, /competitive, /analyze)
 - Content engine (/design, /repurpose — one piece → all platforms)
 - Agent collaboration (Structured Debate protocol)
+- Cross-agent signal system (22 mandatory signals)
+- Capacity aggregation across all life domains
+- Intelligent self-evolution with profile-driven skill matching
 - Webhook integrations (n8n, Zapier, Make)
 - Predictive nudges (energy crash prediction, proactive load reduction)
 - Cloud database support (optional, auto-detected)

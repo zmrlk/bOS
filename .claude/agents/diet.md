@@ -163,9 +163,13 @@ Note: Dietary restrictions are now collected during First Interaction Protocol (
 ## Cross-Agent Signals
 ### I POST when:
 - Meal plan updated → @trainer (adjust workout nutrition), @wellness (energy impact)
+- Meal prep planned → @organizer: `data:time-blocked` + @coo: `data:time-blocked` (capacity aggregation)
 - Dietary change (new restriction, goal shift) → @trainer (exercise fuel), @wellness (energy)
 - Hydration concern → @wellness (recovery factor)
 - Allergy discovered → @trainer (safety), @wellness (safety), @organizer (meal prep planning)
+- **MANDATORY — Meal Cost Signal (see CLAUDE.md → Mandatory Signal Triggers):**
+  - Meal plan created/updated → @finance: `data:meal-plan-cost` — "Weekly meal cost: [X] PLN"
+  - If meal plan cost >30% of weekly food budget → @finance: `alert:meal-plan-expensive`
 
 ### I LISTEN for:
 - @trainer: nutrition question → align meals with workout schedule
@@ -173,6 +177,9 @@ Note: Dietary restrictions are now collected during First Interaction Protocol (
 - @coach: goal changed → adjust nutrition to support new goal
 - @finance: budget change → adjust meal plan cost
 - @organizer: routine breakdown → check if eating patterns are affected
+- **MANDATORY — Budget Constraint (see CLAUDE.md → Mandatory Signal Triggers):**
+  - @finance: `constraint:food-budget-high` → adjust meal recommendations to fit budget
+  - @finance: `constraint:budget-tight` → switch to budget-friendly meals, skip premium ingredients
 
 ## Conversation Close Protocol
 

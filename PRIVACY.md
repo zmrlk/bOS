@@ -15,6 +15,7 @@ When you set up bOS, it creates a profile file. It may include:
 - **Your preferences:** communication style (direct, detailed, warm), how you like advice delivered
 - **How you work:** peak energy hours, work schedule, weekly hours available
 - **Your health setup:** fitness level, gym access, dietary approach, sleep goals — only if you activated the Health pack
+- **Your subscriptions & benefits:** benefit cards (Multisport, Medicover), streaming services, AI tools, productivity tools — collected progressively through conversations and scans
 - **Your patterns:** what you've told bOS about yourself over time, from conversations
 
 What profile.md does NOT contain: passwords, API keys, financial account numbers, or medical diagnoses. Those never go into profile.md.
@@ -44,6 +45,9 @@ Each agent you talk to remembers things about you across sessions. For example, 
 
 This is stored in `~/.claude/agent-memory/` — separate from bOS itself, managed by Claude Code.
 
+### Cross-agent signals (`state/context-bus.md`)
+Agents share relevant information with each other to coordinate better. For example, when your stress is high, @wellness signals @finance to watch for impulse spending. When your budget is tight, @finance signals all agents to avoid recommending paid tools. These signals contain only the relevant data point — not your full profile or history.
+
 ### Webhook configuration (`state/.webhooks.md`)
 If you use `/webhooks` to connect bOS to external tools (n8n, Zapier, Make), the webhook URLs and event mappings are stored in this file. bOS never logs full webhook URLs in cross-agent signals (they may contain tokens). Webhook execution is fire-and-forget — bOS sends a JSON payload when events occur but does not store responses.
 
@@ -52,6 +56,31 @@ API keys and credentials you store via `/vault`. Stored locally only, protected 
 
 ### File scan data
 During setup, if you give permission, bOS scans file and folder **names** (not contents) in your Desktop, Documents, Downloads, and Applications. It uses this to understand who you are and what tools you use. It does not read file contents, ever.
+
+bOS also checks file modification dates to determine which tools and projects are currently active vs. abandoned. Old files (365+ days) are treated as archived and won't trigger tool recommendations.
+
+---
+
+## Subscription & benefit detection
+
+When you run `/scan-context` or `/evolve` (with your consent), bOS may search for subscription-related information:
+
+### What it looks for
+- **Email patterns** (if Gmail/email connected): Searches for emails from known subscription providers by sender domain. It does NOT read email content — only checks if emails from specific senders exist.
+- **Specific domains searched:** Benefit providers (benefitsystems.pl, medicover.pl, lux-med.pl, etc.), streaming services (netflix.com, spotify.com), AI tools (anthropic.com, openai.com), productivity tools (notion.so, figma.com).
+- **App presence:** Checks installed applications (names only) to infer likely subscriptions.
+- **Calendar patterns:** Recurring events at gyms, clinics, or studios may indicate memberships.
+
+### What it does NOT do
+- Does NOT read email content or bodies — only checks for sender domains
+- Does NOT access bank accounts or payment providers
+- Does NOT share subscription data with any external service
+- Does NOT auto-sign up for anything
+
+### How results are stored
+- Detected subscriptions are stored in `profile.md → Subscriptions & Benefits` table
+- Items detected through scanning are marked as "inferred" until you confirm them
+- You can edit or remove any entry at any time
 
 ---
 
@@ -119,6 +148,7 @@ Specifically:
 - It does NOT read your documents, spreadsheets, PDFs, images, or any other file
 - Scanning happens only with your explicit consent during setup or when you run `/scan`
 - You can say no — bOS works fine without scanning
+- File modification dates are checked to prioritize recent/active files
 
 ---
 
@@ -234,6 +264,7 @@ If you use `/reflect`, bOS stores your micro-journal entries (a question and you
 - It does not track you across websites or apps.
 - It does not store payment card numbers or bank credentials.
 - It does not send marketing emails or notifications without you setting that up.
+- It does not read email content — only checks for sender domains during subscription detection (with your consent).
 
 ---
 

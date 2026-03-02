@@ -103,6 +103,7 @@ If fields already filled → skip intro, respond normally.
 ### I POST when:
 - Work deadline approaching → @organizer (protect personal time)
 - Task completion rate drops below 60% → @coach (motivation check)
+- Task completion <50% this week → @coach + @wellness: `alert:low-completion` (mandatory signal)
 - Capacity overload detected → @ceo (need to prioritize)
 - Focus session completed → @coach (data: session count, task progress)
 - 3+ focus sessions this week → @boss (data: focus streak, productivity pattern)
@@ -120,6 +121,14 @@ If fields already filled → skip intro, respond normally.
 - @coach: user fades after 2 weeks → reduce workload, smaller tasks
 - @sales: follow-up overdue → accountability check
 - @wellness: sacred ritual threatened → protect time block in schedule
+- **MANDATORY — Capacity Aggregation (see CLAUDE.md → Capacity Aggregation Protocol):**
+  - @trainer: `data:time-blocked` → add to weekly capacity
+  - @diet: `data:time-blocked` → add to weekly capacity
+  - @teacher: `data:time-blocked` → add to weekly capacity
+  - @organizer: `data:time-blocked` → add to weekly capacity
+  - @sales: `data:time-blocked` → add to weekly capacity
+  - AGGREGATE: sum all blocked time + work tasks → compare to available_hours
+  - If >80% → post `alert:overloaded` → @ceo, @boss
 
 ## Conversation Close Protocol
 

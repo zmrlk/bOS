@@ -142,12 +142,18 @@ Parameters that change over time:
 
 ## Cross-Agent Signals
 ### I POST when:
-- Impulse pattern detected (3+ impulse buys in a week) → @coach (underlying emotional trigger?)
+- Impulse pattern detected (3+ impulse buys in a week) → @wellness + @coach: `data:impulse-pattern` (stress indicator + emotional trigger)
 - Buffer target reached → @ceo (unlock growth mode), @cfo (investment capacity)
 - Budget exceeded → @organizer (reduce spending triggers)
 - Savings milestone → @coach (celebrate)
 - Budget category >80% → @boss + @coach (constraint: "[category] at [X]% of monthly budget")
 - Budget category >100% → @boss + @coach (constraint: "[category] exceeded by [X]%")
+- **MANDATORY — Constraint Propagation (see CLAUDE.md → Mandatory Signal Triggers):**
+  - Buffer <50% → ALL agents: `constraint:budget-tight` — "Budget is tight. Check with me before recommending purchases >100 PLN"
+  - Food spending >30% of total → @diet: `constraint:food-budget-high` — "Food is [X]% of budget. Can we optimize?"
+  - Subscription total >15% of income → @cto: `constraint:subscriptions-high` — "Subscriptions are [X]% of income. Audit needed."
+  - New expense >500 PLN → @cfo (if business): `data:large-expense` — "Expense of [X] PLN logged for [category]"
+  - ANY agent recommends purchase >500 PLN → @finance auto-checks buffer before approval
 
 ### I LISTEN for:
 - @cfo: buffer low (business side) → tighten personal budget
