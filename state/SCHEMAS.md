@@ -3,9 +3,60 @@
 > Authoritative format definitions for all state/*.md files.
 > Skills and agents MUST follow these schemas when reading/writing.
 
+## Growing File Structure (Smart Context Loading)
+
+Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md) use a 3-zone format:
+
+```markdown
+# [TITLE]
+
+## Summary
+<!-- AUTO-UPDATED -->
+Active section: lines XX-YY
+| Metric | Value |
+| [key metrics] | [values] |
+
+---
+
+## Active
+[current month + previous month data]
+
+---
+
+## Archive
+[older data, moved here by maintenance]
+```
+
+**Small files** (habits.md, goals.md, decisions.md, projects.md, pipeline.md) do NOT use this format — they are read in full.
+
+**Tier 1 (every session):** Read first 25 lines of growing files (= Summary only). Read small files in full.
+**Tier 2 (on demand):** Skills read the Active section when they need details, using `offset` from Summary metadata.
+
+**Migration:** When @boss detects a growing file without `## Summary` header → adds Summary + Active/Archive markers automatically.
+
 ---
 
 ## tasks.md
+
+### Summary Template (first 25 lines)
+```
+# Tasks
+
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Today [YYYY-MM-DD] | X/Y done (Z%) |
+| This week | X/Y done |
+| Overdue | X tasks |
+| Backlog | Y tasks |
+| Avg completion 7d | Z% |
+
+---
+```
+
+### Schema
 
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -36,6 +87,27 @@
 ---
 
 ## daily-log.md
+
+### Summary Template (first 25 lines)
+```
+# Daily Log
+
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Last entry | YYYY-MM-DD |
+| Energy 7d avg | X.X |
+| Energy trend | ↑/↓/→ |
+| Sleep last 7d | X good, Y ok, Z bad |
+| Exercise last 7d | X/7 days |
+| Low battery days 14d | X |
+
+---
+```
+
+### Schema
 
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -94,6 +166,25 @@
 ---
 
 ## weekly-log.md
+
+### Summary Template (first 25 lines)
+```
+# Weekly Log
+
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Last review | YYYY-MM-DD |
+| Last completion rate | X% |
+| 4-week avg | X% |
+| Current week goal | [goal text] |
+
+---
+```
+
+### Schema
 
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -161,6 +252,25 @@
 ---
 
 ## finances.md
+
+### Summary Template (first 25 lines)
+```
+# Finances
+
+## Summary
+<!-- AUTO-UPDATED: buffer ALWAYS immediate, rest at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Buffer | XX% (X PLN / Y PLN target) |
+| This month spent | X PLN |
+| Budget remaining | X PLN |
+| Top category | [category] |
+| Impulse ratio | X% (X/Y expenses) |
+| Last expense | YYYY-MM-DD, X PLN, [category] |
+
+---
+```
 
 ### Format:
 ```
@@ -266,17 +376,48 @@
 
 ## context-bus.md
 
+### Summary Template (first 25 lines)
+```
+# Context Bus
+
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+| Metric | Value |
+|--------|-------|
+| Pending critical | X |
+| Pending normal | X |
+| Pending info | X |
+| Oldest pending | YYYY-MM-DD |
+
+---
+```
+
 ### Format:
 ```
 ## [YYYY-MM-DD] @source → @target(s)
-Type: insight | decision | constraint | data
+Type: insight | decision | constraint | data | calibration
 Priority: critical | normal | info
 TTL: [expiry date, default: 14 days]
 Content: [the finding]
-Status: pending | acknowledged | expired
+Status: pending | acknowledged | acted-on | expired
 ```
+
+### Signal types:
+- `insight` — observation, pattern, correlation
+- `decision` — decision made that affects other agents
+- `constraint` — hard limit discovered (budget, time, health)
+- `data` — raw data update (task done, expense logged, streak milestone)
+- `calibration` — updated understanding of the user that other agents should know about
+
+### Status lifecycle:
+- `pending` → signal posted, not yet seen by target agent
+- `acknowledged` → target agent has seen the signal
+- `acted-on` → target agent has incorporated the signal into their behavior/response
+- `expired` → past TTL, awaiting archival
 
 ### Rules:
 - All agents can append (never edit others' entries)
 - @boss sweeps on session start: surface critical+pending, mark expired
-- Monthly: archive expired to state/archive/context-bus-YYYY-MM.md
+- @boss processes `calibration` signals: updates profile.md or reposts as targeted signals
+- After acting on a signal, update Status to `acted-on`
+- Monthly: archive expired and acted-on entries to state/archive/context-bus-YYYY-MM.md

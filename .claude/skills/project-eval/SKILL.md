@@ -86,3 +86,9 @@ Save to `state/decisions.md`:
 Score: [X]/15 — [GO/PASS/CONDITIONAL]
 Reasoning: [summary]
 ```
+
+### Step 6: Context-Bus Signal
+Post to `state/context-bus.md`:
+- **GO decision:** `@ceo → @coo + @cto + @cfo + @sales, Type: decision, Priority: normal, TTL: 14 days, Content: "Project GO: [name]. Score [X]/15. Next: [action].", Status: pending`
+- **PASS decision:** `@ceo → all, Type: decision, Priority: info, TTL: 7 days, Content: "Project PASS: [name]. Score [X]/15. Reason: [summary].", Status: pending`
+- **CONDITIONAL:** `@ceo → @sales + @cfo, Type: decision, Priority: normal, TTL: 14 days, Content: "Project CONDITIONAL: [name]. Needs: [negotiation points].", Status: pending`

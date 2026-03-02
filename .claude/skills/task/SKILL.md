@@ -85,9 +85,31 @@ If task carried 3+ times → flag: "Ten task się ciągnie. Chcesz go rozbić na
 - Freelancer → "work" = client tasks. Add "client:" tag.
 - Student → "work" = study tasks. "personal" = life tasks.
 
+## ADHD + Work Style Adaptation
+
+Read `profile.md` → `adhd_indicators`, `work_style` before displaying or adding tasks.
+
+### ADHD adaptation (adhd_indicators = yes/suspected)
+- **Show tasks:** Max 3 visible tasks, even if more exist. Show: "Masz jeszcze [X] zadań, ale skup się na tych 3."
+- **Add task:** Frame as dopamine hook: "⚡ Nowe wyzwanie dodane!" Add time estimate (15-25 min chunks).
+- **Complete task:** Loud celebration: "🔥 Boom! [X/Y] done! Następne wyzwanie?" Show streak if applicable.
+- **Carry-over:** If task carried 2+ times → break it down immediately, don't just flag at 3.
+
+### Work style adaptation
+- **Sprinter** → Group tasks into sprint blocks: "🏃 Sprint blok (60 min): #1, #2, #3". After sprint: "Odpoczynek czy następny sprint?"
+- **Scattered** → Show ONLY 1 task: "Jedno zadanie. Tylko to." Hide the rest completely. After completion, reveal next one.
+- **Procrastinator** → Show deadlines prominently: "#1 [Task] — ⏰ zostało 3h". Add countdown for today's tasks.
+- **Steady** → Standard display (no changes needed).
+
+## Context-Bus Signals
+After state changes, post to `state/context-bus.md`:
+- **Task completed:** `@coo → @boss, Type: data, Priority: info, TTL: 7 days, Content: "Task #X completed: [description]", Status: pending` — if all today's tasks done, Priority: normal
+- **Task skipped 3+ times:** `@coo → @coach, Type: insight, Priority: normal, TTL: 14 days, Content: "Task '[description]' skipped 3x — possible avoidance pattern", Status: pending`
+- **Goal-connected task done:** `@coo → @coach, Type: data, Priority: info, TTL: 7 days, Content: "Goal progress: [task] completed for goal #[X]", Status: pending`
+
 ## State Files
-- **Read:** state/tasks.md, state/daily-log.md (energy for matching)
-- **Write:** state/tasks.md (Today, This Week, Backlog)
+- **Read:** state/tasks.md, state/daily-log.md (energy for matching), profile.md (work_style, adhd_indicators)
+- **Write:** state/tasks.md (Today, This Week, Backlog), state/context-bus.md (signals)
 
 ## Agents
 - @coo owns work tasks

@@ -9,6 +9,8 @@ command: /evening
 
 Read `profile.md`. Check `user_type`, `tech_comfort`, `communication_style`. Quick end-of-day ritual (~3 min).
 
+**Context loading:** Use Summary reads (first 25 lines) for tasks.md and daily-log.md. Read today's Active section only for specific entries.
+
 **Adapt to tech_comfort:** "not technical" → plain language, no jargon. "I use apps" → name tools. "I code" → technical details OK.
 
 **Adapt to user_type:** Employee → work accomplishments, tomorrow's meetings. Freelancer → client work, invoicing. Student → study progress. Between things → progress on goals.
@@ -138,6 +140,15 @@ If the user interacted with a specific agent today (check context-bus or session
 
 If asked → set `feedback_asked_today: true` in @boss memory. Save response to relevant agent memory.
 If not asked or "Skip" → proceed to close. Never make this feel required.
+
+## Work Style Adaptation
+
+Read `profile.md` → `work_style` before starting the evening ritual.
+
+- **Sprinter** → After energy check, ask: "Sprint day czy rest day?" via `AskUserQuestion` (header: "Typ dnia", options: "🏃 Sprint day" / "🛋️ Rest day"). Sprint day → celebrate intensity. Rest day → validate: "Rest days fuel sprints. Dobra strategia."
+- **Scattered** → Compress to 1 question max (energy only). Skip "what went well" multi-select — instead: "Jedna rzecz, która dziś poszła dobrze?" (open text or skip). Goal: get in and out fast before attention drifts.
+- **Procrastinator** → Show tomorrow's deadlines prominently in close: "Jutro: [task] — deadline za [X]h. Zaczynam z samego rana."
+- **Steady** → Standard flow (no changes needed).
 
 ## Rules
 - Keep it to 3 questions MAX (including optional feedback — if asked, it counts)

@@ -28,18 +28,20 @@ Then immediately `AskUserQuestion`:
   - "⚡ Średnia (4-6) — normalny dzień"
   - "🔥 Wysoka (7-10) — jedziemy"
 
-## Step 1: Batch data loading
+## Step 1: Batch data loading (1 turn, all parallel)
 
-While processing energy answer, load ALL data in one batch of tool calls:
+While processing energy answer, load data in one batch of tool calls. Use **Summary reads (first 25 lines)** for growing files, full reads for small files:
 
-**Lite mode (batch Read calls):**
-- `state/tasks.md` — today's tasks
-- `state/pipeline.md` — follow-ups (if Business)
-- `state/habits.md` — streaks (if Health/Life)
-- `state/goals.md` — active goals
-- `state/daily-log.md` — yesterday's energy
+**Lite mode (batch Read calls — all in 1 turn):**
+- `state/tasks.md` (first 25 lines — Summary) — today's task counts from Summary, then Active section for today's tasks
+- `state/daily-log.md` (first 25 lines — Summary) — energy trend from Summary
+- `state/habits.md` (full) — streaks (if Health/Life)
+- `state/goals.md` (full) — active goals
+- `state/pipeline.md` (full, if Business) — follow-ups
 - Google Calendar MCP — today's events (if available)
 - Gmail MCP — pending follow-ups (if available)
+
+**Tier 2 (after Summary):** Read tasks.md Active section (today's date section) for specific task details.
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn (tasks, daily_logs, leads, habits).
 
@@ -64,6 +66,17 @@ If patterns exist with medium+ confidence AND today matches a pattern trigger �
 - If no pattern matches today → skip this step silently
 
 ## Step 2: Briefing (personalized to energy level)
+
+### Work Style Shaping (before pack-specific content)
+
+Read `profile.md` → `work_style`. This shapes how tasks are presented in the briefing:
+
+- **Sprinter** → Ask first: "🏃 Sprint day czy rest day?" via `AskUserQuestion` (header: "Tryb dnia", options: "🏃 Sprint — pełna moc" / "🛋️ Rest — minimum viable"). Sprint → show 3-5 tasks in sprint blocks. Rest → show 1 micro-task only + "Reszta poczeka."
+- **Scattered** → Show exactly 1 priority: "Dziś jedno: [top task]." Hide everything else. After completing → reveal next. Never show a full task list.
+- **Procrastinator** → Show deadlines with countdowns: "⏰ [task] — deadline za [X]h" for each task. Add: "Pierwszy krok: [smallest sub-task]. Zrób to w najbliższe 15 min."
+- **Steady** → Standard plan, consistent structure. Match what's been working.
+
+If `work_style` is empty → skip this step (standard plan).
 
 ### If Business pack active:
 - Open business tasks

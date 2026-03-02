@@ -14,16 +14,16 @@ One screen. Everything that matters. No scrolling required.
 
 ---
 
-## Data Sources (batch loading)
+## Data Sources (batch loading — Summary only, instant dashboard)
 
-**Issue ALL reads/queries in one batch of tool calls** — host runs them concurrently. Then render dashboard from loaded data.
+**Issue ALL reads in one batch of tool calls** — host runs them concurrently. Use **Summary reads (first 25 lines)** for growing files. /home renders entirely from Summaries — ZERO Tier 2 reads.
 
-**Always (Lite mode) — batch Read calls:**
-- `profile.md` → name, user_type, active_packs, primary_goal
-- `state/tasks.md` → today's tasks (count done/total)
-- `state/daily-log.md` → today's energy level
-- `state/habits.md` → streaks (if Health or Life pack active)
-- `state/finances.md` → buffer status (if Finance active)
+**Always (Lite mode) — batch Read calls, 1 turn:**
+- `profile.md` (full) → name, user_type, active_packs, primary_goal
+- `state/tasks.md` (first 25 lines — Summary) → today's task counts, overdue count
+- `state/daily-log.md` (first 25 lines — Summary) → today's energy, 7d trend
+- `state/habits.md` (full) → streaks (if Health or Life pack active)
+- `state/finances.md` (first 25 lines — Summary) → buffer %, spending today/week (if Finance active)
 
 **Pro mode (Supabase) — batch queries in one tool-use turn:**
 - `tasks` table → WHERE plan_date = CURRENT_DATE

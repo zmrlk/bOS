@@ -13,16 +13,16 @@ Read `profile.md` (incl. `user_type`), `state/tasks.md`, `state/weekly-log.md`.
 
 ## Protocol
 
-### Step 0: Batch data loading
+### Step 0: Batch data loading (1 turn, all parallel)
 
-Issue ALL reads/queries in one batch of tool calls:
-- `state/tasks.md` — this week's tasks completion
-- `state/weekly-log.md` — previous weeks for comparison
-- `state/goals.md` — active goals
-- `state/habits.md` — streaks (if Health/Life active)
-- `state/finances.md` — revenue/expenses (if Business/Finance active)
-- `state/pipeline.md` — pipeline status (if Business active)
-- `state/daily-log.md` — energy trends this week
+Issue ALL reads in one batch of tool calls. Use Summary (first 25 lines) + Active sections for growing files:
+- `state/tasks.md` (Summary + Active section) — this week's tasks completion
+- `state/weekly-log.md` (Summary + Active section) — previous weeks for comparison
+- `state/goals.md` (full) — active goals
+- `state/habits.md` (full) — streaks (if Health/Life active)
+- `state/finances.md` (Summary + Active section) — revenue/expenses (if Business/Finance active)
+- `state/pipeline.md` (full) — pipeline status (if Business active)
+- `state/daily-log.md` (Summary + Active section) — energy trends this week (14d window)
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn.
 
@@ -71,6 +71,108 @@ After user responds, combine their reflection with the data to give:
 **If Learning active:**
 - Study hours logged
 - Progress on current goal
+
+### Step 4B: Stale Profile Detection (after pack-specific updates)
+
+Compare mutable profile.md fields against the last 14 days of behavioral data. Only check fields that have 14+ days of data available.
+
+**Fields to check:**
+
+| Profile field | Compare against | Contradiction example |
+|---------------|----------------|----------------------|
+| `work_style` | daily-log.md task completion patterns | Profile says "steady" but data shows sprint→crash cycles |
+| `energy_pattern` | daily-log.md energy averages per day of week | Profile says "morning person" but highest energy logged in evenings |
+| `fitness_level` | habits.md workout frequency (last 14 days) | Profile says "active" but 2 workouts in 14 days |
+| `money_style` | finances.md impulse ratio (unplanned/total expenses) | Profile says "disciplined" but 40%+ impulse purchases |
+
+**Protocol:**
+1. Read profile.md → extract `work_style`, `energy_pattern`, `fitness_level`, `money_style`
+2. Read state/daily-log.md (last 14 days), state/habits.md, state/finances.md
+3. For each field with sufficient data (14+ days), compare profile claim vs actual behavior
+4. If contradiction found → suggest update:
+   ```
+   "📊 Profil mówi: [field] = [current value]
+    Dane z 2 tygodni: [observed pattern]
+    Zaktualizować?"
+   ```
+5. Use `AskUserQuestion`: "Tak, zaktualizuj" / "Nie, zostaw" / per suggestion
+
+**Rules:**
+- Max 2 suggestions per review (pick the most contradictory)
+- Only flag when data CLEARLY contradicts — borderline cases → skip
+- Skip fields that are empty in profile.md (nothing to contradict)
+- Skip fields with < 14 days of data
+- If user approves → update profile.md (backup first per State Write Protocol)
+
+### Step 4C: Calibration Review (after stale profile detection)
+
+Check @boss agent memory for agent feedback data from the last 14 days.
+
+**Protocol:**
+1. Search agent memory for "Nietrafione" feedback entries per agent
+2. If any agent has 3+ "Nietrafione" in the last 14 days → flag:
+   ```
+   "⚠️ @[agent] otrzymał [X] negatywnych ocen w ostatnich 2 tygodniach.
+    Rekalibracja?"
+   ```
+3. Use `AskUserQuestion`: "Tak, porozmawiajmy" / "Pomiń"
+4. If "Tak" → ask: "Co @[agent] powinien robić inaczej?" (open text)
+5. Save recalibration notes to the agent's memory
+6. Post to context-bus:
+   ```
+   ## [date] @boss → @[agent]
+   Type: calibration
+   Priority: normal
+   TTL: 7 days
+   Content: Recalibration requested. User feedback: [summary]. Adjust approach.
+   Status: pending
+   ```
+
+**Rules:**
+- Max 2 agents flagged per review (prioritize by highest negative count)
+- If no agents have 3+ negatives → skip this step silently
+- Don't flag agents the user hasn't interacted with in 14 days
+
+### Step 4D: Freshness Audit (after calibration review)
+
+**1. Profile freshness scan:**
+Parse `<!-- freshness: YYYY-MM-DD -->` headers from profile.md (already loaded in Step 0).
+Check each active pack section against Memory Freshness Hierarchy thresholds (CLAUDE.md):
+- Static fields: fresh if <365d
+- Semi-static fields: fresh if <90d, stale if 91-180d, expired if >180d
+- Dynamic fields: fresh if <30d, stale if 31-60d, expired if >60d
+
+If any section has EXPIRED dynamic fields (max 2 suggestions per review):
+```
+"📊 Freshness check:
+→ [section] — [field] last updated [X] days ago.
+  Current value: [value]. Still accurate?"
+```
+Use `AskUserQuestion`: "Tak, zaktualizuj" / "Nadal aktualne" / "Pomiń"
+- If "Tak" → ask for new value, update profile.md + freshness header
+- If "Nadal aktualne" → update freshness header only (re-stamp)
+- If "Pomiń" → skip
+
+**2. Agent memory consolidation:**
+For agents the user interacted with this week:
+- Merge duplicate observations (same insight saved multiple times)
+- Add timestamps to undated entries: "As of [month YYYY]: ..."
+- Archive entries older than 180 days to a summary note
+
+**3. State file health check:**
+Flag growing state files that need attention:
+- Archive section >500 lines → "Archive ready to move to separate file"
+- Summary metadata stale → refresh
+
+**4. Context-bus cleanup:**
+- Count expired entries. If >5 expired → archive to `state/archive/context-bus-[YYYY-MM].md`
+- Count `acted-on` entries. If >5 → archive alongside expired.
+
+**Rules:**
+- Max 2 freshness suggestions per review (pick the most expired)
+- Skip fields that are empty (nothing to verify)
+- This entire step should take <2 minutes of user time
+- Freshness audit uses already-loaded data — ZERO extra file reads
 
 ### Context Bus Writes (after review)
 

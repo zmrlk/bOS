@@ -63,8 +63,37 @@ If user provides a goal without subcommand → treat as `/goal set`.
 4. Suggest adjustments for struggling goals
 5. End with: "Jeden cel, który zasługuje na Twój fokus w tym tygodniu: [most impactful]"
 
+## ADHD Adaptation
+
+Read `profile.md` → `adhd_indicators` before all goal operations.
+
+**If adhd_indicators = yes/suspected:**
+
+### Show goals
+- Frame goals as challenges, not obligations: "🎯 Twoje wyzwania:" instead of "Twoje cele:"
+- Show streak counters: "Streak: [X] dni aktywnego postępu"
+- Max 2 visible goals. If more exist: "Masz [X] celów — te 2 są teraz najważniejsze."
+
+### Set goal
+- Add dopamine hook: "Nowe wyzwanie przyjęte! 🔥 Pierwszy milestone za [X] dni."
+- Auto-generate shorter milestones (1-2 weeks instead of months) for quicker wins
+- Frame target dates as countdowns: "Challenge: [goal] w [X] dni. Start!"
+
+### Update goal
+- Celebrate every update loudly: "📈 Postęp! [progress bar ████░░░░ 40%]. Nie zatrzymuj się!"
+- If progress milestone hit → extra celebration: "🏆 MILESTONE! [description]. To jest ogromne."
+
+### Complete goal
+- Maximum celebration: "🎉🎉🎉 WYZWANIE UKOŃCZONE! [goal]. Powiedziałeś, zrobiłeś. LEGENDA."
+- Show total streak/time: "Od startu do mety: [X] dni. [Y] aktualizacji. Konsekwencja = sukces."
+
+### Review
+- Show progress bars visually (████░░░░)
+- Focus on wins first, risks second
+- End with challenge framing: "Wyzwanie tygodnia: [most impactful goal action]"
+
 ## State Files
-- **Read:** state/goals.md, profile.md (primary_goal)
+- **Read:** state/goals.md, profile.md (primary_goal, adhd_indicators)
 - **Write:** state/goals.md (Active Goals, Milestones, Completed Goals)
 
 ## Agents

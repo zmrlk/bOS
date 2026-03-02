@@ -25,15 +25,17 @@ Surface TOP 2 only. Never more than 2 nudges at session start.
 
 ## Protocol
 
-### Step 1: Load state
-Read the following in order:
-- `state/tasks.md` — overdue tasks, tasks with no progress
-- `state/finances.md` — buffer level, recent spending, streak data
-- `state/habits.md` — missed workouts, broken streaks
-- `state/pipeline.md` — stale follow-ups (if business pack active)
-- Agent memory — energy trends from the last 7 days
+### Step 1: Load state (Summary-only — zero full-file reads)
+All data comes from Summary sections (first 25 lines) already loaded by @boss at session start. No additional reads needed.
 
-### Step 2: Check triggers
+**Data from Summaries:**
+- `tasks.md` Summary → "Overdue: X tasks", "Today: X/Y done"
+- `finances.md` Summary → "Buffer: X%", "Impulse ratio: X%"
+- `habits.md` (full, small file) → streak data, missed days
+- `pipeline.md` (full, small file) → stale leads (if business pack active)
+- `daily-log.md` Summary → "Energy 7d avg: X", "Energy trend: ↓"
+
+### Step 2: Check triggers from Summary metrics
 
 For each domain, evaluate:
 

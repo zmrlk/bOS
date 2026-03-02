@@ -44,3 +44,19 @@ Flag as potential impulse if:
 - Amount > 1 week of typical expenses
 - Description includes: "just", "random", "why not", "treat"
 If flagged → gentle note, don't lecture.
+
+### Before logging
+Read `profile.md` for: money_style, monthly_expenses, adhd_indicators, currency.
+Read `state/finances.md` for: buffer current, this month's total.
+- If buffer < target AND expense is non-essential → subtle note: "Buffer at [X]%. Just tracking."
+- If adhd_indicators = yes → keep response very short, no lecture.
+
+### Context-Bus Signals
+After logging, post to `state/context-bus.md`:
+- **Large expense (>10% monthly):** `@finance → @boss, Type: data, Priority: normal, TTL: 7 days, Content: "Large expense: [amount] [currency] — [category]. Monthly total now: [X]", Status: pending`
+- **Impulse flagged:** `@finance → @coach, Type: insight, Priority: info, TTL: 7 days, Content: "Impulse expense flagged: [amount] [currency] — [description]", Status: pending`
+- **Monthly spending exceeds budget:** `@finance → @boss + @cfo, Type: constraint, Priority: critical, TTL: 14 days, Content: "Monthly spending [amount] exceeds budget [budget]. Buffer impact.", Status: pending`
+
+## State Files
+- **Read:** state/finances.md, profile.md (money_style, monthly_expenses, adhd_indicators, currency)
+- **Write:** state/finances.md, state/context-bus.md

@@ -93,10 +93,32 @@ After confirming files exist, validate STRUCTURE:
 - Auto-repair if possible (add missing headers, fix table alignment)
 
 ### 6. System Health
-- **Maintenance check:** Read `state/.maintenance-log.md`. If last maintenance was 30+ days ago → "⚠️ Maintenance overdue. Run /morning to trigger monthly cleanup."
+- **Maintenance check:** Read `state/.maintenance-log.md`. If last maintenance was 30+ days ago OR file is empty/has zero entries → "⚠️ Maintenance overdue. Run /morning to trigger monthly cleanup."
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
 - **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]. Updating..."
 - **Context-bus check:** Count entries in context-bus.md. If >10 expired entries → "⚠️ Context-bus needs cleanup ([X] expired entries)."
+
+### 6B. Memory Freshness
+
+Parse `<!-- freshness: YYYY-MM-DD -->` headers from profile.md. For each active pack section, calculate age and classify as fresh/stale/expired per Memory Freshness Hierarchy (CLAUDE.md).
+
+Count Agent Calibrations entries by freshness (using "Last updated" column).
+
+```
+  🧠  MEMORY FRESHNESS
+  Core profile ........... ✅ fresh (Xd)
+  Business ............... ✅ fresh (Xd) / ⚠️ stale (Xd) / ❌ expired (Xd)
+  Life ................... ✅ / ⚠️ / ❌
+  Health ................. ✅ / ⚠️ / ❌
+  Learning ............... ✅ / ⚠️ / ❌
+  Finance ................ ✅ / ⚠️ / ❌
+  Agent calibrations ..... ✅ X/Y fresh / ⚠️ Z stale
+```
+
+- Only show sections for active packs
+- If any section is ❌ expired → "Run /review-week to update stale data."
+- If all fresh → "✅ All memory data is current."
+- This check uses already-loaded profile.md — zero extra reads
 
 ### 7. Summary
 ```
@@ -108,6 +130,7 @@ After confirming files exist, validate STRUCTURE:
   📁 State files ........ ✅ / ❌
   🔌 Superpowers ........ ✅ [X] active
   🤖 Agents ............. ✅ [X] active
+  🧠 Memory freshness ... ✅ / ⚠️ [X] stale / ❌ [X] expired
   📊 Mode ............... Lite / Pro
 
   Overall: ✅ Everything looks good!

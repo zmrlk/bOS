@@ -22,19 +22,19 @@ Show token awareness note (this is a multi-agent operation):
 ⏳ Zbieram raporty od Twoich agentów...
 ```
 
-### Step 2: Batch data loading
+### Step 2: Batch data loading (1 turn, all parallel)
 
-Load ALL data sources in one batch of tool calls (host runs them concurrently):
+Load data sources in one batch of tool calls. Use **Summary reads (first 25 lines)** for growing files, full reads for small files:
 
-**Lite mode (batch Read calls):**
-- `state/tasks.md` — task completion this week
-- `state/goals.md` — active goals
-- `state/daily-log.md` — energy trends (last 7 days)
-- `state/habits.md` — streak status
-- `state/finances.md` — if Finance/Business packs active
-- `state/pipeline.md` — if Business pack active
-- `state/projects.md` — if Business pack active
-- `state/context-bus.md` — any pending critical signals
+**Lite mode (batch Read calls — all in 1 turn):**
+- `state/tasks.md` (first 25 lines — Summary) — this week's completion metrics
+- `state/goals.md` (full) — active goals
+- `state/daily-log.md` (first 25 lines — Summary) — energy 7d avg and trend
+- `state/habits.md` (full) — streak status
+- `state/finances.md` (first 25 lines — Summary) — if Finance/Business packs active
+- `state/pipeline.md` (full) — if Business pack active
+- `state/projects.md` (full) — if Business pack active
+- `state/context-bus.md` (first 25 lines — Summary) — pending signal counts
 
 **Pro mode (batch Supabase queries):**
 Issue all relevant SELECTs in one tool-use turn: tasks, daily_logs, finances, leads, projects, memory signals.

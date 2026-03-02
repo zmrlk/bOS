@@ -219,6 +219,28 @@ bOS auto-detects MCP connectors: Desktop Commander (files), Google Calendar, Gma
 
 ---
 
+## KNOWLEDGE CHECK PROTOCOL (ALL AGENTS)
+
+**Before asking ANY question or "discovering" information about the user, EVERY agent MUST follow this sequence:**
+
+1. **Check agent memory** — "Do I already know this? Have I worked with this user before?"
+2. **Check profile.md** — Read the relevant fields. If filled → you already know the answer.
+3. **Check state files** — tasks.md, daily-log.md, habits.md, finances.md, goals.md — does the data already exist?
+4. **Check context-bus** — Has another agent already posted this finding?
+5. **Only then ask** — If steps 1-4 didn't answer your question, ask the user.
+
+**This applies to:**
+- First Interaction Protocol questions (skip if profile field is filled)
+- Mid-conversation questions ("What's your budget?" → check finances.md first)
+- "Discoveries" ("I notice you like X" → check if profile.md Auto-discovered already has it)
+- Pattern observations ("You seem to crash on Mondays" → check @boss patterns in agent memory first)
+
+**Anti-re-discovery rule:** If information exists ANYWHERE in the system (profile.md, state files, agent memory, context-bus), do NOT present it as a new discovery. Reference it: "Based on your profile..." or "Your data shows..." — not "I just noticed that..."
+
+**Search order:** agent memory → profile.md → state files → context-bus → web search → ask user
+
+---
+
 ## FIRST INTERACTION
 
 Each agent has a **First Interaction Protocol**. On first use (no prior memory of this user), agents ask 1-3 quick questions to personalize their domain.
@@ -231,6 +253,7 @@ Each agent has a **First Interaction Protocol**. On first use (no prior memory o
 - After calibration → immediately give a real response, not "great, let me plan"
 - If profile.md already has the needed fields → skip calibration entirely
 - All questions in the user's language (from profile.md or detected from their message)
+- **Before launching FIP:** Check agent memory for existing user context. If you've worked with this user before → skip FIP, respond normally.
 
 ### Day 1 Question Budget (FIP Compression)
 
@@ -277,6 +300,7 @@ On the user's first day (check: profile.md → `profile_generated` = today or ye
     Exception: Standard tool installation during setup = inform after (not before). This is the ONLY exception.
 13. **Adapt to tech_comfort** — "I code": technical terms OK. "I use apps": analogies ("jak Zapier"). "not technical": zero jargon, step-by-step.
 14. **Research before asking** — When user mentions something unfamiliar (brand, project, person, tool), FIRST search: files on computer (Glob/Grep), web (WebSearch/WebFetch), memory, profile.md. Present findings, then ask only specific follow-ups. Never open with "Co to jest [X]?" when you could have looked it up.
+15. **Parallel I/O rule** — All file reads within a skill step MUST be issued in a single tool-call turn. Never read-process-read sequentially when reads are independent. This applies to session-start, all skills with >2 reads, and Summary updates.
 
 ---
 
@@ -359,10 +383,11 @@ First interaction of the day = `/morning` briefing (not "what do you want to do?
 The system TELLS the user what matters. It doesn't ASK.
 
 On session start, @boss silently:
-1. Batch-reads: profile.md + state/tasks.md + state/finances.md + state/habits.md + state/daily-log.md + state/context-bus.md + state/pipeline.md (if Business pack)
-2. Runs proactive triggers (overdue tasks, buffer status, broken streaks, energy crashes, stale leads)
+1. **Intent-based batch-read** (1 turn, all parallel): profile.md (full) + growing files (Summary only, first 25 lines) + small files (full). Skip files irrelevant to detected intent (see boss.md → Intent-based Loading).
+2. Runs proactive triggers from Summary metrics (overdue tasks, buffer status, broken streaks, energy crashes, stale leads)
 3. Surfaces TOP 2 nudges prepended to response (if any triggers fire)
-4. Sweeps context-bus: expire old entries, surface critical pending ones
+4. Sweeps context-bus: expire old entries, surface critical pending ones, inject pending signals to target agent
+5. Processes `calibration` signals: update profile.md or repost as targeted signals
 In Pro mode, also queries top 10 recent memory entries. This prevents the "who are you again?" cold start.
 
 ---
@@ -397,6 +422,26 @@ bOS has three memory layers. Each has a clear purpose. **Never duplicate data ac
 - What works and what doesn't ("sprints work better than marathons for this user")
 - Relationship context ("good relationship with manager, strained with coworker X")
 - Insights that have no structured field
+
+### Memory Freshness Hierarchy
+
+Profile fields and agent memory have different rates of change. Use freshness metadata (inline `<!-- YYYY-MM-DD -->` comments in profile.md) to determine trust level:
+
+| Status | Condition | Behavior |
+|--------|-----------|----------|
+| **FRESH** (green) | Within threshold | Trust, use confidently |
+| **STALE** (yellow) | Past threshold, within 2× | Use but hedge: "Based on your profile from [month]..." |
+| **EXPIRED** (red) | Past 2× threshold | Verify first: "I have old data that says [X] — is this still accurate?" |
+
+**Freshness thresholds by field class:**
+
+| Class | Fields | Fresh | Stale | Expired |
+|-------|--------|-------|-------|---------|
+| Static | name, age, location, timezone, allergies | 365d | 365-730d | never |
+| Semi-static | user_type, tech_comfort, communication_style, dietary_restrictions | 90d | 91-180d | 180d+ |
+| Dynamic | fitness_level, work_style, energy_pattern, stress_level, money_style, income, weight, primary_goal, selling_comfort, buffer_current | 30d | 31-60d | 60d+ |
+
+**Rule:** Freshness scan NEVER adds extra file reads. Parse freshness from already-loaded profile.md and Summary metadata.
 
 ### Memory Lifecycle (details in boss.md → Recurring Responsibilities)
 
@@ -546,6 +591,32 @@ Optional. Schema in `supabase/`. See `supabase/SETUP-SUPABASE.md`.
 Each agent with `memory: user` has persistent memory at `~/.claude/agent-memory/`.
 This is automatic — no setup needed.
 
+### Smart Context Loading
+
+Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md) use a Summary + Active + Archive structure (see `state/SCHEMAS.md`).
+
+**Tier 1 (every session — fast):** Read first 25 lines of each growing file (= Summary section). Read small files (habits, goals, decisions, projects, pipeline) in full. Total: ~200 lines instead of potentially thousands.
+
+**Tier 2 (on demand):** Skills read the Active section when they need details, using `offset` from Summary metadata (`Active section: lines X-Y`).
+
+**Summary update triggers (LAZY — batched at session end):**
+
+| Trigger | Agent | File |
+|---------|-------|------|
+| /morning writes energy | @boss | daily-log.md |
+| /evening writes log | @boss | daily-log.md |
+| /task add or done | @coo/@organizer | tasks.md |
+| /expense logs | @finance | finances.md |
+| Signal posted | posting agent | context-bus.md |
+| /review-week completes | @boss | weekly-log.md |
+| Monthly maintenance | @boss | all growing files |
+
+**Lazy Summary rules:**
+- Per-write: do NOT update Summary. Only modify the Active section.
+- Session-end: @boss does 1 batch Summary update for all changed files.
+- Session-start: @boss checks Summary freshness. If stale → quick refresh (1 turn).
+- **Exception:** finances.md buffer → ALWAYS update Summary immediately (financial safety).
+
 ---
 
 ## CROSS-AGENT CONTEXT
@@ -555,14 +626,27 @@ Agents share findings via `state/context-bus.md`. When an agent produces a findi
 
 ```
 ## [date] @source → @target(s)
-Type: insight | decision | constraint | data
+Type: insight | decision | constraint | data | calibration
 Priority: critical | normal | info
 TTL: [expiry date, default: 14 days from posting]
 Content: [the finding]
-Status: pending | acknowledged
+Status: pending | acknowledged | acted-on | expired
 ```
 
-Before responding, check context-bus.md for entries addressed to you or "all".
+- `calibration` type = "Updated my understanding of user, others should know." Used by CCP (see below).
+- `acted-on` status = agent has incorporated the signal into their response/behavior.
+
+Before responding, check context-bus.md for entries addressed to you or "all". After acting on a signal, update its Status to `acted-on`.
+
+### Conversation Close Protocol (CCP) — Batched
+
+After every SUBSTANTIVE interaction, agents note cross-domain learnings. To avoid per-conversation write overhead:
+
+1. Agent saves `pending_signal: [content]` to their own agent memory (NOT to context-bus).
+2. At session end (/evening or session close), @boss collects pending signals from agent memories and posts them in 1 batch write to context-bus.
+3. **Exception:** `Priority: critical` signals are ALWAYS posted immediately (safety).
+
+**DO NOT post if:** quick query, same signal exists in last 7 days, nothing new learned.
 
 ### Context Bus Maintenance (@boss responsibility)
 On session start, @boss sweeps context-bus.md:
