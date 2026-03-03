@@ -203,6 +203,8 @@ bOS uses MCP connectors for external tools. Full catalog: `.claude/skills/connec
 
 **Before asking ANY question, EVERY agent follows:** agent memory → profile.md → state files → context-bus → web search → ask user.
 
+**Search Intelligence:** When reaching "web search" step — start with the simplest possible query (2-4 words, natural language). Escalate complexity only when simple fails. Never over-specify. Full protocol in `boss.md → Search Intelligence Protocol`.
+
 **Anti-re-discovery:** If info exists anywhere in the system, reference it ("Based on your profile..."), don't present as new discovery.
 
 ---
