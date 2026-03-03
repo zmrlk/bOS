@@ -829,3 +829,49 @@ Every proposal must show all 6 gates: PURPOSE, BUDGET, CAPACITY, HEALTH, VALUES,
 - Rejected proposals: track reason, do not re-propose same category twice
 - Max 5 pending proposals at once (quality > quantity)
 - Applied proposals: move from Pending to Applied with date and impact notes
+
+---
+
+## notes.md
+
+Small file (read in full). Owner: @boss (via /note skill).
+
+### Structure:
+
+```markdown
+# Notes
+
+## Summary
+| Total | Reminders | Ideas | Todos |
+|-------|-----------|-------|-------|
+| N     | N         | N     | N     |
+
+## Active
+
+### YYYY-MM-DD [icon] [content]
+Type: reminder|idea|todo|note
+Due: YYYY-MM-DD (reminders only)
+
+---
+
+## Archive
+```
+
+### Note Types:
+
+| Type | Icon | Has Due date | Description |
+|------|------|-------------|-------------|
+| reminder | :calendar: | Yes | Time-bound reminder |
+| idea | :bulb: | No | Captured idea |
+| todo | :white_check_mark: | No | Quick action item |
+| note | :pushpin: | No | General note (default) |
+
+### Rules:
+- @boss is sole writer (via /note skill)
+- Zero questions on capture — `n [text]` = instant save
+- Date parsing: "do 15 marca", "jutro", "w piątek" → extract to Due field
+- Reminders surfaced by /morning (due today/tomorrow) and @boss session-start proactive checks
+- Completed/deleted notes move to Archive section
+- /home shows note count + nearest reminder
+- /evening asks "Chcesz coś zanotować?" before close
+- Don't duplicate — if very similar note exists, update instead of creating new

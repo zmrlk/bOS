@@ -47,6 +47,7 @@ Show a clean, one-screen reference of everything available.
   /card             — shareable profile card
 
   ⚙️  SYSTEM
+  /note (n [text])  — quick capture — notes, reminders, ideas
   /scan             — learn about you (files)
   /check            — system health check
   /vault            — manage secrets/API keys

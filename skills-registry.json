@@ -66,6 +66,21 @@
       "tags": ["pitch", "sales", "presentation", "investor"]
     },
     {
+      "id": "note",
+      "name": "Quick Note",
+      "version": "1.0.0",
+      "author": "zmrlk",
+      "author_type": "official",
+      "category": "system",
+      "command": "/note",
+      "shortcut": "n",
+      "description": "Quick capture — notes, reminders, ideas. Saves to state/notes.md with timestamp and optional tags.",
+      "security_score": 10,
+      "requires_mcp": [],
+      "compatible_agents": ["@boss"],
+      "tags": ["note", "capture", "reminder", "idea", "quick"]
+    },
+    {
       "id": "meal-plan",
       "name": "AI Meal Planner",
       "version": "1.0.0",

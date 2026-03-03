@@ -468,3 +468,4 @@ History informs future cycles: rejected category twice -> stop suggesting. Patch
 13. **Objective Kernel gates everything.** No proposal reaches the user without passing alignment.
 14. **Version before modifying.** Agent files always backed up before prompt patches.
 15. **Auto-rollback on failure.** Prompt patch makes things worse -> revert automatically.
+16. **Anti-re-discovery.** Before presenting ANY proposal, check: agent memory, context-bus, recent conversation context, state files. If the issue was already discussed or established → reference it ("Jak ustaliliśmy...") instead of presenting as new discovery. /evolve discovers GAPS, not things the system already knows.

@@ -125,7 +125,7 @@ Agents live in `.claude/agents/`. Each has a `description` field.
 | `x [amt] [cat]` | /expense | `tt` | /timetrack |
 | `cn` | /connect | `in` | /inbox |
 | `sc` | /schedule | `mp` | /marketplace |
-| `sy` | /sync | | |
+| `sy` | /sync | `n [text]` | /note |
 
 ### Natural language → skill (any language, execute without asking)
 
@@ -154,6 +154,7 @@ Agents live in `.claude/agents/`. Each has a `description` field.
 | "energy map" / "mapa energii" | /energy-map | "network" / "kontakty" | /network |
 | "learning path" / "ścieżka nauki" | /learn-path | "karta" / "card" / "profile card" | /card |
 | "delete data" / "usuń dane" / "reset" | /delete-data | "webhooks" / "automation" / "n8n" | /webhooks |
+| "zanotuj" / "zapisz" / "notatka" / "note" | /note | | |
 
 **Rules:**
 - Context-sensitive: "plan" on Wednesday = "plan my day" → route to agent, not /plan-week.
@@ -250,6 +251,8 @@ Each agent has a FIP — 1-3 quick calibration questions on first use. Rules:
 12. **Parallel I/O** — All independent file reads in a single tool-call turn.
 13. **Voice mode** — Detect dictated messages → shorter responses, numbered options.
 14. **Quick Actions** — `AskUserQuestion` follow-ups ONLY after skill completions or clear follow-up. Max 3 options + escape.
+15. **Respond-First** — When a question requires research or background agents: (1) Answer IMMEDIATELY from what you already know (memory, state, context-bus), (2) Launch agents in background (`run_in_background: true`) for details/research, (3) When agents return, deliver results as follow-up. NEVER make the user wait in silence while agents work. Use the waiting time productively — share relevant context, teach, or surface useful info.
+16. **Max Parallelization** — Always look for ways to split work across multiple agents running simultaneously. If a task has 3+ independent parts, launch them as parallel agents. Assemble results after. Quality stays the same — each agent does its part fully. @boss decides the split strategy autonomously. The user gets faster results without sacrificing depth.
 
 ---
 
@@ -596,7 +599,7 @@ Don't load the full profile for every agent. Each agent gets ONLY the fields it 
 
 ### State files (`state/*.md`)
 Growing: tasks.md, finances.md, daily-log.md, weekly-log.md, context-bus.md, time-log.md, inbox.md
-Small: habits.md, goals.md, decisions.md, pipeline.md, projects.md, journal.md, network.md, invoices.md, schedules.md, marketplace.md, telemetry.md, evolution-proposals.md
+Small: habits.md, goals.md, decisions.md, pipeline.md, projects.md, journal.md, network.md, invoices.md, schedules.md, marketplace.md, telemetry.md, evolution-proposals.md, notes.md
 Infrastructure: .setup-progress.md, .mobile-setup-progress.md, .maintenance-log.md, .backup/, .webhooks.md, .pre-morning.md
 
 ### Mode Detection
@@ -626,13 +629,16 @@ Supabase MCP connected → Pro mode. No Supabase → Lite mode. Auto-detected, u
 ## CROSS-AGENT CONTEXT
 
 ### Context Bus (`state/context-bus.md`)
-Agents share findings affecting other domains:
+**One bus for ALL participants** — agents, sessions, system. No separate files.
 ```
 ## [date] @source → @target(s)
-Type: insight|decision|constraint|data|calibration | Priority: critical|normal|info
-TTL: [expiry, default 14d] | Status: pending|acknowledged|acted-on|expired
+Type: insight|decision|constraint|data|calibration|session-status | Priority: critical|normal|info
+TTL: [expiry, default 14d; session-status: 24h] | Status: pending|acknowledged|acted-on|expired
 Content: [finding]
 ```
+
+**Participants:** `@agent` (agents), `session:name` (parallel Claude Code sessions), `ALL` (broadcast).
+**Sessions on bus:** When multiple sessions run in parallel, each posts `session-status` entries with progress. Other sessions read these on start and during work. TTL = 24h (auto-expire). Same format, same file, same rules.
 
 Before responding, check bus for entries addressed to you. After acting, update Status.
 
@@ -692,6 +698,7 @@ Session start: @boss surfaces critical pending, expires past-TTL, monthly archiv
 | context-bus.md | all (append only) | all |
 | telemetry.md | @boss | /review-week, /evolve |
 | evolution-proposals.md | @boss (via /evolve) | all |
+| notes.md | @boss (via /note) | all |
 | journal/network/invoices/time-log/inbox/schedules/marketplace/.webhooks | respective skill owners | see schema |
 
 **Rules:** Read before writing. Only modify YOUR sections. Never delete others' entries. Re-read to verify. Coordinators (goals.md/@coach, habits.md/@wellness) receive updates via context-bus.
@@ -744,6 +751,24 @@ Supported events: `task.completed`, `expense.logged`, `habit.milestone`, `energy
 
 ### Token Awareness
 Inform before heavy ops (/scan, /standup, /review-week). Simple: "To zużyje więcej zasobów." Don't inform for normal ops.
+
+### Night Cycle (end of last session of the day)
+When user says /evening or "koniec dnia", @boss triggers Night Cycle after the evening skill:
+1. **Consolidate** — Each agent's observations from today → compress into agent memory (patterns, not raw events)
+2. **Archive** — Move completed tasks, expired context-bus entries, processed notes to Archive sections
+3. **Prepare** — Draft tomorrow's /morning brief: top 3 priorities + any reminders from notes.md due tomorrow
+4. **Clean** — Remove duplicate entries across state files, merge redundant context-bus signals
+
+Night Cycle runs silently within /evening. User sees only: "🌙 Night cycle done — tomorrow's brief ready."
+
+### Attention Guardian (ADHD protection)
+@boss monitors conversation flow. When user switches topics 3+ times in rapid succession without completing any:
+1. **Detect** — Track topic changes (different agent domains, different projects, unrelated questions)
+2. **Gentle nudge** — After 3rd switch: "Hej, masz 3 otwarte wątki: [A], [B], [C]. Który zamykamy najpierw?"
+3. **No blocking** — If user ignores or says "wiem" → back off, don't repeat for 30 min
+4. **Log** — Note the pattern in @boss memory (sprint→scatter indicator for @wellness/@coach)
+
+Rules: Never patronizing. Never block. Once per 30 min max. Skip if user explicitly said "random mode" or "luźno".
 
 ---
 

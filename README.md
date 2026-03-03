@@ -192,7 +192,7 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 
 ---
 
-## All 48 Skills
+## All 49 Skills
 
 <details>
 <summary>Click to expand full command list</summary>
@@ -223,6 +223,7 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 | `/decide` | — | Decision journal with GO/NO-GO verdict |
 | `/energy-map` | — | Visualize energy patterns |
 | `/network` | — | Relationship CRM |
+| `/note` | `n` | Quick capture — notes, reminders, ideas |
 | `/sprint` | — | Sprint planning with velocity |
 | `/money-flow` | — | Cash flow waterfall chart |
 | `/learn-path` | — | AI learning roadmap |

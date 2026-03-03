@@ -37,10 +37,11 @@ While processing energy answer, load data in one batch of tool calls. Use **Summ
 - `state/daily-log.md` (first 25 lines — Summary) — energy trend from Summary
 - `state/habits.md` (full) — streaks (if Health/Life)
 - `state/goals.md` (full) — active goals
+- `state/notes.md` (full) — reminders due today/tomorrow, active notes
 - `state/pipeline.md` (full, if Business) — follow-ups
 - Google Calendar MCP — today's events AND tomorrow's events (if available)
 - Gmail MCP — 3 parallel queries (all in same turn, if available):
-  - Newsletters last 24h: `from:([known newsletter senders from agent memory]) newer_than:1d`
+  - Newsletters last 24h: `from:(rundown.ai OR thenewstack.io OR bensbites.beehiiv.com OR dharmesh.com OR mrugalski) newer_than:1d`
   - Important non-newsletter emails: `newer_than:1d -label:newsletters -category:promotions -category:social is:inbox`
   - Overdue follow-ups: flagged/starred or `follow up` label
 
@@ -101,6 +102,13 @@ If @boss detects crash probability based on sprint length vs avg crash pattern:
 ```
 → Auto-reduce task suggestions to match predicted energy.
 
+**Notes reminders** (from notes.md):
+If notes.md has Active entries with type `reminder` and Due ≤ today or tomorrow:
+```
+📌 Przypomnienie: [note content] (termin: [date])
+```
+Max 2 reminders. If more → "...i jeszcze [N] przypomnień. Powiedz /note list."
+
 ## Step 1B: Pattern Insight (if 7+ entries in daily-log, runs after Step 1 data loading)
 
 **After Step 1 data loading, check @boss agent memory for patterns (from Pattern Analysis Protocol).**
@@ -155,78 +163,82 @@ If `work_style` is empty → skip this step (standard plan).
 - Current learning streak
 - Today's study goal (if any)
 
-### 📰 Newslettery (last 24h) — run if Gmail MCP available AND user has known newsletter senders
+### 📰 Newslettery (last 24h) — ALWAYS run if Gmail MCP available
 
-Search Gmail for newsletters from the last 24 hours. Newsletter senders are discovered progressively:
-- **Agent memory:** @boss stores newsletter senders as they're identified (from /scan-context, user mentions, or email patterns)
-- **Profile interests:** Match newsletters to `profile.md → interests` field
-- **First run:** If no senders known yet → skip. After first /scan-context or when user mentions newsletters → start tracking.
+Search Gmail for newsletters from the last 24 hours. Known newsletter senders for this user:
+- The Rundown AI / The Rundown Tech / The Rundown Robotics (`from:rundown`)
+- TAAFT — There's An AI For That (`from:taaft` or `from:theresanaiforthat`)
+- simple.ai — Dharmesh Shah (`from:dharmesh` or subject:simple.ai)
+- Ben's Bites (`from:bensbites`)
+- [#uN] Jakub Mrugalski (`from:mrugalski` or subject:"#uN")
 
 For each newsletter found, extract **1-2 key takeaways** (not full summaries, just the insight). Format:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📰 NEWSLETTERS — last 24h
+📰 NEWSLETTERY — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 [Newsletter name]: [1-2 sentence key insight]
-📧 [Newsletter name]: [1-2 sentence key insight]
+🤖 The Rundown: [1-2 zdania kluczowego insightu]
+🔧 Ben's Bites: [1-2 zdania]
+🇵🇱 [#uN] Mrugalski: [1-2 zdania]
+[inne newslettery jeśli są]
 ```
 
 **Rules:**
 - Max 2 sentences per newsletter. No fluff, just the actionable insight or key fact.
-- If no newsletters in last 24h → skip section silently
-- If 5+ newsletters found → pick top 3 most relevant to user's context (from profile interests + primary_goal)
+- If no newsletters in last 24h → skip section silently (no "brak newsletterów" message)
+- If 5+ newsletters found → pick top 3 most relevant to user's primary_goal and interests (from profile.md)
 - Language: match newsletter language (EN newsletter → EN summary, PL → PL)
 
-### 📧 Emails — last 24h
+### 📧 Maile — last 24h
 
 Search Gmail for important non-newsletter emails from last 24 hours (exclude: promotions, social, newsletters, automated notifications).
 
 Prioritize:
-1. Emails requiring action/reply (known contacts from state/network.md inner circle)
+1. Emails requiring action/reply (clients, key contacts from agent memory/profile.md)
 2. Invoices / payments received or due
-3. Emails from domains related to user's business (from profile.md → business section)
+3. Emails from domains/contacts flagged as important in agent memory
 4. Anything the user hasn't read
 
 Format:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 EMAILS — last 24h
+📧 MAILE — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✉️ [Sender] — [subject] → [1 sentence what it is + if reply needed]
-✉️ [Sender] — [subject] → [...]
+✉️ [Nadawca] — [temat] → [1 zdanie co to jest + czy wymaga odpowiedzi]
+✉️ [Nadawca] — [temat] → [...]
 ```
 
 **Rules:**
 - Max 5 emails. If more → show top 5 by priority (action required > unread > FYI)
-- If email requires reply → add `⚡ reply needed`
-- If 0 important emails → show: "📧 No important emails. Inbox clear."
+- If email requires reply → add `⚡ odpowiedź wymagana`
+- If 0 important emails → show: "📧 Brak ważnych maili. Skrzynka czysta."
 - Skip: automated system emails, newsletters, GitHub notifications, payment receipts with no action needed
 
-### 🗓️ Calendar
+### 🗓️ Kalendarz
 
 Pull today's events AND tomorrow's preview from Google Calendar MCP. Format:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🗓️ TODAY — [day of week, date]
+🗓️ DZIŚ — [dzień tygodnia, data]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[time] [event name] [location or link if available]
-[time] [event name]
+[czas] [event name] [ew. lokalizacja lub link]
+[czas] [event name]
 ...
-🌅 Tomorrow: [1-2 most important events or "no events"]
+🌅 Jutro: [1-2 najważniejsze eventy z jutra lub "brak eventów"]
 ```
 
 **Rules:**
-- Show all today's events with time. If 0 events → "No meetings — open day."
-- Flag back-to-back meetings: "⚠️ [N] meetings in a row — plan breaks"
-- Check profile.md → sacred_rituals: if any event conflicts with sacred ritual → flag: "⚠️ Conflict with [ritual] at [time]"
+- Show all today's events with time. If 0 events → "Brak spotkań — dzień wolny."
+- Flag back-to-back meetings: "⚠️ 3 spotkania pod rząd — zaplanuj przerwy"
+- Check profile.md → sacred_rituals. If any event conflicts → flag: "⚠️ Conflict with sacred ritual"
 - Tomorrow preview: max 2 events (the most important ones)
 - If Calendar MCP unavailable → skip section silently
 
 ### If user has tracked interests (from profile.md → interests field, then agent memory):
 - Run WebSearch for 2-3 topics user cares about (politics, markets, industry, weather)
-- Show as brief bullets with source: "📰 [headline] — [source]"
+- Show as brief bullets with source: "📰 [headline] — [źródło]"
 - Max 3 items. If WebSearch fails → skip silently.
 - If no interests tracked yet → skip this section entirely
 
@@ -241,37 +253,38 @@ Pull today's events AND tomorrow's preview from Google Calendar MCP. Format:
 [mode_icon] [MODE] | [HH:MM] | ⚡ [energy] | 📅 [N events]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-☀️ Good morning, [name]!
+☀️ Dzień dobry, [name]!
 
-[Pattern insight — if available, 1 line]
+[Pattern insight — jeśli jest, 1 linia]
 
-[🧠 bOS INSIGHTS — if Pro mode and insights exist]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📰 NEWSLETTERS — last 24h
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 [Newsletter]: [insight]
-📧 [Newsletter]: [insight]
+[🧠 bOS INSIGHTS — jeśli Pro mode i insights istnieją]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 EMAILS — last 24h
+📰 NEWSLETTERY — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✉️ [Sender] — [subject] → [summary + ⚡ if reply needed]
-[or: 📧 No important emails. Inbox clear.]
+🤖 The Rundown: [insight]
+📧 Ben's Bites: [insight]
+[inne jeśli są]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🗓️ TODAY — [day, date]
+📧 MAILE — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[time] [event]
-[time] [event]
-🌅 Tomorrow: [1-2 key events]
+✉️ [Nadawca] — [temat] → [zdanie + ew. ⚡ odpowiedź wymagana]
+[lub: 📧 Brak ważnych maili. Skrzynka czysta.]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ TODAY'S PLAN
+🗓️ DZIŚ — [dzień, data]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[czas] [event]
+[czas] [event]
+🌅 Jutro: [1-2 kluczowe eventy]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PLAN DNIA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [pack-specific briefing items]
 
-⏭️ Quick win: [1 small action to do RIGHT NOW]
+⏭️ Quick win: [1 małe działanie do zrobienia TERAZ]
 ```
 
 ## Low Battery Day (energy 1-3)

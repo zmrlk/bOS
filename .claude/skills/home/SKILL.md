@@ -24,6 +24,7 @@ One screen. Everything that matters. No scrolling required.
 - `state/daily-log.md` (first 25 lines — Summary) → today's energy, 7d trend
 - `state/habits.md` (full) → streaks (if Health or Life pack active)
 - `state/finances.md` (first 25 lines — Summary) → buffer %, spending today/week (if Finance active)
+- `state/notes.md` (full) → note count, nearest reminder
 
 **Pro mode (Supabase) — batch queries in one tool-use turn:**
 - `tasks` table → WHERE plan_date = CURRENT_DATE
@@ -88,6 +89,23 @@ Then show BLOCKS based on active packs. Each block is independent.
 ```
 
 Pick the highest-priority undone task for today. If no tasks → show primary_goal from profile.md with a suggestion.
+
+---
+
+## Block: NOTES (if notes.md has active entries)
+
+```
+  📌  NOTES
+  ┌─────────────────────────────────┐
+  │  [total] active · Next: [reminder text] ([date])  │
+  └─────────────────────────────────┘
+```
+
+- Only show if notes.md has Active entries (Total > 0)
+- Show total count + nearest reminder (if any has Due date)
+- If no reminders, just show count: "[N] active notes"
+- If no notes at all → skip this block entirely
+- Quick action hint: `n [text]` to add, `/note list` to see all
 
 ---
 
