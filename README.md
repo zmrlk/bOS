@@ -76,25 +76,50 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ---
 
-## What's New in v0.6.1
+## What's New in v0.7.0
+
+### Circadian Engine
+bOS adapts to your time of day and energy. 4 modes — STRATEGIST (morning, deep thinking), EXECUTOR (peak hours, action), PHILOSOPHER (evening, reflection), MAINTAINER (low energy, minimal). Automatically adjusts response format, routing, and task suggestions. Context bar shows current mode at top of every interaction.
+
+### Smart Model Router
+Automatic model selection based on task complexity. Quick ops → haiku (fast, cheap). Analysis → sonnet. Strategy → opus. Cost awareness built in — daily/weekly/monthly budget tracking with automatic de-escalation.
+
+### Minimal Context Injection
+Each agent receives ONLY the profile fields it needs — not the full profile. Saves tokens, protects privacy, faster routing. 17 agents × custom field maps.
+
+### Output Modes (MINIMAL / DETAILED / VISUAL / VOICE)
+Auto-detected from Circadian Engine, user preference, or voice mode. MINIMAL: 5 lines max. DETAILED: full analysis. VISUAL: ASCII charts. VOICE: 3 sentences, numbered options.
+
+### World Insights (Pro mode)
+Background intelligence surfaced in /morning. AI-generated insights from your data — patterns, predictions, recommendations. Max 2 per morning to avoid overwhelm.
+
+### Enhanced Morning Briefing
+Newsletter digest, email triage, calendar with tomorrow preview — all personalized from your profile and contact network. Visual hierarchy with section separators.
+
+### /connect Skill (MCP Manager)
+Full MCP lifecycle management: add, remove, test, discover, import. Adapted to tech_comfort (hide "MCP" from non-technical users). 7 modes including internet discovery with security scoring.
+
+### Sequential Thinking (Standard Tool)
+Structured reasoning for complex tasks. Automatically loaded at session start. Think → Search → Think → Act pattern for multi-step analysis.
+
+---
+
+## What Was New in v0.6.1
 
 ### Unified Inbox (/inbox)
-Messages from Telegram, Email, Slack, Discord, and WhatsApp — all in one place. Route messages to agents, reply through the original channel. Works in Lite mode (local markdown) and Pro mode (Supabase). Auto-routing sends invoices to @cfo, meetings to @coo, bugs to @devlead.
+Messages from Telegram, Email, Slack, Discord, and WhatsApp — all in one place. Route messages to agents, reply through the original channel.
 
 ### Cron Schedules (/schedule)
-Automate your rituals. Schedule /morning, /evening, /standup, or any skill to run on a cron. Delivered via Telegram, email, or in-app (free, no n8n needed). @boss checks for overdue in-app schedules every session.
+Automate your rituals. Schedule any skill to run on a cron. No n8n needed.
 
 ### Skill Marketplace (/marketplace)
-Browse and install official bOS skills from the GitHub registry. 10 skills available at launch (pomodoro, contract, pitch, meal-plan, meditation, and more). Security validation before every install. Community skills coming in v0.7.0.
+Browse and install official bOS skills from the GitHub registry. Security validation before every install.
 
 ### Hybrid Sync (/sync)
-Offline-first with cloud sync. Local files are always the fast source of truth. When Supabase is connected, changes push automatically. Conflict resolution: <5 min = auto-merge, >=5 min = you decide. Works transparently — agents don't need to know about sync.
+Offline-first with cloud sync. Conflict resolution built in.
 
-### Post-Update Data Migration
-After updates, bOS auto-fills new fields from existing data. What it can't figure out, it asks — with options to answer now, be reminded in 3 sessions, or skip forever. No more empty fields after version bumps.
-
-### Webhook Events Expanded
-New events: `message.received`, `message.replied`, `schedule.created`, `skill.installed`. Total: 17 webhook event types for n8n/Zapier/Make integration.
+### Post-Update Data Migration + Webhook Events
+Smooth version upgrades. 17 webhook event types for n8n/Zapier/Make.
 
 ---
 
@@ -255,7 +280,7 @@ Your data (profile, tasks, finances, habits, goals) is never touched — only th
 
 You have the full version of bOS. Everything included:
 - 17 agents + custom agent builder
-- 49 skills (including /inbox, /schedule, /marketplace, /sync)
+- 49 skills (including /connect, /inbox, /schedule, /marketplace, /sync)
 - Unified inbox — all channels in one place
 - Cron schedules — automate any skill
 - Skill marketplace — install new skills from registry

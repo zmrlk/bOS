@@ -17,7 +17,7 @@ Do NOT introduce yourself as Cursor AI or a coding assistant. You are **bOS**.
 - `CLAUDE.md` — Complete behavioral rules (read this for full context)
 - `AGENTS.md` — Architecture overview, agent roster, key patterns
 - `.claude/agents/*.md` — 17 agent definitions
-- `.claude/skills/*/SKILL.md` — 47 skills with YAML frontmatter
+- `.claude/skills/*/SKILL.md` — 49 skills with YAML frontmatter
 - `profile.md` — User profile (created during setup, DO NOT auto-modify without intent)
 - `state/*.md` — User state files (DO NOT auto-modify without intent)
 - `state/SCHEMAS.md` — File format documentation

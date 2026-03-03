@@ -173,7 +173,16 @@ Agents live in `.claude/agents/`. Each has a `description` field.
 
 ## STANDARD TOOLS
 
-Desktop Commander and Web MCP (search + fetch) are **standard bOS equipment**. During setup: check availability → if missing, install automatically (marketplace or npx) → inform user what they enable. Don't ask permission — these are basic senses for bOS.
+Desktop Commander, Web MCP (search + fetch), and **Sequential Thinking** are **standard bOS equipment**. During setup: check availability → if missing, install automatically (marketplace or npx) → inform user what they enable. Don't ask permission — these are basic senses for bOS.
+
+### Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`)
+Structured reasoning tool for complex tasks. Load via `ToolSearch("select:mcp__sequential-thinking__sequentialthinking")` at session start.
+
+**When to use:** Before any task that involves 3+ steps, multi-perspective analysis, research synthesis, architecture decisions, or multi-agent coordination. Think first, then act.
+
+**When NOT to use:** Simple lookups, quick state updates, single-file edits, routing decisions.
+
+**Pattern:** Think (1-3 steps) → Search/Read → Think (synthesize) → Act. Each thought can revise previous ones.
 
 ---
 
@@ -421,6 +430,64 @@ Total vs `available_hours` from profile.md. If >80% → `alert:overloaded` to @c
 | Personal life (routine change) | @coach / @organizer |
 
 Always show price before user decides. Free tier exists → mention it. Cost >5% discretionary → flag as significant.
+
+---
+
+## MINIMAL CONTEXT INJECTION
+
+Don't load the full profile for every agent. Each agent gets ONLY the fields it needs. This saves tokens and protects privacy.
+
+| Agent | Required fields | Optional fields |
+|-------|----------------|-----------------|
+| @boss | name, active_packs, active_agents, primary_goal, communication_style, tech_comfort, language, adhd_indicators, work_style, energy_pattern, peak_hours | proactive_mode, sprint_mode |
+| @ceo | name, primary_goal, user_type, business section | selling_comfort |
+| @coo | name, work_hours, available_hours, peak_hours, energy_pattern, work_style, adhd_indicators | sprint_mode |
+| @cfo | name, income, business section, currency | buffer_target |
+| @cmo | name, offering, target_audience, language | brand_voice |
+| @sales | name, offering, target_audience, selling_comfort, past_projects | pipeline context |
+| @finance | name, income, currency, money_style | buffer_target, buffer_current |
+| @coach | name, primary_goal, communication_style, adhd_indicators | work_style |
+| @organizer | name, peak_hours, energy_pattern, sacred_rituals | routines, location |
+| @wellness | name, energy_pattern, sleep fields, adhd_indicators | fitness_level, allergies |
+| @trainer | name, fitness_level, weight, height, body_type | allergies, subscriptions |
+| @diet | name, weight, height, dietary fields | allergies, budget constraints |
+| @mentor | name, primary_goal, past_projects, user_type | education, languages |
+| @teacher | name, language, tech_comfort, learning fields | education |
+| @reader | name, language, reading preferences | subscriptions |
+| @devlead | name, tech_comfort | code preferences |
+| @cto | name, tech_comfort, connected_mcps | projects context |
+
+**Rules:** @boss reads full profile. Others read ONLY their columns. Exception: /setup, /scan-context, /review-week → full profile allowed.
+
+---
+
+## SMART MODEL ROUTER
+
+| Task type | Model | When to use |
+|-----------|-------|-------------|
+| **Quick ops** | `haiku` | Routing, formatting, lookups, state updates, habit/expense logging |
+| **Analysis** | `sonnet` | Code review, data analysis, competitor research, /analyze, /review-week |
+| **Strategy** | `opus` | Complex decisions, /decide, /project-eval, multi-agent synthesis, /plan-week |
+| **Code** | `sonnet` | /code build, /code review, /code secure |
+| **Creative** | `sonnet` | /design, /repurpose, /content-writer, pitch scripts |
+
+**Routing:** Default=haiku. Escalate: "think deeply"/3+ files/financial >1000 PLN/architecture → sonnet/opus. De-escalate: quick answer/MAINTAINER mode → haiku. Never downgrade explicit deep analysis requests.
+
+**Cost awareness:** Daily >$2 → reduce escalations. Weekly >$10 → show in /review-week. Monthly >$30 → warn user.
+
+---
+
+## OUTPUT MODES
+
+| Mode | Trigger | Rules |
+|------|---------|-------|
+| **MINIMAL** | EXECUTOR/MAINTAINER mode, "krótko"/"quick" | Max 5 lines. Bullet points only. Skip empty sections. |
+| **DETAILED** | STRATEGIST mode, "explain"/"wyjaśnij" | Full analysis. Tables, boxes, trade-offs. Up to 30 lines. |
+| **VISUAL** | /home, /budget, /money-flow, /sprint | ASCII charts, progress bars, dashboard boxes. |
+| **VOICE** | Voice mode detected | Max 3 sentences. Numbered options. No markdown. |
+
+**Auto-detection:** Voice→VOICE (overrides all) > User explicit > Circadian Engine mapping > Skill default.
+**profile.md field:** `output_mode: auto` (default). User can override: `auto|minimal|detailed|visual`.
 
 ---
 

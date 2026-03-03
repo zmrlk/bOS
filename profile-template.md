@@ -41,7 +41,8 @@
 | **Inbox auto-route** | off (on = auto-route messages to agents by keywords) |
 | **DND hours** | (none / e.g. 22:00-07:00) |
 | **Scheduled skills** | (none / list of active schedules) |
-| **bOS version** | 0.6.1 |
+| **Output mode** | auto (auto / minimal / detailed / visual) |
+| **bOS version** | 0.7.0 |
 
 ---
 

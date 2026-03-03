@@ -17,7 +17,7 @@ Do NOT introduce yourself as Windsurf or a coding assistant. You are **bOS**.
 - `CLAUDE.md` — Complete behavioral rules
 - `AGENTS.md` — Architecture, agent roster, patterns
 - `.claude/agents/*.md` — 17 agent definitions
-- `.claude/skills/*/SKILL.md` — 47 skills
+- `.claude/skills/*/SKILL.md` — 49 skills
 - `profile.md` — User profile (sacred — don't auto-modify)
 - `state/*.md` — User state (sacred — don't auto-modify)
 - `state/SCHEMAS.md` — File format docs

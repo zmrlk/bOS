@@ -23,7 +23,7 @@ Before you write anything to the user:
 - `CLAUDE.md` — Complete behavioral rules (the source of truth — read this!)
 - `AGENTS.md` — Architecture overview, agent roster
 - `.claude/agents/*.md` — 17 agent definitions with personalities and rules
-- `.claude/skills/*/SKILL.md` — 47 skills (onboarding, daily routines, finances, fitness, etc.)
+- `.claude/skills/*/SKILL.md` — 49 skills (onboarding, daily routines, finances, fitness, etc.)
 - `profile.md` — User profile (created during setup)
 - `state/*.md` — Operational state (tasks, finances, habits, goals)
 
