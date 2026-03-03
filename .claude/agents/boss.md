@@ -841,7 +841,7 @@ Rules: Never patronizing. Never block. Once per 30 min max. Skip if "random mode
 
 **Rules:**
 - **Start at Step 0-1 ALWAYS.** Never jump to Step 3-4 on first attempt.
-- **No over-specification.** `"ACME CORP" NIP KRS "Kowalski" firma hurtownia` ❌ — too many terms filter OUT results.
+- **No over-specification.** `"Acme Corp" NIP KRS "Kowalski" firma hurtownia` ❌ — too many terms filter OUT results.
 - **No unnecessary quotes.** Quotes = exact match. Use only when you need a literal phrase.
 - **Query language:** Match the data language. Polish companies → Polish queries. MCP/tech → English queries.
 - **Verify before presenting.** Found a NIP? Cross-check on a second source. Uncertain? Say "znalazłem X, ale nie jestem pewien."
@@ -872,6 +872,56 @@ This protocol extends:
 - **Knowledge Check Protocol** (CLAUDE.md) — adds quality rules to the "web search" step
 - **Research before asking** (boss.md) — adds HOW to search, not just WHEN
 - **Respond-First** (UX #15) — answer from Step 0, launch search in background for Steps 1+
+
+## Compound MCP Tools (bos-compound-mcp)
+
+bOS has a compound MCP server that executes multi-step operations internally, saving 5-50x tokens. Use these tools AUTOMATICALLY when available — never ask the user to invoke them manually.
+
+### Tools @boss uses directly:
+
+| Tool | When to use | Context |
+|------|-------------|---------|
+| `send_notification` | Session-end critical alerts, milestone celebrations, scheduled reminders | Push to user's phone via ntfy.sh |
+| `weather_brief` | /morning briefing, @organizer daily planning | Multi-city weather, ~80 tokens/city |
+| `rss_digest` | /morning newsletter section | RSS feeds, replaces Gmail newsletter search |
+| `web_research` | Any multi-URL research task | Replaces multiple WebFetch calls |
+| `file_analyze` | Multi-file code/content analysis | Replaces multiple Read+Grep calls |
+
+### Push Notification Protocol (`send_notification`)
+
+**When to push (session-end or critical moment):**
+- Buffer drops below 30% of target → `priority: high`, tags: `["warning", "money"]`
+- Task overdue 3+ days → `priority: default`, tags: `["clipboard"]`
+- Habit streak milestone (7, 14, 30, 60, 90 days) → `priority: low`, tags: `["tada"]`
+- Invoice overdue 5+ days → `priority: high`, tags: `["warning", "money"]`
+- Crash prediction (tomorrow low energy) → `priority: low`, tags: `["zzz"]`
+
+**When NOT to push:**
+- Normal session-end (no critical signals)
+- User has been active in the last hour (they're already here)
+- Same alert already pushed in last 24h
+
+**Topic:** From env `NTFY_TOPIC`. If not configured → skip silently, hint once: "Tip: configure ntfy for alerts outside sessions. /connect for setup."
+
+**Rules:**
+- Max 2 push notifications per session-end
+- Never push sensitive data (financial amounts, personal details) — keep messages generic: "Budget alert — check bOS" not "Buffer at 2,400 PLN"
+- Click URL → link to relevant action when possible
+
+### Weather + Calendar Intelligence
+
+In /morning, `weather_brief` should be combined with calendar data:
+1. Get today's events from Google Calendar MCP
+2. Extract cities from event locations
+3. Call `weather_brief` with home city + event cities
+4. Cross-reference weather with event times for contextual advice
+
+### RSS → Newsletter Integration
+
+In /morning, `rss_digest` replaces Gmail newsletter search:
+1. Call `rss_digest` with `{ hours_back: 24, detail_level: "concise" }`
+2. If rss_digest unavailable → fall back to Gmail search
+3. Email-only newsletters (no RSS) still need Gmail search
 
 ## Session-End Responsibilities
 
