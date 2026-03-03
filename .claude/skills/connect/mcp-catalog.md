@@ -1,7 +1,8 @@
 # MCP Catalog — Vetted Connectors for bOS
 
-> Last updated: 2026-03-03. Update during each /evolve or /bos-dev research cycle.
-> Source: Anthropic MCP Registry, GitHub, community reviews.
+> Last updated: 2026-03-03. Update during each /bos-dev research cycle.
+> Source: Anthropic MCP Registry, GitHub, community reviews, mcp.so, glama.ai, pulsemcp.com, smithery.ai
+> Ecosystem: ~18,000+ MCP servers (Glama: 18,052 | PulseMCP: 8,600+ | Smithery: 7,300+)
 
 ---
 
@@ -123,7 +124,7 @@ These are verified by Anthropic and available via HTTP transport. Score: 10/10.
 
 ---
 
-## Community Servers (Vetted, Score >=8/10)
+## Community Servers (Vetted, Score ≥8/10)
 
 These are open-source, actively maintained, and community-verified.
 
@@ -260,14 +261,123 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | User profile | Recommended MCPs | Why |
 |-------------|-----------------|-----|
-| **Business owner** | GitHub, Notion/Linear, Stripe, Slack | Core business stack |
-| **Freelancer** | GitHub, Notion, Stripe, Gmail/ms365 | Client management |
-| **Developer** | GitHub, Playwright, Sentry, Supabase, Context7 | Dev workflow |
-| **Designer** | Figma, Canva, Miro | Creative tools |
-| **Manager** | Slack, Asana/Linear, Notion, Google Calendar | Team coordination |
-| **Student** | Notion, Google Drive, Context7 | Learning & notes |
-| **Sales** | HubSpot, Slack, Gmail/ms365 | Pipeline management |
-| **Marketing** | Canva, HubSpot, Slack | Content & campaigns |
+| **Business owner** | GitHub, Notion/Linear, Stripe, Slack, WhatsApp, ntfy* | Core business + messaging |
+| **Freelancer** | GitHub, Notion, Stripe, Gmail/ms365, WhatsApp, Clockwise | Client mgmt + focus time |
+| **Developer** | GitHub, Playwright, Sentry, Supabase, Context7, Tavily | Dev workflow + research |
+| **Designer** | Figma, Canva, Miro, YouTube | Creative tools + inspiration |
+| **Manager** | Slack, Asana/Linear, Notion, Google Calendar, Clockwise | Team coord + scheduling |
+| **Student** | Notion, Google Drive, Context7, YouTube, Spotify | Learning + focus music |
+| **Sales** | HubSpot, Slack, Gmail/ms365, WhatsApp, Postiz | Pipeline + social selling |
+| **Marketing** | Canva, HubSpot, Slack, Postiz, GA4, DeepL | Content + analytics |
+| **ADHD** | Clockwise, Spotify, ntfy*, Apple Reminders | Focus defense + notifications |
+| **Health-focused** | Open Wearables, Garmin, Spotify | Fitness tracking + motivation |
+
+*ntfy = built into bos-compound-mcp, no separate install needed
+
+---
+
+## Messaging & Communication
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **WhatsApp** (Go) | `claude mcp add whatsapp -- npx -y whatsapp-mcp` | Personal WhatsApp — messages, contacts, search. SQLite local. | 9/10 | HIGH |
+| **WhatsApp** (TS) | `claude mcp add whatsapp -- npx -y whatsapp-mcp-ts` | TypeScript alt — Baileys library | 8/10 | HIGH |
+| **Telegram** | `claude mcp add telegram -- npx -y telegram-mcp` | Send/receive Telegram, manage chats | 6/10 | LOW |
+| **Discord** | Community implementations | Channel messaging, server management | 5/10 | LOW |
+
+**WhatsApp note:** QR code scan on first run. Messages stored locally in SQLite, only sent to LLM when accessed. Critical for @inbox unified messaging.
+
+## Productivity & Focus (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Clockwise** | `claude mcp add --transport http clockwise https://www.getclockwise.com/mcp` | Smart scheduling, focus time defense, capacity analysis | 8/10 | HIGH |
+| **FocusMo** (ADHD) | FocusMo Pro + MCP integration | Focus data, streaks, app usage for ADHD coaching | 9/10 | MED (paid) |
+| **Apple Reminders** | `claude mcp add reminders -- npx -y apple-reminders-mcp` | Manage Reminders natively, sync to iPhone | 8/10 | MED |
+
+**Clockwise:** Free tier exists. ADHD-critical: auto-defends 4-6h focus blocks/week.
+
+## Media & Content (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Spotify** | `claude mcp add spotify -- npx -y spotify-mcp` | Playback control, playlists, search | 8/10 | MED |
+| **YouTube** | `claude mcp add youtube -- npx -y mcp-youtube` | Video search, transcript extraction, trends | 8/10 | MED |
+| **Postiz** (Social) | Self-hosted or cloud + MCP | Schedule posts to X, LinkedIn, IG, TikTok | 8/10 | MED |
+
+**YouTube note:** Needs YouTube Data API v3 key. Token-optimized: smart transcript segmentation.
+**Spotify note:** Needs Spotify Developer App + OAuth. @wellness focus music, @focus ADHD playlists.
+
+## Translation (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **DeepL** | `claude mcp add deepl -- npx -y deepl-mcp-server` | Professional multilingual translation, document translation | 8/10 | MED |
+| **Lara Translate** | `claude mcp add lara -- npx -y lara-mcp` | Context-aware translation with memory | 6/10 | LOW |
+
+**DeepL:** Free tier: 500k chars/month. Great for proposals + @cmo content in multiple languages.
+
+## Health & Fitness (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Open Wearables** | `claude mcp add wearables -- npx -y @openwearables/mcp-server` | Unified wearable data: Strava, Garmin, Apple Health, Polar, Whoop | 8/10 | LOW |
+| **Garmin Connect** | `claude mcp add garmin -- npx -y garmin-connect-mcp` | Garmin workout data, health metrics | 7/10 | LOW |
+| **Spike Health** | Spike API account + MCP | Wearable + fitness aggregation | 7/10 | LOW |
+
+**Open Wearables:** 47 sports science tools. v0.3.0-alpha (Jan 2026). @trainer + @wellness.
+
+## Research & Deep Web (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Tavily** | `claude mcp add tavily -- npx -y tavily-mcp` | AI-optimized search + extract + research | 9/10 | HIGH (needs key) |
+| **Firecrawl** | `claude mcp add firecrawl -- npx -y firecrawl-mcp` | Web scraping, crawling, structured extraction | 9/10 | HIGH (needs key) |
+| **Exa AI** | `claude mcp add exa -- npx -y exa-mcp` | Semantic search, find similar | 8/10 | MED (needs key) |
+| **Brave Search** | `claude mcp add brave -- npx -y @anthropic/brave-search-mcp --env BRAVE_API_KEY=KEY` | Web + local search | 9/10 | MED (needs key) |
+
+**Note:** All require API keys.
+
+## Memory & Knowledge (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Mem0/OpenMemory** | `pip install mcp-mem0` or OpenMemory local | Semantic memory search, graph memory | 8/10 | MED |
+| **Knowledge Graph** | `claude mcp add kg -- npx -y mcp-knowledge-graph` | Entity-relation graph, persistent context | 7/10 | LOW |
+
+**Mem0:** 9k+ GitHub stars. bOS already has memory architecture, but Mem0 adds semantic search. Candidate for bOS 1.0 Concept Graph.
+
+## Analytics & SEO (NEW)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Google Analytics GA4** | `claude mcp add ga4 -- npx -y google-analytics-mcp` | 200+ dimensions, traffic, conversions | 8/10 | MED |
+| **DataForSEO** | DataForSEO API key + MCP | SERP, keywords, backlinks | 7/10 | LOW (paid) |
+
+## MCP Gateways (Mega-tools)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Composio** | `claude mcp add --transport http composio https://mcp.composio.dev/` | ONE gateway to 300+ apps, managed OAuth | 9/10 | FUTURE |
+| **Zapier MCP** | `claude mcp add --transport http zapier [your-zapier-url]` | ONE connection to 8,000+ apps | 8/10 | FUTURE |
+
+**Privacy note:** Data flows through gateway provider. For sensitive data, prefer individual local MCPs. Good for non-sensitive ops when MCP count gets unwieldy.
+
+## Smart Home (Future — bOS 2.0)
+
+| Name | Install command | What it does | Score | Priority |
+|------|----------------|-------------|-------|----------|
+| **Home Assistant** | `claude mcp add ha -- [HA instance]/mcp` | Smart home control, automations | 7/10 | bOS 2.0 |
+
+---
+
+## Ecosystem Gaps (No good MCP exists yet)
+
+1. **EU/Regional banking** — No PSD2-compliant open banking MCP for most EU countries. Plaid is US/UK focused.
+2. **Regional invoicing systems** — Country-specific invoicing tools lack MCP integration.
+3. **ADHD-specific productivity** — FocusMo is paywalled. Opportunity for open-source.
+4. **Personal energy tracking** — No dedicated MCP (bOS has this internally via /energy-map).
+5. **Smart Pomodoro** — Flowtime/adaptive focus MCP doesn't exist.
 
 ---
 
@@ -275,16 +385,16 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 Before installing ANY MCP not in this catalog:
 
-- [ ] GitHub >=100 stars OR official Anthropic marketplace
+- [ ] GitHub ≥100 stars OR official Anthropic marketplace
 - [ ] Last commit < 3 months (actively maintained)
-- [ ] Positive reviews on >=2 sources (Reddit, GitHub, X)
+- [ ] Positive reviews on ≥2 sources (Reddit, GitHub, X)
 - [ ] No sudo/root/admin required
 - [ ] Open source (full code available)
 - [ ] Clear permissions in README
 - [ ] No security flags in GitHub issues
 - [ ] Known author (GitHub history, not anonymous)
 
-**Score >=8/10 = safe to propose. <8 = DO NOT install.**
+**Score ≥8/10 = safe to propose. <8 = DO NOT install.**
 
 ---
 
