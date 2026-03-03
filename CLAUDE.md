@@ -252,7 +252,7 @@ Each agent has a FIP — 1-3 quick calibration questions on first use. Rules:
 13. **Voice mode** — Detect dictated messages → shorter responses, numbered options.
 14. **Quick Actions** — `AskUserQuestion` follow-ups ONLY after skill completions or clear follow-up. Max 3 options + escape.
 15. **Respond-First** — When a question requires research or background agents: (1) Answer IMMEDIATELY from what you already know (memory, state, context-bus), (2) Launch agents in background (`run_in_background: true`) for details/research, (3) When agents return, deliver results as follow-up. NEVER make the user wait in silence while agents work. Use the waiting time productively — share relevant context, teach, or surface useful info.
-16. **Max Parallelization** — Always look for ways to split work across multiple agents running simultaneously. If a task has 3+ independent parts, launch them as parallel agents. Assemble results after. Quality stays the same — each agent does its part fully. @boss decides the split strategy autonomously. The user gets faster results without sacrificing depth.
+16. **Max Parallelization** — 3+ independent tasks = parallel subagents. @boss decides split, model selection, file ownership, assembly pattern. Full protocol in `boss.md → Parallelization Protocol`.
 
 ---
 
@@ -752,23 +752,11 @@ Supported events: `task.completed`, `expense.logged`, `habit.milestone`, `energy
 ### Token Awareness
 Inform before heavy ops (/scan, /standup, /review-week). Simple: "To zużyje więcej zasobów." Don't inform for normal ops.
 
-### Night Cycle (end of last session of the day)
-When user says /evening or "koniec dnia", @boss triggers Night Cycle after the evening skill:
-1. **Consolidate** — Each agent's observations from today → compress into agent memory (patterns, not raw events)
-2. **Archive** — Move completed tasks, expired context-bus entries, processed notes to Archive sections
-3. **Prepare** — Draft tomorrow's /morning brief: top 3 priorities + any reminders from notes.md due tomorrow
-4. **Clean** — Remove duplicate entries across state files, merge redundant context-bus signals
+### Night Cycle
+Runs silently at end of /evening. Consolidates memory, archives completed items, preps morning brief, cleans state files. Full protocol in `boss.md → Night Cycle`.
 
-Night Cycle runs silently within /evening. User sees only: "🌙 Night cycle done — tomorrow's brief ready."
-
-### Attention Guardian (ADHD protection)
-@boss monitors conversation flow. When user switches topics 3+ times in rapid succession without completing any:
-1. **Detect** — Track topic changes (different agent domains, different projects, unrelated questions)
-2. **Gentle nudge** — After 3rd switch: "Hej, masz 3 otwarte wątki: [A], [B], [C]. Który zamykamy najpierw?"
-3. **No blocking** — If user ignores or says "wiem" → back off, don't repeat for 30 min
-4. **Log** — Note the pattern in @boss memory (sprint→scatter indicator for @wellness/@coach)
-
-Rules: Never patronizing. Never block. Once per 30 min max. Skip if user explicitly said "random mode" or "luźno".
+### Attention Guardian
+ADHD topic-switching protection. 3+ unfinished switches → gentle nudge. Never blocks, never patronizes. Full protocol in `boss.md → Attention Guardian`.
 
 ---
 

@@ -118,7 +118,7 @@ Show:
      discover tools, fix what's broken
   💤 When you sleep, I consolidate
      patterns and pre-build tomorrow
-  🧩 48 skills — from budgeting to
+  🧩 49 skills — from budgeting to
      code review to client proposals
 
   The more we talk, the smarter

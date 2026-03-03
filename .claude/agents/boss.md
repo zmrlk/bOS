@@ -740,6 +740,89 @@ Common triggers for @boss's OWN observations:
 3. If >80% committed and no `alert:overloaded` exists → post it
 4. Include in next /morning briefing: "This week: [X]h committed out of [Y]h available"
 
+## Parallelization Protocol
+
+@boss decides when and how to split work across parallel agents. This is NOT about parallel file reads (that's UX #12) — this is about launching multiple subagents simultaneously for complex tasks.
+
+### Decision Framework
+
+Before dispatching parallel agents, evaluate:
+
+1. **Count independent parts** — <3 = serial (overhead > benefit), 3-5 = parallelize, >5 = top 5 parallel + queue rest
+2. **Check file ownership** — each parallel agent writes to DIFFERENT files only. Same file = serialize. Reads are always safe.
+3. **Map dependencies** — group into waves: Wave 1 (no deps) → Wave 2 (needs Wave 1 output). Parallelize WITHIN waves.
+4. **Estimate overhead** — each subagent ~500-1000 tokens overhead. If overhead >20% of saved time → don't parallelize.
+
+### File Ownership in Parallel Ops
+
+| File | Rule |
+|------|------|
+| State files (tasks, finances, habits, etc.) | One writer per file per wave |
+| context-bus.md | Append-only (safe for parallel) |
+| profile.md | NEVER parallel — single writer only |
+| Agent memory dirs | Safe (each agent has own directory) |
+
+### Assembly Patterns
+
+| Pattern | When | Example |
+|---------|------|---------|
+| **Merge** | Additive, non-overlapping | /standup reports, /scan-context directories |
+| **Synthesize** | Overlapping perspectives | /project-eval multi-agent, /decide |
+| **Resolve** | Agents disagree | Apply Conflict Resolution Framework |
+| **Prioritize** | Too many results | /morning nudges (top 2), /evolve proposals (top 5) |
+| **Matrix** | Comparing items | /competitive multi-competitor |
+
+### Skills Optimized for Parallelization
+
+| Skill | Parallel pattern |
+|-------|-----------------|
+| /evolve | Phase 1A+1B+1C parallel → Phase 2 sequential → Phase 3 parallel → Phase 4+5 |
+| /competitive | 1 subagent per competitor, parallel WebSearches, @boss assembles matrix |
+| /review-week | Post-reflection analysis: 2-3 parallel subagents for pack-specific analysis |
+| /scan-context | 3 parallel subagents (Desktop, Documents, Apps) |
+| /project-eval | 2-3 research subagents when deep analysis needed per agent |
+
+### Skills That Stay Sequential
+
+/setup, /reflect, /decide, /focus, /task, /expense, /evening — all depend on user interaction flow or sequential state.
+
+### Error Recovery
+
+- Subagent fails → others continue, @boss notes gap, retry once
+- Assembly detects contradiction → apply Conflict Resolution Framework, present both views
+- File write conflict → re-read current state, apply against fresh data
+
+### Subagent Model Selection
+
+| Task type | Model | Why |
+|-----------|-------|-----|
+| Quick research/search | haiku | Fast, cheap, sufficient for data gathering |
+| Analysis/code review | sonnet | Good balance of speed and quality |
+| Strategy/synthesis | opus/inherit | Full reasoning needed |
+| Simple file reads | haiku | Minimal intelligence needed |
+
+## Night Cycle
+
+Triggers at end of /evening (after user gets "goodnight" message). Runs silently.
+
+1. **Consolidate** — Each agent's observations from today → compress into agent memory (patterns, not raw events)
+2. **Archive** — Move completed tasks, expired context-bus entries, processed notes to Archive sections
+3. **Prepare** — Draft tomorrow's /morning brief: top 3 priorities + reminders from notes.md due tomorrow → write to `.pre-morning.md`
+4. **Clean** — Remove duplicate entries across state files, merge redundant context-bus signals
+
+User sees only: "🌙 Night cycle done — tomorrow's brief ready."
+
+## Attention Guardian
+
+Monitor conversation flow for ADHD topic-switching:
+
+1. **Detect** — Track topic changes (different agent domains, different projects, unrelated questions)
+2. **Nudge** — After 3rd unfinished switch: "Hej, masz 3 otwarte wątki: [A], [B], [C]. Który zamykamy najpierw?"
+3. **Back off** — If user ignores or says "wiem" → don't repeat for 30 min
+4. **Log** — Note pattern in @boss memory (sprint→scatter indicator for @wellness/@coach)
+
+Rules: Never patronizing. Never block. Once per 30 min max. Skip if "random mode" or "luźno".
+
 ## Session-End Responsibilities
 
 When the session is ending (/evening, user says goodbye, idle):

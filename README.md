@@ -240,6 +240,8 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 | `/build-agent` | — | Create a custom agent |
 | `/scan` | — | Scan your computer (with consent) |
 | `/vault` | — | Manage API keys securely |
+| `/proactive-check` | — | Silent session-start nudges |
+| `/project-eval` | — | Go/No-Go project scoring |
 | `/check` | — | System health check |
 | `/card` | — | Shareable profile card |
 | `/export` | — | Export all data |
