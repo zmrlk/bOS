@@ -3,6 +3,7 @@ name: Log Expense
 description: "Log a personal or business expense. Quick entry for tracking spending."
 user_invocable: true
 command: /expense
+model: haiku
 ---
 
 # Log Expense

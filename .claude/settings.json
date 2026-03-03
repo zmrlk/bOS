@@ -16,6 +16,26 @@
       "Bash(wc *)",
       "Bash(pwd)",
       "Bash(touch *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(stat *)",
+      "Bash(sort *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(echo *)",
+      "Bash(printf *)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git show*)",
+      "Bash(git fetch*)",
+      "Bash(npx *)",
+      "Bash(which *)",
+      "Bash(uname *)",
+      "Bash(test *)",
+      "Bash([ *)",
       "mcp__*"
     ],
     "deny": [
@@ -26,7 +46,47 @@
       "Bash(wget *)",
       "Bash(python*)",
       "Bash(node -e *)",
-      "Bash(pbcopy*)"
+      "Bash(pbcopy*)",
+      "Bash(git push*)",
+      "Bash(git reset --hard*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-compact.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-end.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "75"
   }
 }

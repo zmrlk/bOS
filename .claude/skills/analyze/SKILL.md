@@ -3,6 +3,8 @@ name: Data Analysis
 description: "Professional data analysis — read CSV/JSON/Excel, summary statistics, outliers, ASCII charts, insights. Use when the user needs to analyze data files or validate pipeline data."
 user_invocable: true
 command: /analyze
+model: sonnet
+context: fork
 ---
 
 # /analyze — Professional Data Analysis

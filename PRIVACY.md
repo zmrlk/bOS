@@ -275,12 +275,6 @@ If you use `/marketplace`, bOS tracks which skills you've installed in `state/ma
 
 ---
 
-## Cross-platform instruction files
-
-bOS includes instruction files for multiple AI coding platforms (`.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, `AGENTS.md`, `GEMINI.md`, `.codex/config.toml`). These files contain only system architecture descriptions and behavioral instructions — no personal data, no secrets, no user information. They help other AI tools understand the bOS codebase if you open it in Cursor, Copilot, Codex, or other platforms. These files are safe to commit to version control.
-
----
-
 ## What bOS does NOT do
 
 - bOS does not sell your data. All your information stays on your computer (or in your own private database if you connect one). There is no central server, no analytics, no tracking.

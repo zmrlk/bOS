@@ -3,6 +3,7 @@ name: Task Manager
 description: "Add, list, complete, or manage tasks. Works with @coo (work tasks) and @organizer (life tasks)."
 user_invocable: true
 command: /task
+model: haiku
 ---
 
 # /task — Task Manager

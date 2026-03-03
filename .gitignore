@@ -27,6 +27,13 @@ state/n8n-templates/
 bos-export-*.md
 
 # ─────────────────────────────────────────────
+# TEMP / BUILD
+# ─────────────────────────────────────────────
+.trash-cross-platform/
+node_modules/
+state/.pre-morning.md
+
+# ─────────────────────────────────────────────
 # OS ARTIFACTS
 # ─────────────────────────────────────────────
 .DS_Store

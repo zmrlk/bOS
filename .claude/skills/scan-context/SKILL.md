@@ -3,6 +3,7 @@ name: Scan Context
 description: "Scan the user's files, calendar, and apps to build context about them. Used during setup or anytime the user wants bOS to learn more about them. Always requires explicit consent."
 user_invocable: true
 command: /scan
+context: fork
 ---
 
 # Context Scanner

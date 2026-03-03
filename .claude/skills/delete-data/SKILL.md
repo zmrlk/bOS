@@ -3,6 +3,8 @@ name: Delete My Data
 description: "Delete all personal data from bOS. Resets profile, state files, and agent memory."
 user_invocable: true
 command: /delete-my-data
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+disable-model-invocation: true
 ---
 
 # /delete-my-data — Data Deletion

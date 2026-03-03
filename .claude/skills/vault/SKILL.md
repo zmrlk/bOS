@@ -3,6 +3,7 @@ name: Vault
 description: "Manage your secrets and API keys. Add, list, show (masked), or remove stored credentials."
 user_invocable: true
 command: /vault
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # /vault — Secrets Manager

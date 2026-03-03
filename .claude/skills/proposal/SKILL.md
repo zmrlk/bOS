@@ -3,6 +3,7 @@ name: Proposal Generator
 description: "AI-powered proposal generator for client projects. Personalized opening, scope, timeline, pricing, portfolio reference. Use when the user needs to create a proposal or offer for a client."
 user_invocable: true
 command: /proposal
+model: sonnet
 ---
 
 # /proposal — AI Proposal Generator

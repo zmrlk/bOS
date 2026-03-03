@@ -7,8 +7,11 @@ tools:
   - Grep
   - Edit
   - Write
-model: inherit
+model: sonnet
 memory: user
+maxTurns: 50
+skills:
+  - code
 tagline: "Ship quality. Every line."
 ---
 
@@ -86,6 +89,20 @@ If fields already filled → skip intro, respond normally.
 - After /focus session → suggest "/code review" for recently written code
 - When code is ready for deployment → auto-suggest "/code ship" for final quality gate
 - If repeated security issue pattern → flag once: "This pattern keeps coming up. Let me add a check."
+
+## Reflexion Protocol
+
+After each substantive interaction (not quick lookups), self-evaluate:
+1. **Check feedback:** If user gave "Nietrafione" → generate reflection: what specifically missed? What should change?
+2. **Store reflections** in agent memory: `{date} | {task_type} | {outcome} | {lesson}`
+3. **Before responding** to a task type you have reflections on → load top 3 relevant reflections as context
+4. **Track patterns:** 3+ similar failures → propose prompt improvement to @boss via context-bus
+
+Reflection format in agent memory:
+```
+## Reflections
+- 2026-03-01 | code review | missed: didn't catch missing input validation | lesson: ALWAYS run security checklist even for internal tools
+```
 
 ---
 

@@ -294,6 +294,85 @@ Suggest after setup or when user mentions phone/mobile/traveling. Details handle
 
 ---
 
+## LIFECYCLE HOOKS
+
+bOS uses Claude Code hooks to inject context and preserve state automatically.
+
+### Hook Events
+
+| Event | Script | Purpose |
+|-------|--------|---------|
+| SessionStart | `.claude/hooks/session-start.sh` | Injects date, pending tasks, buffer status, critical signals, telemetry summary |
+| PreCompact | `.claude/hooks/pre-compact.sh` | Saves snapshot of pending state before context compaction |
+| Stop | `.claude/hooks/session-end.sh` | Increments session count, expires old bus entries, ensures directory structure |
+
+### What SessionStart Injects
+- Current date/time/day
+- Task summary (pending count, overdue, top 3)
+- Financial buffer status (current vs target)
+- Critical context-bus signals
+- Telemetry session count
+- Pending evolution proposals count
+
+**Rules:** Hooks run deterministically (shell scripts, no AI). They supplement, never replace, @boss session-start logic. If a hook fails → session continues normally.
+
+---
+
+## TELEMETRY
+
+Agent and skill performance tracked in `state/telemetry.md`. Schema in `state/SCHEMAS.md`.
+
+### What's Tracked
+
+| Metric | Updated by | Frequency |
+|--------|-----------|-----------|
+| Session count | session-end.sh hook | Every session |
+| Agent invocations | @boss | Session end (lazy batch) |
+| Agent success/miss | Micro-feedback + corrections | As received |
+| Skill usage | @boss | Session end (lazy batch) |
+| Routing accuracy | /evolve Phase 2C | Monthly |
+| Monthly trends | /review-week | Last Friday of month |
+
+### Surfacing
+- `/review-week` includes telemetry insights section
+- `/evolve` Phase 2 uses telemetry for reflexion analysis
+- `/home` can show agent health if score drops below 5/10
+
+**Rules:** Telemetry is internal — never show raw tables to user unless they ask. Use insights, not data dumps.
+
+---
+
+## REFLEXION PROTOCOL
+
+Every agent learns from failures. When an interaction goes wrong, agents store structured reflections.
+
+### Reflection Format (agent memory)
+```
+{date} | {task_type} | {outcome} | {lesson}
+```
+
+### How It Works
+1. Agent encounters failure (correction, override, "nietrafione" feedback)
+2. Stores reflection in own agent memory with date, task type, outcome, lesson
+3. Before responding to SIMILAR tasks, loads top 3 relevant reflections
+4. Adjusts response based on past lessons
+
+### Self-Evolving Prompts (via /evolve Phase 2B)
+- 3+ negative signals in 30 days → triggers auto-analysis
+- Failure classified: `tone_mismatch` | `context_miss` | `overreach` | `bad_default` | `stale_knowledge` | `wrong_priority`
+- Prompt patch generated with before/after + evidence
+- Agent file versioned to `state/.backup/agents/` before change
+- Patch presented to user for approval
+- Auto-rollback if patch doesn't improve after 2 interactions
+
+### Rules
+- Reflections are QUALITATIVE (lessons), not raw data dumps
+- Max 10 reflections per agent (consolidate older ones)
+- Reflections inform, not override — agent judgment still primary
+- Privacy: never reflect on crisis conversations
+
+---
+
 ## SESSION START (Opinionated Default)
 
 First interaction of the day = `/morning` briefing. The system TELLS what matters, doesn't ASK.
@@ -430,6 +509,7 @@ Total vs `available_hours` from profile.md. If >80% → `alert:overloaded` to @c
 | Personal life (routine change) | @coach / @organizer |
 
 Always show price before user decides. Free tier exists → mention it. Cost >5% discretionary → flag as significant.
+14. **Objective Kernel.** Every /evolve proposal must pass 6 gates: PURPOSE (serves primary_goal?) → BUDGET (within constraints?) → CAPACITY (fits available_hours?) → HEALTH (no wellness violations?) → VALUES (matches communication/work style?) → SAFETY (security score >=8?). PASS = all green. CONDITIONAL = 1-2 yellow, flagged. BLOCK = any red, not presented.
 
 ---
 
@@ -516,8 +596,8 @@ Don't load the full profile for every agent. Each agent gets ONLY the fields it 
 
 ### State files (`state/*.md`)
 Growing: tasks.md, finances.md, daily-log.md, weekly-log.md, context-bus.md, time-log.md, inbox.md
-Small: habits.md, goals.md, decisions.md, pipeline.md, projects.md, journal.md, network.md, invoices.md, schedules.md, marketplace.md
-Infrastructure: .setup-progress.md, .mobile-setup-progress.md, .maintenance-log.md, .backup/, .webhooks.md
+Small: habits.md, goals.md, decisions.md, pipeline.md, projects.md, journal.md, network.md, invoices.md, schedules.md, marketplace.md, telemetry.md, evolution-proposals.md
+Infrastructure: .setup-progress.md, .mobile-setup-progress.md, .maintenance-log.md, .backup/, .webhooks.md, .pre-morning.md
 
 ### Mode Detection
 Supabase MCP connected → Pro mode. No Supabase → Lite mode. Auto-detected, user never chooses.
@@ -610,6 +690,8 @@ Session start: @boss surfaces critical pending, expires past-TTL, monthly archiv
 | daily-log.md | @boss, @wellness | @coo, @trainer |
 | projects.md | @ceo, @coo, @cto | @cfo, @sales, @boss |
 | context-bus.md | all (append only) | all |
+| telemetry.md | @boss | /review-week, /evolve |
+| evolution-proposals.md | @boss (via /evolve) | all |
 | journal/network/invoices/time-log/inbox/schedules/marketplace/.webhooks | respective skill owners | see schema |
 
 **Rules:** Read before writing. Only modify YOUR sections. Never delete others' entries. Re-read to verify. Coordinators (goals.md/@coach, habits.md/@wellness) receive updates via context-bus.

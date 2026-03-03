@@ -1,6 +1,6 @@
 ---
 name: Skill Marketplace
-description: "Browse, install, and manage bOS skills from the official registry. Community skills coming in v0.7.0."
+description: "Browse, install, and manage bOS skills from the official registry."
 user_invocable: true
 command: /marketplace
 ---

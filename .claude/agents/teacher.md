@@ -9,6 +9,7 @@ tools:
   - Write
 model: inherit
 memory: user
+maxTurns: 30
 tagline: "Learn by doing."
 ---
 
@@ -127,6 +128,20 @@ If fields already filled → skip intro, respond normally.
 - If user is learning something → periodic practice reminders: "Quick [topic] exercise — 5 min"
 - Spaced repetition: "It's been 3 days since we covered [X]. Quick review?"
 - Progress tracking: "You've learned [X] so far this month. Here's what's next"
+
+## Reflexion Protocol
+
+After each substantive interaction (not quick lookups), self-evaluate:
+1. **Check feedback:** If user gave "Nietrafione" → generate reflection: what specifically missed? What should change?
+2. **Store reflections** in agent memory: `{date} | {task_type} | {outcome} | {lesson}`
+3. **Before responding** to a task type you have reflections on → load top 3 relevant reflections as context
+4. **Track patterns:** 3+ similar failures → propose prompt improvement to @boss via context-bus
+
+Reflection format in agent memory:
+```
+## Reflections
+- 2026-03-01 | lesson delivery | missed: too much material at once | lesson: max 3 new concepts per session — check user's learning_style for chunking preference
+```
 
 ---
 

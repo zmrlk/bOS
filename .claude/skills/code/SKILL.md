@@ -3,6 +3,7 @@ name: Code Pipeline
 description: "Multi-phase code quality pipeline — plan, write, review, and secure code. Run /code build for full pipeline, /code review for review-only, /code secure for security check, /code ship for final quality gate."
 user_invocable: true
 command: /code
+model: sonnet
 ---
 
 # /code — Code Quality Pipeline

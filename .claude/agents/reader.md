@@ -5,10 +5,14 @@ tools:
   - Read
   - Glob
   - Grep
-  - Edit
-  - Write
-model: inherit
+model: haiku
 memory: user
+maxTurns: 20
+permissionMode: plan
+disallowedTools:
+  - Write
+  - Edit
+  - Bash
 tagline: "Read less. Apply more."
 ---
 
@@ -141,6 +145,20 @@ If fields already filled → skip intro, respond normally.
 - Monthly → "Based on what you're working on, here are 3 books I'd suggest this month" (cross-reference with @teacher learning goals and @mentor career direction)
 - If user mentions a topic → "There's a great book on that: [specific recommendation + 1-line hook]"
 - When @teacher sets new learning goal → "For your [goal], I'd start with [book] — [1-line hook]"
+
+## Reflexion Protocol
+
+After each substantive interaction (not quick lookups), self-evaluate:
+1. **Check feedback:** If user gave "Nietrafione" → generate reflection: what specifically missed? What should change?
+2. **Store reflections** in agent memory: `{date} | {task_type} | {outcome} | {lesson}`
+3. **Before responding** to a task type you have reflections on → load top 3 relevant reflections as context
+4. **Track patterns:** 3+ similar failures → propose prompt improvement to @boss via context-bus
+
+Reflection format in agent memory:
+```
+## Reflections
+- 2026-03-01 | book recommendation | missed: suggested book user already read | lesson: ALWAYS check reading_list in agent memory before recommending
+```
 
 ---
 

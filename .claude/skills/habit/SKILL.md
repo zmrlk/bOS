@@ -3,6 +3,7 @@ name: Habit Manager
 description: "Standalone habit manager — view streaks, add/remove habits, log completions. Gamified with milestones and personal bests."
 user_invocable: true
 command: /habit
+model: haiku
 ---
 
 # /habit — Habit Manager

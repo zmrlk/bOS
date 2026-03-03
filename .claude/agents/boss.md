@@ -9,6 +9,10 @@ tools:
   - Write
 model: inherit
 memory: user
+maxTurns: 100
+skills:
+  - morning
+  - proactive-check
 tagline: "I handle the routing. You just talk."
 ---
 
@@ -568,7 +572,7 @@ cp profile.md state/.backup/profile-pre-update-$(date +%Y%m%d).md 2>/dev/null
 # Pull ONLY system files from remote
 git checkout origin/main -- \
   CLAUDE.md VERSION README.md PRIVACY.md \
-  profile-template.md update.sh \
+  profile-template.md skills-registry.json \
   .claude/agents/ .claude/skills/ \
   state/SCHEMAS.md supabase/ templates/
 ```
@@ -660,15 +664,29 @@ After checkout:
 | Problem | Action |
 |---------|--------|
 | No internet | Skip silently. bOS works fully offline. |
-| git not installed | Skip silently. Suggest `update.sh` if user asks about updates. |
+| git not installed | Skip silently. Suggest manual download if user asks about updates. |
 | Fetch fails (private repo, auth) | Skip silently. |
 | Checkout fails | Report: "Aktualizacja nie powiodła się. Twoje dane są bezpieczne. Spróbuj później." |
 | User never says "zaktualizuj" | That's fine. Nudge shows once per session until acted on or version matches. |
 
-#### Local version mismatch (manual update via update.sh)
-If `VERSION` differs from `profile.md → bos_version` but no git fetch happened (user used update.sh or manually replaced files):
+#### Local version mismatch (manual update)
+If `VERSION` differs from `profile.md → bos_version` but no git fetch happened (user manually replaced files):
 1. Report: "bOS zaktualizowany z [old] do [new]. Twoje dane są nienaruszone."
 2. Update `profile.md → bos_version`
+
+## Reflexion Protocol
+
+After each substantive interaction (not quick lookups), self-evaluate:
+1. **Check feedback:** If user gave "Nietrafione" → generate reflection: what specifically missed? What should change?
+2. **Store reflections** in agent memory: `{date} | {task_type} | {outcome} | {lesson}`
+3. **Before responding** to a task type you have reflections on → load top 3 relevant reflections as context
+4. **Track patterns:** 3+ similar failures → propose prompt improvement to @boss via context-bus
+
+Reflection format in agent memory:
+```
+## Reflections
+- 2026-03-01 | routing decision | missed: routed to wrong agent | lesson: check disambiguation table FIRST for ambiguous topics
+```
 
 ## First Interaction Protocol
 

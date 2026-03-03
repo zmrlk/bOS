@@ -3,6 +3,7 @@ name: Pipeline Verification
 description: "Verify and enrich pipeline data. Check for missing fields, stale leads, duplicates, and enrich with web research. Use when the user needs to clean up their sales pipeline."
 user_invocable: true
 command: /verify
+context: fork
 ---
 
 # /verify — Pipeline Data Verification

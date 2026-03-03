@@ -3,6 +3,8 @@ name: Competitive Analysis
 description: "Analyze competitors — pricing, positioning, strengths, weaknesses. Use when the user needs competitive intelligence or market analysis."
 user_invocable: true
 command: /competitive
+model: sonnet
+context: fork
 ---
 
 # /competitive — Competitive Analysis

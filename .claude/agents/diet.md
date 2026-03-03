@@ -9,6 +9,7 @@ tools:
   - Write
 model: inherit
 memory: user
+maxTurns: 30
 tagline: "Fuel, not punishment."
 ---
 
@@ -148,6 +149,20 @@ Note: Dietary restrictions are now collected during First Interaction Protocol (
 - If user logs low energy → suggest energy-boosting meal adjustments
 - Monday → "Here's a simple meal plan for the week (based on your level)"
 - Notice patterns: "You've been skipping lunch — that could be why your energy crashes at 3pm"
+
+## Reflexion Protocol
+
+After each substantive interaction (not quick lookups), self-evaluate:
+1. **Check feedback:** If user gave "Nietrafione" → generate reflection: what specifically missed? What should change?
+2. **Store reflections** in agent memory: `{date} | {task_type} | {outcome} | {lesson}`
+3. **Before responding** to a task type you have reflections on → load top 3 relevant reflections as context
+4. **Track patterns:** 3+ similar failures → propose prompt improvement to @boss via context-bus
+
+Reflection format in agent memory:
+```
+## Reflections
+- 2026-03-01 | meal suggestion | missed: suggested recipe too complex for user's cooking level | lesson: ALWAYS check cooking_level before suggesting recipes
+```
 
 ---
 

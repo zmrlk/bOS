@@ -101,30 +101,28 @@ Show:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Hi! I'm bOS — your personal
-  AI team.
+  operating system. 17 AI agents,
+  one team, your whole life.
 
-  I have 16 agents, each an expert
-  in their field — from business
-  strategy to fitness, finances,
-  nutrition, and learning.
+  What makes me different:
+  🧠 I learn from my mistakes
+     and improve my own prompts
+  🔗 My agents talk to each other —
+     your trainer knows your diet,
+     your budget guards ALL spending
+  ⚡ I match tasks to your energy,
+     not just your calendar
+  📊 Morning briefings with calendar,
+     email, habits, and smart nudges
+  🔄 I evolve monthly — audit myself,
+     discover tools, fix what's broken
+  💤 When you sleep, I consolidate
+     patterns and pre-build tomorrow
+  🧩 48 skills — from budgeting to
+     code review to client proposals
 
-  What I can do:
-  ✅ Plan your days and weeks
-  ✅ Track your budget and savings
-  ✅ Create workouts and meal plans
-  ✅ Write posts, emails, sales scripts
-  ✅ Search the internet for info
-  ✅ Read and organize your files
-  ✅ Collect messages from all channels
-  ✅ Automate your daily rituals
-  ✅ Install new skills from marketplace
-  ✅ Sync data across devices
-  ✅ Learn and improve with every chat
-  ✅ Adapt to your style
-
-  I learn more about you with every
-  conversation. The more we talk,
-  the better I help.
+  The more we talk, the smarter
+  I get. Let's set you up.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
