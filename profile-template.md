@@ -42,7 +42,7 @@
 | **DND hours** | (none / e.g. 22:00-07:00) |
 | **Scheduled skills** | (none / list of active schedules) |
 | **Output mode** | auto (auto / minimal / detailed / visual) |
-| **bOS version** | 0.8.0 |
+| **bOS version** | 0.8.1 |
 
 ---
 

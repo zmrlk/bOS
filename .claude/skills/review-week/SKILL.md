@@ -3,6 +3,7 @@ name: Weekly Review
 description: "Friday evening weekly review — scorecard, lessons, next week prep. Takes 10-15 minutes."
 user_invocable: true
 command: /review-week
+model: sonnet
 ---
 
 # Weekly Review

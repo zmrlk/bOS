@@ -3,6 +3,7 @@ name: Budget Builder
 description: "Interactive budget builder — create or review your 50/30/20 budget with spending categories from your history."
 user_invocable: true
 command: /budget
+model: sonnet
 ---
 
 # /budget — Interactive Budget Builder

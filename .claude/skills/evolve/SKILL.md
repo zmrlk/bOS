@@ -4,6 +4,7 @@ description: "bOS improves itself — audits system health, analyzes agent perfo
 user_invocable: true
 command: /evolve
 version: "2.0"
+model: sonnet
 ---
 
 # bOS -- Self-Evolution 2.0

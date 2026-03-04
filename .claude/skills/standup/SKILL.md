@@ -3,6 +3,7 @@ name: Team Standup
 description: "Multi-agent standup. Each active agent gives their weekly perspective, then a synthesis. Best used Monday morning."
 user_invocable: true
 command: /standup
+model: sonnet
 ---
 
 # Team Standup

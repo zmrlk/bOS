@@ -1,3 +1,11 @@
+---
+name: Quick Note
+description: "Instant capture to state/notes.md. No friction. Use when user says zanotuj, notatka, note, or remember this."
+user_invocable: true
+command: /note
+model: haiku
+---
+
 # /note — Quick Capture
 
 ## Trigger
@@ -13,9 +21,9 @@ bOS reads notes during /morning and /home — understands context (deadlines, re
 
 ### Quick capture
 ```
-n raport do 15 marca
-n zadzwonić do klienta w sprawie oferty
-n pomysł: program lojalnościowy dla klientów
+n BDO do 15 marca
+n zadzwonić do Radka w sprawie pitch
+n pomysł: karty lojalnościowe w STAGO
 ```
 
 ### List notes
@@ -60,13 +68,13 @@ notatki
 
 ## Active
 
-### 2026-03-03 📅 Raport do 15 marca
+### 2026-03-03 📅 BDO do 15 marca
 Type: reminder | Due: 2026-03-15
 
-### 2026-03-03 💡 Program lojalnościowy dla klientów
+### 2026-03-03 💡 Karty lojalnościowe w STAGO
 Type: idea
 
-### 2026-03-03 ✅ Zadzwonić do klienta w sprawie oferty
+### 2026-03-03 ✅ Zadzwonić do Radka w sprawie pitch
 Type: todo
 
 ---

@@ -3,6 +3,7 @@ name: Sprint Planning
 description: "Weekly sprint system — capacity planning, story points, burndown tracking. For users who want structured productivity."
 user_invocable: true
 command: /sprint
+model: sonnet
 ---
 
 # /sprint — Weekly Sprint System

@@ -3,6 +3,7 @@ name: Decision Journal
 description: "Structured decision-making — capture the decision, analyze options, get a GO/NO-GO verdict, and schedule a review."
 user_invocable: true
 command: /decide
+model: sonnet
 ---
 
 # /decide — Decision Journal

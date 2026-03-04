@@ -3,6 +3,7 @@ name: Design Support
 description: "Design briefs, social media content creation, brand consistency checks. Use when the user needs to create social media posts, design briefs, or check brand consistency."
 user_invocable: true
 command: /design
+model: sonnet
 ---
 
 # /design — Design Support

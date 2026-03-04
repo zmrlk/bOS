@@ -3,6 +3,7 @@ name: Relationship CRM
 description: "Personal relationship manager — log contacts, track follow-ups, get reminded who to reach out to. Your network is your net worth."
 user_invocable: true
 command: /network
+model: haiku
 ---
 
 # /network — Relationship CRM

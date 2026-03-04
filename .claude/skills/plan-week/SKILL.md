@@ -3,6 +3,7 @@ name: Plan Week
 description: "Weekly planning ritual. Create a focused plan for the upcoming week with energy-matched tasks. Best used Sunday evening."
 user_invocable: true
 command: /plan-week
+model: sonnet
 ---
 
 # Weekly Planning

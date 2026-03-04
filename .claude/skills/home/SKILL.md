@@ -3,6 +3,7 @@ name: Home
 description: "Dashboard — one screen with everything that matters right now. Tasks, energy, streaks, buffer, calendar, next action."
 user_invocable: true
 command: /home
+model: haiku
 ---
 
 # /home — Dashboard

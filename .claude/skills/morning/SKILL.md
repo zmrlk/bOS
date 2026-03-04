@@ -3,6 +3,7 @@ name: Morning Briefing
 description: "Daily morning briefing — priorities, energy check, quick win. Run at the start of each day."
 user_invocable: true
 command: /morning
+model: haiku
 ---
 
 # Morning Briefing
@@ -32,7 +33,7 @@ Then immediately `AskUserQuestion`:
 
 While processing energy answer, load data in one batch of tool calls. Use **Summary reads (first 25 lines)** for growing files, full reads for small files:
 
-**Lite mode (batch Read calls + MCP calls — all in 1 turn):**
+**Lite mode (batch Read calls — all in 1 turn):**
 - `state/tasks.md` (first 25 lines — Summary) — today's task counts from Summary, then Active section for today's tasks
 - `state/daily-log.md` (first 25 lines — Summary) — energy trend from Summary
 - `state/habits.md` (full) — streaks (if Health/Life)
@@ -40,13 +41,10 @@ While processing energy answer, load data in one batch of tool calls. Use **Summ
 - `state/notes.md` (full) — reminders due today/tomorrow, active notes
 - `state/pipeline.md` (full, if Business) — follow-ups
 - Google Calendar MCP — today's events AND tomorrow's events (if available)
-- **bos-compound MCP** (parallel, if available):
-  - `rss_digest` — newsletters from last 24h (replaces Gmail newsletter search)
-  - `weather_brief` — weather for home city + cities from calendar events
-- Gmail MCP — 2 parallel queries (if available):
+- Gmail MCP — 3 parallel queries (all in same turn, if available):
+  - Newsletters last 24h: `from:(rundown.ai OR thenewstack.io OR bensbites.beehiiv.com OR dharmesh.com OR mrugalski) newer_than:1d`
   - Important non-newsletter emails: `newer_than:1d -label:newsletters -category:promotions -category:social is:inbox`
   - Overdue follow-ups: flagged/starred or `follow up` label
-- Gmail MCP — email-only newsletters (no RSS, from agent memory): `from:([email-only senders]) newer_than:1d`
 
 **Tier 2 (after Summary):** Read tasks.md Active section (today's date section) for specific task details.
 
@@ -166,36 +164,31 @@ If `work_style` is empty → skip this step (standard plan).
 - Current learning streak
 - Today's study goal (if any)
 
-### 📰 Newslettery (last 24h)
+### 📰 Newslettery (last 24h) — ALWAYS run if Gmail MCP available
 
-**Primary: `rss_digest` compound tool** (if bos-compound MCP available):
-```
-Call rss_digest with: { hours_back: 24, detail_level: "concise" }
-```
-This fetches RSS feeds configured in the tool's defaults (or user-configured feeds from profile.md → newsletter_feeds). Much faster and more reliable than Gmail search.
+Search Gmail for newsletters from the last 24 hours. Known newsletter senders for this user:
+- The Rundown AI / The Rundown Tech / The Rundown Robotics (`from:rundown`)
+- TAAFT — There's An AI For That (`from:taaft` or `from:theresanaiforthat`)
+- simple.ai — Dharmesh Shah (`from:dharmesh` or subject:simple.ai)
+- Ben's Bites (`from:bensbites`)
+- [#uN] Jakub Mrugalski (`from:mrugalski` or subject:"#uN")
 
-**Fallback: Gmail search** (if rss_digest unavailable but Gmail MCP available):
-Search Gmail for newsletters: `from:(rundown OR bensbites OR taaft OR theresanaiforthat) newer_than:1d`
-Add user-specific senders from profile.md → newsletter_feeds or agent memory.
-
-**Email-only newsletters** (no RSS, always check Gmail if available):
-Some newsletters don't have RSS feeds. Check agent memory for known email-only newsletter senders for this user. Search Gmail for those separately.
-
-For each item found, extract **1-2 key takeaways** (not full summaries, just the insight). Format:
+For each newsletter found, extract **1-2 key takeaways** (not full summaries, just the insight). Format:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📰 NEWSLETTERY — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤖 [Feed/Newsletter name]: [1-2 sentences of key insight]
-🔧 [Feed/Newsletter name]: [1-2 sentences]
-[more if available]
+🤖 The Rundown: [1-2 zdania kluczowego insightu]
+🔧 Ben's Bites: [1-2 zdania]
+🇵🇱 [#uN] Mrugalski: [1-2 zdania]
+[inne newslettery jeśli są]
 ```
 
 **Rules:**
 - Max 2 sentences per newsletter. No fluff, just the actionable insight or key fact.
-- If no newsletters in last 24h → skip section silently
-- If 5+ items → pick top 3 most relevant to user's primary_goal and interests
+- If no newsletters in last 24h → skip section silently (no "brak newsletterów" message)
+- If 5+ newsletters found → pick top 3 most relevant to Karol's context (AI, ISIKO, STAGO, tech)
 - Language: match newsletter language (EN newsletter → EN summary, PL → PL)
 
 ### 📧 Maile — last 24h
@@ -203,9 +196,9 @@ For each item found, extract **1-2 key takeaways** (not full summaries, just the
 Search Gmail for important non-newsletter emails from last 24 hours (exclude: promotions, social, newsletters, automated notifications).
 
 Prioritize:
-1. Emails requiring action/reply (clients, key contacts from agent memory/profile.md)
+1. Emails requiring action/reply (clients, Denis, Jacek, Radek, Mateusz — known contacts from memory)
 2. Invoices / payments received or due
-3. Emails from domains/contacts flagged as important in agent memory
+3. Anything from VAVO or STAGO domains
 4. Anything the user hasn't read
 
 Format:
@@ -240,49 +233,12 @@ Pull today's events AND tomorrow's preview from Google Calendar MCP. Format:
 **Rules:**
 - Show all today's events with time. If 0 events → "Brak spotkań — dzień wolny."
 - Flag back-to-back meetings: "⚠️ 3 spotkania pod rząd — zaplanuj przerwy"
-- Check profile.md → sacred_rituals. If any event conflicts with a sacred ritual → flag: "⚠️ Konflikt z [ritual] o [time]"
+- Sauna 16:00-17:00 is SACRED — if any event conflicts → flag: "⚠️ Konflikt z sauną o 16:00"
 - Tomorrow preview: max 2 events (the most important ones)
 - If Calendar MCP unavailable → skip section silently
 
-### 🌤️ Pogoda — ALWAYS run if bos-compound MCP available
-
-**Use `weather_brief` compound tool** to get weather for relevant cities:
-
-```
-Call weather_brief with: {
-  cities: [user's home city from profile.md → location, + cities from today's calendar events],
-  hours_ahead: 12
-}
-```
-
-**City selection logic:**
-1. **Always include:** User's home city (from profile.md → location)
-2. **From calendar:** If today's events mention a location/city different from home → add it
-3. **From context:** If user mentioned travel plans yesterday or has upcoming travel → add destination
-
-**Contextual intelligence (THIS IS KEY):**
-Don't just dump weather data. Combine weather + calendar to give actionable advice:
-- "Rain in [city] at 14:00, but your last meeting ends at 12:00 — won't affect you"
-- "Cold morning (3°C), warms up to 15°C by your lunch break"
-- "Take an umbrella — 70% rain chance during your commute window"
-
-Format:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🌤️ POGODA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[weather_brief output — already formatted with emoji, temps, hourly forecast]
-[+ contextual advice based on calendar]
-```
-
-**Rules:**
-- Max 3 cities. Home city always first.
-- If bos-compound MCP unavailable → skip weather (don't use WebSearch for weather — too many tokens)
-- Clothing advice from weather_brief is automatic (jacket, umbrella based on conditions)
-- If user has no location in profile.md → skip silently
-
 ### If user has tracked interests (from profile.md → interests field, then agent memory):
-- Run WebSearch for 2-3 topics user cares about (politics, markets, industry)
+- Run WebSearch for 2-3 topics user cares about (politics, markets, industry, weather)
 - Show as brief bullets with source: "📰 [headline] — [źródło]"
 - Max 3 items. If WebSearch fails → skip silently.
 - If no interests tracked yet → skip this section entirely
@@ -305,16 +261,11 @@ Format:
 [🧠 bOS INSIGHTS — jeśli Pro mode i insights istnieją]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🌤️ POGODA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[weather_brief output + contextual calendar advice]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📰 NEWSLETTERY — ostatnie 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤖 [Feed name]: [insight]
-🔧 [Feed name]: [insight]
-[more if available]
+🤖 The Rundown: [insight]
+📧 Ben's Bites: [insight]
+[inne jeśli są]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📧 MAILE — ostatnie 24h

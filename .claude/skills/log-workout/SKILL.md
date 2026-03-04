@@ -3,6 +3,7 @@ name: Log Workout
 description: "Log a workout or exercise session. Quick entry for fitness tracking."
 user_invocable: true
 command: /workout
+model: haiku
 ---
 
 # Log Workout

@@ -3,6 +3,7 @@ name: Time Tracking
 description: "Track time spent on projects. Start/stop timers, log manual entries, view reports. Use when the user needs to track project hours or view time reports."
 user_invocable: true
 command: /timetrack
+model: haiku
 ---
 
 # /timetrack — Project Time Tracking

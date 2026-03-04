@@ -3,6 +3,7 @@ name: Invoice Management
 description: "Create, track, and manage invoices. Generate payment reminders. Use when the user needs to invoice a client, check outstanding invoices, or send payment reminders."
 user_invocable: true
 command: /invoice
+model: haiku
 ---
 
 # /invoice — Invoice Management
