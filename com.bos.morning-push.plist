@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  bOS Layer 3 — Morning Push LaunchAgent
+  File: com.bos.morning-push.plist
+  Install to: ~/Library/LaunchAgents/com.bos.morning-push.plist
+  Load: launchctl load ~/Library/LaunchAgents/com.bos.morning-push.plist
+  Test: launchctl start com.bos.morning-push
+  Unload: launchctl unload ~/Library/LaunchAgents/com.bos.morning-push.plist
+-->
+<plist version="1.0">
+<dict>
+
+  <!-- ── Identity ─────────────────────────────────────────── -->
+  <key>Label</key>
+  <string>com.bos.morning-push</string>
+
+  <!-- ── Script to run ────────────────────────────────────── -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>REPLACE_WITH_HOME/.claude/hooks/morning-push.sh</string>
+  </array>
+
+  <!-- ── Schedule: multi-slot (first awake wins) ─────────── -->
+  <!-- Script has idempotency — only pushes ONCE per day.      -->
+  <!-- 4 slots: if Mac sleeps through 7:30, tries 8:30, etc.  -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+
+  <!-- ── Environment variables ────────────────────────────── -->
+  <!-- launchd runs with a stripped environment.               -->
+  <!-- Core PATH + ntfy config injected here.                  -->
+  <!-- NTFY_TOPIC: set to your ntfy.sh channel name.           -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key>
+    <string>REPLACE_WITH_HOME</string>
+    <key>USER</key>
+    <string>REPLACE_WITH_USER</string>
+    <key>SHELL</key>
+    <string>/bin/zsh</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+    <key>LC_ALL</key>
+    <string>en_US.UTF-8</string>
+    <!-- ntfy.sh config — override by setting NTFY_TOPIC here  -->
+    <!-- OR leave empty and set it in .secrets/ntfy.env         -->
+    <key>NTFY_TOPIC</key>
+    <string></string>
+    <key>NTFY_BASE_URL</key>
+    <string>https://ntfy.sh</string>
+    <!-- Weekend push: set to 1 to push on Sat/Sun too         -->
+    <key>MORNING_PUSH_WEEKENDS</key>
+    <string>0</string>
+  </dict>
+
+  <!-- ── Logging ───────────────────────────────────────────── -->
+  <!-- stdout goes to the script's own log file (via exec >>)   -->
+  <!-- stderr captured here as safety net                       -->
+  <key>StandardOutPath</key>
+  <string>REPLACE_WITH_HOME/.claude/logs/morning-push-launchd.out</string>
+  <key>StandardErrorPath</key>
+  <string>REPLACE_WITH_HOME/.claude/logs/morning-push-launchd.err</string>
+
+  <!-- ── Behavior flags ───────────────────────────────────── -->
+  <!-- One-shot: don't restart on success or failure           -->
+  <key>RunAtLoad</key>
+  <false/>
+  <key>KeepAlive</key>
+  <false/>
+
+  <!-- If the job exits non-zero, don't respawn               -->
+  <key>ThrottleInterval</key>
+  <integer>3600</integer>
+
+  <!-- Working directory for the script                        -->
+  <key>WorkingDirectory</key>
+  <string>REPLACE_WITH_HOME/bos</string>
+
+</dict>
+</plist>

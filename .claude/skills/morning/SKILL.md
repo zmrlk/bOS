@@ -188,7 +188,7 @@ For each newsletter found, extract **1-2 key takeaways** (not full summaries, ju
 **Rules:**
 - Max 2 sentences per newsletter. No fluff, just the actionable insight or key fact.
 - If no newsletters in last 24h → skip section silently (no "brak newsletterów" message)
-- If 5+ newsletters found → pick top 3 most relevant to Karol's context (AI, ISIKO, STAGO, tech)
+- If 5+ newsletters found → pick top 3 most relevant to user's context (based on profile.md interests)
 - Language: match newsletter language (EN newsletter → EN summary, PL → PL)
 
 ### 📧 Maile — last 24h
@@ -196,9 +196,9 @@ For each newsletter found, extract **1-2 key takeaways** (not full summaries, ju
 Search Gmail for important non-newsletter emails from last 24 hours (exclude: promotions, social, newsletters, automated notifications).
 
 Prioritize:
-1. Emails requiring action/reply (clients, Denis, Jacek, Radek, Mateusz — known contacts from memory)
+1. Emails requiring action/reply (clients, known contacts from memory/profile)
 2. Invoices / payments received or due
-3. Anything from VAVO or STAGO domains
+3. Anything from known business/client domains (from profile.md)
 4. Anything the user hasn't read
 
 Format:

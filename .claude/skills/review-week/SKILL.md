@@ -26,6 +26,7 @@ Issue ALL reads in one batch of tool calls. Use Summary (first 25 lines) + Activ
 - `state/daily-log.md` (Summary + Active section) — energy trends this week (14d window)
 - `state/journal.md` (full) — journal entries for pattern analysis (if Life active)
 - `state/decisions.md` (full) — decisions with upcoming reviews
+- `state/.engagement-log.md` (full) — time-aware engagement metrics (micro-morning shown/skipped, evening-energy logged)
 
 **Pro mode:** Issue all Supabase SELECTs in one tool-use turn.
 

@@ -3,7 +3,6 @@ name: Self-Evolution 2.0
 description: "bOS improves itself — audits system health, analyzes agent performance via reflexion, optimizes routing, discovers new capabilities, and measures impact. Runs proactively or on demand."
 user_invocable: true
 command: /evolve
-version: "2.0"
 model: sonnet
 ---
 

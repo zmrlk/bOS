@@ -1,7 +1,7 @@
 ---
 name: connect
 description: "Manage MCP connections — add, remove, test, discover connectors. Use when the user wants to connect a tool, check connections, or find new integrations."
-user-invocable: true
+user_invocable: true
 argument-hint: "[service-name | list | test | discover]"
 ---
 

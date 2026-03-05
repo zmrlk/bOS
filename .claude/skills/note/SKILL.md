@@ -22,8 +22,8 @@ bOS reads notes during /morning and /home — understands context (deadlines, re
 ### Quick capture
 ```
 n BDO do 15 marca
-n zadzwonić do Radka w sprawie pitch
-n pomysł: karty lojalnościowe w STAGO
+n zadzwonić do klienta w sprawie pitch
+n pomysł: karty lojalnościowe w sklepie
 ```
 
 ### List notes
@@ -68,13 +68,13 @@ notatki
 
 ## Active
 
-### 2026-03-03 📅 BDO do 15 marca
+### 2026-03-03 📅 Raport do 15 marca
 Type: reminder | Due: 2026-03-15
 
-### 2026-03-03 💡 Karty lojalnościowe w STAGO
+### 2026-03-03 💡 Program lojalnościowy w sklepie
 Type: idea
 
-### 2026-03-03 ✅ Zadzwonić do Radka w sprawie pitch
+### 2026-03-03 ✅ Zadzwonić do klienta w sprawie pitch
 Type: todo
 
 ---

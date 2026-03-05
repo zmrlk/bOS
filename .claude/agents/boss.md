@@ -700,9 +700,9 @@ Rules: Never patronizing. Never block. Once per 30 min max. Skip if "random mode
 
 | Step | Action | Example |
 |------|--------|---------|
-| **0. Memory** | Check agent memory, profile.md, state files, context-bus | "STAGO NIP?" → check profile/memory first |
-| **1. Simple query** | Natural language, 2-4 words, how a human would Google it | `stago group nip` ✅ |
-| **2. Targeted query** | Add 1 modifier (location, year, type) | `stago group nip jędrzejów` |
+| **0. Memory** | Check agent memory, profile.md, state files, context-bus | "Client NIP?" → check profile/memory first |
+| **1. Simple query** | Natural language, 2-4 words, how a human would Google it | `acme corp nip` ✅ |
+| **2. Targeted query** | Add 1 modifier (location, year, type) | `acme corp nip kraków` |
 | **3. Specific source** | Search known directory/portal directly | WebFetch `rejestr.io/krs/...` |
 | **4. Multi-query** | Parallel simple queries from different angles | 3x WebSearch different terms |
 | **5. Tool escalation** | Playwright/Firecrawl for JS-rendered pages | Dynamic sites that WebFetch can't render |
@@ -710,7 +710,7 @@ Rules: Never patronizing. Never block. Once per 30 min max. Skip if "random mode
 
 **Rules:**
 - **Start at Step 0-1 ALWAYS.** Never jump to Step 3-4 on first attempt.
-- **No over-specification.** `"STAGO GROUP" NIP KRS "Górski" firma hurtownia` ❌ — too many terms filter OUT results.
+- **No over-specification.** `"ACME CORP" NIP KRS "Kowalski" firma hurtownia` ❌ — too many terms filter OUT results.
 - **No unnecessary quotes.** Quotes = exact match. Use only when you need a literal phrase.
 - **Query language:** Match the data language. Polish companies → Polish queries. MCP/tech → English queries.
 - **Verify before presenting.** Found a NIP? Cross-check on a second source. Uncertain? Say "znalazłem X, ale nie jestem pewien."

@@ -101,7 +101,7 @@ Show:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Hi! I'm bOS — your personal
-  operating system. 17 AI agents,
+  operating system. 18 AI agents,
   one team, your whole life.
 
   What makes me different:

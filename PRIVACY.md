@@ -42,6 +42,7 @@ Daily activity tracked in local markdown files:
 | `state/inbox.md` | Messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) — sender, subject, status |
 | `state/schedules.md` | Automated skill schedules — which skills run when, delivery channel |
 | `state/marketplace.md` | Installed marketplace skills — skill name, version, install date |
+| `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
 
 ### Agent memory (`~/.claude/agent-memory/`)
 Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.
@@ -56,6 +57,9 @@ If you use `/webhooks` to connect bOS to external tools (n8n, Zapier, Make), the
 
 ### Secrets vault (`.secrets/vault.json`)
 API keys and credentials you store via `/vault`. Stored locally only, protected so only your account can read them. Never sent anywhere.
+
+### Push notification config (`.secrets/ntfy.env`)
+If you use push notifications via ntfy.sh, your topic name and server URL are stored in `.secrets/ntfy.env`. This file is local-only and never synced to Supabase or any external service.
 
 ### File scan data
 During setup, if you give permission, bOS scans file and folder **names** (not contents) in your Desktop, Documents, Downloads, and Applications. It uses this to understand who you are and what tools you use. It does not read file contents, ever.
@@ -246,6 +250,47 @@ If you configure webhooks via `/webhooks`, bOS sends event data (like "task comp
 **What does NOT get sent:** Your full profile, passwords, health details, journal entries, or any data beyond the specific event.
 
 **You control everything:** You choose which events to hook, where they go, and you can remove them anytime with `/webhooks remove`.
+
+---
+
+## Push notifications (ntfy.sh)
+
+If you enable push notifications, bOS uses [ntfy.sh](https://ntfy.sh) to send alerts to your phone.
+
+**What gets sent:** Short text strings only — for example "Reminder: weekly review" or "Buffer alert: below target". No personal data, no file contents, no financial amounts, no conversation excerpts.
+
+**Where it goes:** Messages are published to an ntfy topic. By default this is the public ntfy.sh server. You can self-host ntfy for full control.
+
+**Who can see it:** Anyone who knows your topic name can subscribe to it. Choose a topic name that is long and random — treat it like a password. If you self-host ntfy, only you have access.
+
+**Configuration:** Topic name and server URL are stored in `.secrets/ntfy.env` on your local machine. This file is never synced to Supabase or sent anywhere.
+
+**How to disable:** Remove or empty `.secrets/ntfy.env`. Notifications will stop immediately. Alternatively, change your topic name — the old topic becomes unreachable.
+
+---
+
+## Session context injection (hooks)
+
+bOS uses lifecycle hooks (SessionStart, PreCompact, Stop) that run automatically as shell scripts. These hooks:
+
+- Read the current date and time from your local system clock
+- Count pending tasks and overdue items from local state files
+- Check your financial buffer status from `state/finances.md`
+- Scan `state/context-bus.md` for critical pending signals
+
+**No external service is involved.** Hooks are plain shell scripts that run locally. They do not send data anywhere — they only read local files and inject a summary into your session context. The same privacy rules apply as for interactive bOS use: everything stays on your machine.
+
+---
+
+## Headless execution (`claude -p`)
+
+bOS can run scheduled skills using `claude -p` (headless/non-interactive mode). This is how `/schedule` runs morning briefings, reminders, or recurring tasks automatically.
+
+**Privacy model:** Identical to interactive use. The same files are read, the same local-only data is used, and nothing additional is sent to external services. Claude Code processes locally; if a skill sends output (Telegram, email), only the same data that would appear in an interactive session is sent.
+
+**What runs:** Only skills you explicitly scheduled via `/schedule`. You can see all active schedules in `state/schedules.md`.
+
+**How to stop:** Run `/schedule remove [skill]` or delete the relevant entry in `state/schedules.md`.
 
 ---
 

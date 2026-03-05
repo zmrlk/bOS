@@ -1,6 +1,6 @@
 # bOS — Your Personal Operating System
 
-> 17 AI agents. One team. Your whole life — business, health, growth, money — managed like a system.
+> 18 AI agents. One team. Your whole life — business, health, growth, money — managed like a system.
 
 ---
 
@@ -8,7 +8,7 @@
 
 **You don't need another chatbot.** You need a system that knows your goals, tracks your money, manages your energy, and tells you what matters — without you having to ask.
 
-bOS turns Claude into a team of 17 specialized AI agents that work together. They share context, learn from your patterns, and evolve over time. It's not a prompt. It's an operating system for ambitious people.
+bOS turns Claude into a team of 18 specialized AI agents that work together. They share context, learn from your patterns, and evolve over time. It's not a prompt. It's an operating system for ambitious people.
 
 ---
 
@@ -76,7 +76,7 @@ Say "hi" → 5-minute setup (mostly clicking) → it works. No API keys to paste
 
 | Area | Agents | What they do |
 |------|--------|-------------|
-| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales, @devlead | Strategy, sprint planning, tech decisions, business finances, marketing, sales scripts, code quality pipeline |
+| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales, @devlead, @advocate | Strategy, sprint planning, tech decisions, business finances, marketing, sales scripts, code quality pipeline, devil's advocate analysis |
 | 🧭 **Life** | @coach, @organizer, @finance | Goal tracking, decision journal, daily planning, personal budgeting, habit building |
 | 💪 **Health** | @trainer, @diet, @wellness | Personalized workouts, meal planning, energy science, sleep tracking, stress management |
 | 📚 **Learning** | @teacher, @mentor, @reader | Learning roadmaps, career strategy, networking CRM, book recommendations |
@@ -86,7 +86,29 @@ Plus: `/build-agent` to create any custom agent you need.
 
 ---
 
-## What's New in v0.8.0
+## What's New in v0.9.0
+
+### Ambient bOS
+bOS is now time-aware between sessions — not just reactive during them. Lifecycle hooks trigger micro-actions: a lightweight pre-morning push at 6:00 AM, an evening energy check at 9:00 PM, and ADHD novelty rotation that quietly varies format and framing to fight habituation. The system does more before you even open it.
+
+### Layer 3: Proactive Morning Push
+A launchd job runs `claude -p` headlessly every morning, pushes today's top priority to your phone via ntfy.sh — no app open required. bOS delivers context to you, not the other way around.
+
+### @advocate — Devil's Advocate Agent
+An 18th agent purpose-built for critical thinking. Before you commit to a big decision, @advocate stress-tests it across 5 frameworks: steelman the opposite, pre-mortem failure analysis, second-order effects, assumption audit, and reversibility check. Use it before any GO/NO-GO.
+
+### Affect Modulation
+bOS now detects your emotional state from conversation signals — frustration, low energy, excitement, uncertainty — and silently adapts tone, depth, and pacing. No announcements, no "I see you're tired." Just responses that match where you are.
+
+### Engagement Tracking
+bOS tracks which directives you engage with vs. skip — micro-mornings, evening energy checks, weekly nudges. This usage data feeds into `/evolve` over time, helping the system learn what works for you and what to stop pushing.
+
+---
+
+## Previous Versions
+
+<details>
+<summary>v0.8.0 — Lifecycle Hooks & Reflexion Protocol</summary>
 
 ### Lifecycle Hooks
 Deterministic shell scripts that inject context at session start (today's tasks, budget status, critical signals), preserve state before compaction, and batch-update telemetry at session end. Your agents never lose context.
@@ -104,14 +126,12 @@ Agent performance tracking: invocations, success rates, routing accuracy, skill 
 After your evening shutdown, bOS silently consolidates daily patterns, detects energy correlations, and pre-generates tomorrow's morning brief. Wake up to a faster, smarter system.
 
 ### Agent Intelligence Upgrade
-All 17 agents enriched with frontmatter: model routing (haiku for quick ops, sonnet for analysis), turn limits, permission boundaries, skill associations, and the Reflexion Protocol. Smarter, faster, more secure.
+All 17 agents (now 18 with @advocate) enriched with frontmatter: model routing (haiku for quick ops, sonnet for analysis), turn limits, permission boundaries, skill associations, and the Reflexion Protocol. Smarter, faster, more secure.
 
 ### Skill Optimization
 12 skills optimized with model selection (haiku for logging, sonnet for analysis), context isolation for heavy operations, and tool restrictions for privacy-sensitive skills.
 
----
-
-## Previous Versions
+</details>
 
 <details>
 <summary>v0.7.0 — Circadian Engine</summary>
@@ -192,7 +212,7 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 
 ---
 
-## All 49 Skills
+## All Skills
 
 <details>
 <summary>Click to expand full command list</summary>
@@ -223,7 +243,6 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 | `/decide` | — | Decision journal with GO/NO-GO verdict |
 | `/energy-map` | — | Visualize energy patterns |
 | `/network` | — | Relationship CRM |
-| `/note` | `n` | Quick capture — notes, reminders, ideas |
 | `/sprint` | — | Sprint planning with velocity |
 | `/money-flow` | — | Cash flow waterfall chart |
 | `/learn-path` | — | AI learning roadmap |
@@ -240,8 +259,6 @@ Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spen
 | `/build-agent` | — | Create a custom agent |
 | `/scan` | — | Scan your computer (with consent) |
 | `/vault` | — | Manage API keys securely |
-| `/proactive-check` | — | Silent session-start nudges |
-| `/project-eval` | — | Go/No-Go project scoring |
 | `/check` | — | System health check |
 | `/card` | — | Shareable profile card |
 | `/export` | — | Export all data |
