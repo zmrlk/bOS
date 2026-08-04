@@ -19,10 +19,7 @@ Communication style|7
 Tech comfort|6
 User type|5
 Language|4
-Location|3
-Interests|2
-Household|1
-Age|1"
+Location|3"
 
 # ── 1. AUTO-DETECTED (nigdy o to nie pytaj — potwierdź w prezentacji) ──
 echo "== AUTO-DETECTED (use these, do NOT ask; confirm in one presentation card) =="

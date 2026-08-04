@@ -15,7 +15,7 @@ Nikt dojrzały w tej kategorii nie wypytuje usera, kim jest — profil narasta z
 
 1. **Najpierw skaner, potem usta.** Zanim napiszesz COKOLWIEK: `bash <KATALOG_BOS>/.claude/skills/setup/scripts/profile-scan.sh <KATALOG_BOS>` (pełna ścieżka — nie zakładaj cwd). Sekcja `gaps_by_leverage` = JEDYNE pola, o które wolno zapytać; skaner sam odejmuje wykryte i tnie do 5.
 2. **Nigdy nie pytaj o to, co wykryte albo zapisane.** AUTO-DETECTED i wypełnione pola = potwierdzenie w JEDNEJ karcie prezentacji, nie osobne pytania.
-3. **Jedno pytanie naraz**, każde jako AskUserQuestion (fallback: numerowane opcje). **System zadaje dokładnie JEDNO pytanie otwarte** (cel główny). Korekty inicjowane przez usera ("prawie — poprawię") nie liczą się do tego limitu, ale nie wolno ich prowokować dodatkowymi "a może coś jeszcze?".
+3. **Jedno pytanie naraz**, każde jako AskUserQuestion (fallback: numerowane opcje). **System zadaje max DWA pytania otwarte**: imię (tylko przy WEAK/braku name_guess) i cel główny. Korekty inicjowane przez usera ("prawie — poprawię") nie liczą się do tego limitu, ale nie wolno ich prowokować dodatkowymi "a może coś jeszcze?".
 4. **Każde pytanie pomijalne.** AskUserQuestion zawsze ma wbudowane "Other" — traktuj je i wpisane "pomiń" jako skip (pole zostaje puste, wypełni się z użycia). Przy <4 opcjach dodawaj jawną opcję "Pomiń".
 5. **Budżet: max 5 pytań o luki + max 3 interakcje potwierdzające** (imię-confirm, zgoda, prezentacja). Razem ≤8. Skaner mówi WEAK przy name_guess-inicjałach → wtedy pytaj o imię wprost (1 typed zamiast 2 interakcji).
 6. **Liczby w welcome = dosłownie ze skanera** (skills/agents/hooks_wired). Zero funkcji, których inwentarz nie potwierdza (Rule 18).
@@ -73,7 +73,7 @@ Natychmiast po prezentacji dowieź jeden mały artefakt z tego, co JUŻ masz:
 - Kalendarz dostępny → "Twoje dziś w 3 punktach + jedna kolizja/luka, którą widzę"
 - Desktop ze starymi plikami → "3 najstarsze sprawy wiszące na pulpicie — ogarnąć którąś?"
 - Nic z powyższych (pusta maszyna / odmowa skanu) → przesuń ten krok ZA pytanie o cel (Krok 4.1) i zrób artefakt z celu: pierwszy task w /task albo pierwszy nawyk w /habit — to zawsze możliwe bez żadnych danych.
-Format: `[emoji] @Agent — [artefakt]` + ⏭️ Next step ≤30 min. Potem dopiero pytania, sframowane jako "dostroję się — [N] szybkich pytań".
+Artefakt jest STWIERDZENIEM, nie pytaniem — nie renderuj go jako AskUserQuestion (nie liczy się do budżetu). Format: `[emoji] @Agent — [artefakt]` + ⏭️ Next step ≤30 min. Potem dopiero pytania, sframowane jako "dostroję się — [N] szybkich pytań".
 
 ## Krok 4 — LUKI (wyłącznie `gaps_by_leverage` ze skanera, po jednym)
 
@@ -85,7 +85,7 @@ Kanoniczne brzmienia (użyj gdy pole jest w lukach):
    - Advisor — proponuję drafty i kroki, ty klepiesz (Recommended)
    - Assistant — sam porządkuję rutynę, pytam przy działaniach na zewnątrz
    - Partner — wykonuję rutynę autonomicznie, raportuję
-   Zapisz do profile.md. Egzekwowanie: na razie dyrektywa promptowa czytana z profilu na starcie sesji; spięcie z hookami = faza F3 (nie obiecuj, że "hooki już to czytają"). Niezależnie od poziomu: śmiało wewnątrz (pliki, notatki), ZAWSZE pytaj przed działaniem na zewnątrz (mail, wiadomość, pieniądze).
+   Zapisz do profile.md. Egzekwowanie: pole zapisywane POD przyszłe spięcie (faza F3) — dziś nic go jeszcze automatycznie nie czyta; traktuj wybór jako dyrektywę dla SIEBIE w tej i kolejnych sesjach. Niezależnie od poziomu: śmiało wewnątrz (pliki, notatki), ZAWSZE pytaj przed działaniem na zewnątrz (mail, wiadomość, pieniądze).
 4. **Communication style** — direct / casual / detailed / motivational.
 5. **Tech comfort** — pytaj, chyba że user POTWIERDZIŁ prezentację zawierającą wniosek o kodowaniu.
 
@@ -97,7 +97,7 @@ User prosi o konkretne zadanie w trakcie → PRZERWIJ setup i zrób zadanie (to 
 
 ## Krok 6 — BUDOWA + ZAMKNIĘCIE (cicho, potem 1 karta)
 
-Za kulisami: utwórz `profile.md` z profile-template.md (wypełnione pola, freshness = dziś). **State/: twórz TYLKO brakujące pliki; istniejących NIGDY nie nadpisuj ani nie czyść** (read-before-write). Wpis do session-log ("setup ukończony"). SKASUJ `state/.setup-progress.md`.
+Za kulisami: utwórz `profile.md` z profile-template.md — wpisz odpowiedzi usera ORAZ WSZYSTKIE wartości z AUTO-DETECTED (Language, Location, Currency, Timezone; freshness = dziś). Bez tego drugi /setup wraca do pełnej ankiety. **State/: twórz TYLKO brakujące pliki; istniejących NIGDY nie nadpisuj ani nie czyść** (read-before-write). Wpis do session-log ("setup ukończony"). SKASUJ `state/.setup-progress.md`.
 
 ```
 ✅ Gotowe. Profil: [X] pól, reszta urośnie z rozmów.
