@@ -1,0 +1,97 @@
+{
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/time-aware.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-compact.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-end.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "WebFetch",
+      "WebSearch",
+      "Bash(mkdir *)",
+      "Bash(chmod 600 .secrets/*)",
+      "Bash(chmod 700 .secrets)",
+      "Bash(ls *)",
+      "Bash(date *)",
+      "Bash(wc *)",
+      "Bash(pwd)",
+      "Bash(touch *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(stat *)",
+      "Bash(sort *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(echo *)",
+      "Bash(printf *)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git show*)",
+      "Bash(git fetch*)",
+      "Bash(git checkout origin*)",
+      "Bash(git clone*)",
+      "Bash(npx *)",
+      "Bash(which *)",
+      "Bash(uname *)",
+      "Bash(test *)",
+      "Bash([ *)",
+      "mcp__*"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm *)",
+      "Bash(sudo *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(python*)",
+      "Bash(node -e *)",
+      "Bash(pbcopy*)"
+    ]
+  }
+}
