@@ -20,7 +20,10 @@ INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | grep -o '"tool_name":"[^"]*"' | head -1 | sed 's/"tool_name":"//;s/"//')
 
 # Skip if no tool name (shouldn't happen but safety)
-[ -z "$TOOL_NAME" ] && exit 0
+if [ -z "$TOOL_NAME" ]; then
+  echo "{\"ts\":\"$TIMESTAMP\",\"tool\":\"UNKNOWN\",\"status\":\"PARSE_FAIL\"}" >> "$TOOL_LOG_JSONL"
+  exit 0
+fi
 
 # Log Skill invocations to skill-runs.jsonl
 if [ "$TOOL_NAME" = "Skill" ]; then
@@ -43,8 +46,11 @@ case "$TOOL_NAME" in
     ;;
 esac
 
-# Check if tool errored — look in both tool_response and full input for error signals
-if echo "$INPUT" | grep -qi '"error"\|"Error"\|"ERROR"\|"failed"\|"Failed"\|"FAILED"\|"is_error":true\|"status":"error"'; then
+# FM-6: error detection from tool_response STATUS FIELD, not a grep of the whole input
+TOOL_RESPONSE_BLOB=$(echo "$INPUT" | grep -o '"tool_response":.*' | head -c 2000)
+if echo "$TOOL_RESPONSE_BLOB" | grep -qi '"is_error":\s*true\|"isError":\s*true'; then
+  STATUS="FAIL"
+elif [ -n "$TOOL_RESPONSE_BLOB" ] && echo "$TOOL_RESPONSE_BLOB" | grep -qi '"error":\|"status":"error"'; then
   STATUS="FAIL"
 else
   STATUS="OK"
