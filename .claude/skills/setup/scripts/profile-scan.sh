@@ -49,7 +49,8 @@ echo ""
 echo "== SYSTEM INVENTORY (raw counts — welcome must not exceed these) =="
 N_SKILLS=$(find "$BOS_DIR/.claude/skills" -maxdepth 2 -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 N_AGENTS=$(find "$BOS_DIR/.claude/agents" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-N_HOOKS=$(grep -o '"command"' "$BOS_DIR/.claude/settings.json" 2>/dev/null | wc -l | tr -d ' ')
+# count actual hook scripts wired in settings.json (each entry is one "command": "bash .claude/hooks/...")
+N_HOOKS=$(grep -o 'bash \.claude/hooks/[a-z-]*\.sh' "$BOS_DIR/.claude/settings.json" 2>/dev/null | wc -l | tr -d ' ')
 echo "skills: $N_SKILLS | agents: $N_AGENTS | hooks_wired: $N_HOOKS"
 
 # ── 3. PROFILE COMPLETENESS (tryb liczony po sekcji Core — reszta narasta z użycia) ──
