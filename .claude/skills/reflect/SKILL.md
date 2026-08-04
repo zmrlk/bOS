@@ -65,7 +65,7 @@ No analysis, no follow-up questions, no advice. Just acknowledgment.
 
 ### Step 6: 30-day analysis trigger
 
-If journal.md has 30+ entries AND this runs during /review-week → @coach generates "Journal Patterns" section:
+If journal.md has 30+ entries AND this runs during /evolve → @coach generates "Journal Patterns" section:
 - Most common themes across answers
 - Emotional trends (if detectable)
 - Growth indicators (comparing early vs recent entries)
@@ -148,7 +148,7 @@ If journal.md has 30+ entries AND this runs during /review-week → @coach gener
 1. ONE question per session — never batch questions
 2. Free-form text response — no selections for the answer
 3. No analysis during the reflection — just save and acknowledge
-4. 30-day analysis happens in /review-week, not here
+4. 30-day analysis happens in /evolve, not here
 5. Max 2 context-bus signals per execution
 6. All reads in 1 turn (parallel I/O)
 7. Language matches user's profile language

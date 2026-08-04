@@ -13,26 +13,25 @@ Read `profile.md`. Check `active_packs`, `user_type`, `tech_comfort`, `communica
 **Adapt to tech_comfort:** "not technical" → plain language, no jargon. "I use apps" → name tools. "I code" → technical details OK.
 **Adapt to ADHD:** If `adhd_indicators` = yes/suspected in profile.md → shorter briefing (max 3 items), dopamine hooks ("Quick win first!"), chunk tasks to 15-25 min, add novelty element. Skip overwhelming lists.
 
-## Step 0: Energy check (FIRST — before anything else)
+## Step 0: Read state BEFORE asking anything
 
-The first thing the user sees is the energy question. This shapes the entire briefing.
+**Never open with a question.** Read the files first (Step 1), then decide whether a question is even needed.
 
-```
-☀️ Dzień dobry, [name].
-```
+Energy level comes from state, not from an interrogation:
+1. If today's row in `state/daily-log.md` already has an energy value → use it, say nothing.
+2. If the user already mentioned how they feel in this conversation → use that.
+3. Only if neither exists AND the briefing would materially change → one `AskUserQuestion`:
+   - header: "Energy"
+   - options: "🔋 Low (1-3)" / "⚡ Medium (4-6)" / "🔥 High (7-10)"
+4. Otherwise assume medium and move on. A briefing with an assumed energy level beats a briefing gated behind a question.
 
-Then immediately `AskUserQuestion`:
-- header: "Energia"
-- options:
-  - "🔋 Niska (1-3) — spokojny dzień"
-  - "⚡ Średnia (4-6) — normalny dzień"
-  - "🔥 Wysoka (7-10) — jedziemy"
+Greeting is one line: `☀️ Good morning, [name].`
 
 ## Step 1: Parallel data fetch (ALL in 1 turn — this is the key improvement)
 
 **CRITICAL: Launch ALL data fetches in parallel. Do NOT wait for one before starting another.**
 
-While processing energy answer, execute ALL of the following tool calls in a SINGLE turn:
+Execute ALL of the following tool calls in a SINGLE turn:
 
 ### State files (Read tool — parallel batch):
 - `state/projects.md` (Dashboard table — CRITICAL for multi-project awareness)
@@ -40,16 +39,15 @@ While processing energy answer, execute ALL of the following tool calls in a SIN
 - `state/daily-log.md` (first 25 lines — Summary)
 - `state/habits.md` (full)
 - `state/goals.md` (full)
-- `state/notes.md` (full)
 - `state/pipeline.md` (full, if Business pack)
-- `state/context-bus.md` (first 25 lines — Summary)
+- `state/context-bus.jsonl` (last 20 lines)
 
 ### MCP tools (parallel with state reads):
 
 **Weather — bos-compound `weather_brief`:**
 ```
 ToolSearch("select:mcp__bos-compound__weather_brief")
-→ call with: { cities: ["Kraków"] }
+→ call with: { cities: [<city from profile.md → location; skip section if unset>] }
 ```
 If user has travel planned (from calendar or tasks) → add destination city.
 Fallback: skip silently if tool unavailable.
@@ -71,27 +69,20 @@ Run 3 parallel email searches:
 2. **Gmail important:** `is:unread newer_than:1d -category:promotions -category:social -label:9-newsletter -label:10-marketing`
 3. **Outlook important:** `afterDateTime: yesterday, limit: 15`
 
-**Outlook post-processing — filter noise:**
-- IGNORE `powiadomienia@[system-alerts@company.com]` → count by type for 1-line summary:
-  - "Zamknięte punkty sprzedaży" → `pos_closed` count
-  - "POS - sprzedaż awaryjna" → `pos_emergency` count
-  - "Roznice magazynowe" → `inventory_diff` count
-  - "Wykryto niedobory/nadwyżki" → `inventory_alert` count
-- IGNORE `noreply@[noreply@client-company.com]` UNLESS subject contains "zamówienie" or "B2B"
-- IGNORE any sender containing `inpost`
-- Keep everything else
+**Post-processing — filter noise:**
+Automated senders (monitoring, POS, warehouse, shipping trackers) collapse into ONE counted summary line instead of individual entries. The user's own noise senders are learned over time and stored in `profile.md → email_noise_senders`; if that field is empty, treat any `noreply@` / `notifications@` / `alerts@` sender as noise on first pass and confirm with the user before persisting the rule.
 
 **Morning email section format:**
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 MAILE — ostatnie 24h
+📧 EMAIL — last 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📧 [Gmail sender] — [subject] → [1 line]
 📨 [Outlook sender] — [subject] → [1 line]
-🏭 [system-alerts]: [X] POS alertów, [Y] awaryj, [Z] magazyn
+🤖 automated: [X] alerts ([types])
 ```
-Use 📧 for Gmail, 📨 for Outlook. Max 5 important emails + 1 [system-alerts@company.com] summary line.
-Failed payments (Stripe, Anthropic) → always show with ⚠️ prefix.
+Use 📧 for Gmail, 📨 for Outlook. Max 5 important emails + 1 automated summary line.
+Failed payments (any billing provider) → always show with ⚠️ prefix.
 
 For each result, call `gmail_read_message` to get content (batch the reads).
 Alternative (token-efficient): use bos-compound `email_digest` if available.
@@ -121,40 +112,9 @@ If ToolSearch returns no match → skip that data source. Never error on unavail
 
 **Rule: NEVER show "brak danych do pokazania". Either show real data or skip the section entirely.**
 
-## Step 1.5: World Insights (Pro mode only — if Supabase connected)
-
-Query world_insights table for unsurfaced insights from the last 24h:
-```sql
-SELECT type, content, confidence, domains FROM world_insights
-WHERE acted_on = FALSE AND surfaced_at IS NULL
-AND created_at > NOW() - INTERVAL '24 hours'
-AND confidence >= 0.6
-ORDER BY confidence DESC LIMIT 3;
-```
-
-If insights found → show max 2 in the briefing:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 bOS INSIGHTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 [insight content — 1-2 sentences]
-💡 [second insight if exists]
-```
-
-After surfacing, mark as shown:
-```sql
-UPDATE world_insights SET surfaced_at = NOW() WHERE id IN (...);
-```
-
-**Rules:**
-- Max 2 insights per morning (dopamine, not overwhelm)
-- Skip if confidence < 0.6
-- Skip if type = 'recommendation' and buffer = 0 (don't suggest spending)
-- Lite mode: skip this section (no daemon running without Supabase)
-
 ## Step 1A: Proactive Checks (after data loading, before pattern insight)
 
-**Decision review check** (from @ceo memory → pending_reviews):
+**Decision review check** (from `state/decisions.md` if it exists → pending reviews):
 If any decision has `review_date` ≤ today → nudge:
 ```
 📋 Decision review due: "[title]" — decided [date]. Still the right call?
@@ -173,9 +133,9 @@ Show max 2 overdue milestones. If goal progress = 0% for >30d → add:
 ⚠️ [goal name] — 0% progress since [date]. Still a priority?
 ```
 AskUserQuestion: "Work on this today" / "Update status" / "Deprioritize goal"
-**Rules:** Max 1 goal alarm per morning. Rotate if multiple. Don't repeat same alarm 2 days in a row (track in @boss memory).
+**Rules:** Max 1 goal alarm per morning. Rotate if multiple. Don't repeat same alarm 2 days in a row (track in native auto-memory).
 
-**Network nudge** (from @mentor — inner circle overdue):
+**Network nudge** (from @coach — inner circle overdue):
 If network.md has inner circle contacts with follow-up date 7+ days past → nudge (max 1):
 ```
 👥 Dawno nie rozmawiałeś z [Name]. Napisz dziś?
@@ -188,22 +148,22 @@ If @boss detects crash probability based on sprint length vs avg crash pattern:
 ```
 → Auto-reduce task suggestions to match predicted energy.
 
-**Notes reminders** (from notes.md):
-If notes.md has Active entries with type `reminder` and Due ≤ today or tomorrow:
+**Reminders** (from `state/reminders.md`, written by /remind):
+If any reminder is due today or tomorrow:
 ```
-📌 Przypomnienie: [note content] (termin: [date])
+📌 Reminder: [content] (due: [date])
 ```
-Max 2 reminders. If more → "...i jeszcze [N] przypomnień. Powiedz /note list."
+Max 2. If more → "...and [N] more. Say /remind list."
 
 ## Step 1B: Pattern Insight OR Serendipity Insight (pick ONE — never both)
 
-**After Step 1 data loading, check @boss agent memory for patterns AND cross-domain correlations.**
+**After Step 1 data loading, check native auto-memory for patterns AND cross-domain correlations.**
 
 **Priority:** Serendipity Insight > Pattern Insight (cross-domain is rarer and more valuable). Show exactly 1, never both.
 
 ### Option A: Serendipity Insight (cross-domain correlation)
 
-Check @boss agent memory for `serendipity.correlations` (computed during /review-week). If a correlation exists with strength moderate+ AND is relevant to today's context → show it:
+Check native auto-memory for `serendipity.correlations` (computed during /evolve). If a correlation exists with strength moderate+ AND is relevant to today's context → show it:
 
 **Cross-domain correlations to surface:**
 
@@ -213,7 +173,7 @@ Check @boss agent memory for `serendipity.correlations` (computed during /review
 | Sleep | Task completion | "Dni po dobrym śnie: [X]% tasków done. Po złym: [Y]%. Sen = Twój mnożnik produktywności." |
 | Spending | Energy | "Twoje dane sugerują: w dni niskiej energii wydajesz więcej. Nie oceniam — flaguję pattern." |
 | Workout streak | Other habits | "Kiedy regularnie trenujesz, inne nawyki trzymają się lepiej. Trening kotwiczny." |
-| Planning | Completion | "Tygodnie z /plan-week mają [X]% wyższy completion. Planowanie jest boostem." |
+| Planning | Completion | "Tygodnie z /task mają [X]% wyższy completion. Planowanie jest boostem." |
 
 **Rules:**
 - Minimum 14 data points across BOTH domains
@@ -221,7 +181,7 @@ Check @boss agent memory for `serendipity.correlations` (computed during /review
 - Max 1 serendipity insight per session
 - Only actionable insights — skip if no clear "try this"
 - Never moralize — state correlation, user decides
-- Track in @boss memory: `last_serendipity_surfaced: [date]`, don't repeat same correlation within 7 days
+- Track in native auto-memory: `last_serendipity_surfaced: [date]`, don't repeat same correlation within 7 days
 
 ### Option B: Pattern Insight (single-domain, fallback if no serendipity)
 
@@ -257,7 +217,7 @@ If `work_style` is empty → skip this step (standard plan).
 
 ### If Business pack active:
 - Open business tasks
-- Any follow-ups due? (check pipeline.md → follow-up dates per @sales Day 0/3/7/14 framework)
+- Any follow-ups due? (check pipeline.md → follow-up dates per @cmo Day 0/3/7/14 framework)
 - Any deadlines within 3 days?
 - **Invoices:** Check state/invoices.md for overdue or due-today invoices → "⚠️ Faktura [#] [klient] — płatna dziś/zaległa [X dni]"
 - **Active timer:** Check state/time-log.md Summary for active timer → if running → "⏱️ Timer dla [projekt] działa od [czas]. Kontynuujesz czy zatrzymać?"
@@ -325,7 +285,7 @@ Assemble the briefing from the data collected. **Only include sections that have
 
 ### Section rules:
 - **Weather** → in header bar (temperature + emoji). If unavailable → omit from header.
-- **Calendar** → show if events exist. Flag back-to-back meetings: "⚠️ 3 spotkania pod rząd". Sauna 16:00-17:00 is SACRED — flag conflicts. Tomorrow preview: max 2 events.
+- **Calendar** → show if events exist. Flag back-to-back meetings: "⚠️ 3 spotkania pod rząd". Tomorrow preview: max 2 events.
 - **Emails** → max 5, prioritized: action-required > unread > FYI. If email requires reply → `⚡ odpowiedź wymagana`. If 0 → "Skrzynka czysta."
 - **News** → merge newsletters (Gmail) + RSS into one "NEWSY" section. Deduplicate by topic. Max 2 sentences per item. Max 5 items total. If both sources have same story → pick the better summary. If 0 → skip section.
 - **Plan** → energy-matched tasks. Quick win always last.
@@ -354,7 +314,7 @@ On next day: "Yesterday was a Low Battery Day. That's by design. Today: [normal 
 
 ## First Morning (day after setup)
 
-If this is the user's first /morning (check: no entries in state/weekly-log.md or `first_morning_shown` = false/missing in @boss agent memory):
+If this is the user's first /morning (check: no entries in state/weekly-log.md or `first_morning_shown` = false/missing in native auto-memory):
 
 **Reference seeded data from /setup.** Read state/tasks.md, state/goals.md, state/habits.md to show what's already there.
 
@@ -381,8 +341,8 @@ If this is the user's first /morning (check: no entries in state/weekly-log.md o
   Day 2-3: Try /evening before bed
   Day 4: Talk to @[relevant agent]
          about [primary_goal]
-  Day 5: Run /plan-week
-  Day 7: Run /review-week
+  Day 5: Run /task
+  Day 7: Run /evolve
 
   Each step takes 5 min. After a week,
   your agents know you well enough to
@@ -390,7 +350,7 @@ If this is the user's first /morning (check: no entries in state/weekly-log.md o
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Then continue with the normal morning briefing using seeded data. Set `first_morning_shown: true` in @boss agent memory so this only shows once.
+Then continue with the normal morning briefing using seeded data. Set `first_morning_shown: true` in native auto-memory so this only shows once.
 
 **First Morning motivational hook:**
 "You're not starting from zero — your system is already working for you. [X] tasks, 1 goal, [Y] profile fields filled. Let's make Day 1 count."
@@ -405,19 +365,19 @@ Never end with a question or open-ended prompt. End with confidence.
 
 ## Context Bus Writes (after briefing)
 
-After completing the morning briefing, write relevant signals to state/context-bus.md:
+After completing the morning briefing, write relevant signals to state/context-bus.jsonl:
 
-| Condition | Write to context-bus.md |
+| Condition | Write to context-bus.jsonl |
 |-----------|------------------------|
-| Energy ≤ 3 (low battery day) | `## [date] @boss → @coo, @organizer` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: Low energy today ([X]/10). Lighten workload.` / `Status: pending` |
-| Energy ≤ 3 for 3+ consecutive days | `## [date] @boss → @wellness` / `Type: insight` / `Priority: critical` / `TTL: 7 days` / `Content: Energy crash: [X] days of low energy. Check-in needed.` / `Status: pending` |
-| Overdue tasks found (2+ days overdue) | `## [date] @boss → @coo` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: [X] overdue tasks. Reprioritize or reschedule.` / `Status: pending` |
-| Pattern insight about exercise/sleep | `## [date] @boss → @trainer or @wellness` / `Type: insight` / `Priority: info` / `TTL: 7 days` / `Content: [insight summary]` / `Status: pending` |
+| Energy ≤ 3 (low battery day) | `## [date] @boss → @coach` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: Low energy today ([X]/10). Lighten workload.` / `Status: pending` |
+| Energy ≤ 3 for 3+ consecutive days | `## [date] @boss → @coach` / `Type: insight` / `Priority: critical` / `TTL: 7 days` / `Content: Energy crash: [X] days of low energy. Check-in needed.` / `Status: pending` |
+| Overdue tasks found (2+ days overdue) | `## [date] @boss → @boss` / `Type: data` / `Priority: normal` / `TTL: 3 days` / `Content: [X] overdue tasks. Reprioritize or reschedule.` / `Status: pending` |
+| Pattern insight about exercise/sleep | `## [date] @boss → @trainer or @coach` / `Type: insight` / `Priority: info` / `TTL: 7 days` / `Content: [insight summary]` / `Status: pending` |
 
 Use the canonical context-bus format from CLAUDE.md (## date header, Type, Priority, TTL, Content, Status — each on its own line).
 
 **Rules:**
-- Only write NEW signals — check context-bus.md for existing recent signals on the same topic before writing duplicates
+- Only write NEW signals — check context-bus.jsonl for existing recent signals on the same topic before writing duplicates
 - Don't write info-priority signals more than once per week on same topic
 
 ## State Writes (after briefing)
@@ -475,7 +435,7 @@ This pattern applies to ALL skills, not just /morning:
 ## Rules
 - Keep it SHORT (5-8 lines max per section)
 - Be specific, not generic
-- If you have agent memory data about the user's patterns, use it
+- If you have native auto-memory data about the user's patterns, use it
 - If user has low energy pattern at this time → lighter suggestions
 - End with confidence, not a question
 - **Model: sonnet** — morning needs tool orchestration + synthesis, haiku can't handle parallel MCP coordination well

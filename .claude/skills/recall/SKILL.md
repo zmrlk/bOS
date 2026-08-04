@@ -23,13 +23,13 @@ Search ALL sources in parallel. Each source has different strengths:
 | Source | Path | What it captures | Best for |
 |--------|------|-----------------|----------|
 | **Session digests** | `state/.backup/session-digests/` | Topic, decisions, open threads per session | "What did we decide about X?" |
-| **Memory files** | `~/.claude/projects/<project-dir>/memory/` | Persistent facts, patterns, feedback | "What do you know about X?" |
+| **Memory files** | `~/.claude/projects/<project>/memory/` | Persistent facts, patterns, feedback | "What do you know about X?" |
 | **Pre-compact snapshots** | `state/.backup/pre-compact-*.md` | State at moment of context compaction | Recovering mid-session context |
-| **Context bus** | `state/context-bus.md` | Inter-agent signals, decisions | "When did agent X say Y?" |
+| **Context bus** | `state/context-bus.jsonl` | Inter-agent signals, decisions | "When did agent X say Y?" |
 | **Session log** | `state/session-log.md` | Timestamps of sessions | "When was our last session?" |
 | **State files** | `state/*.md` | Tasks, finances, habits, goals, etc. | "What task did we add for X?" |
-| **Agent memory** | `~/.claude/agent-memory/*/` | Agent-specific observations (cto/, boss/, etc.) | Agent behavioral patterns |
-| **Project memory** | `~/.claude/projects/<project-dir>/memory/` | Project-scoped persistent memory | Cross-session facts, MEMORY.md index |
+| **Native auto-memory** | `~/.claude/projects/<project>/memory/` | Agent-specific observations (cto/, boss/, etc.) | Agent behavioral patterns |
+| **Project memory** | `~/.claude/projects/<project>/memory/` | Project-scoped persistent memory | Cross-session facts, MEMORY.md index |
 
 ---
 

@@ -25,58 +25,26 @@ Show:
 🌙 Hey [name], time for a quick shutdown.
 ```
 
-Then use `AskUserQuestion`:
-- header: "Energia"
-- options:
-  - "🔋 Niska (1-3) — spokojny dzień"
-  - "⚡ Średnia (4-6) — normalny dzień"
-  - "🔥 Wysoka (7-10) — produktywny dzień"
+**Hard cap: 3 questions, ever.** Read `state/tasks.md`, `state/daily-log.md` and `state/habits.md` FIRST — anything already logged today is not asked again. If the conversation already told you the answer, use it and skip the question. A shutdown with 1 question is a good shutdown; a shutdown with 5 is an interrogation.
 
-Then use `AskUserQuestion`:
-- header: "Sen ostatniej nocy"
-- options:
-  - "😴 Dobrze się wyspałem"
-  - "😐 Mogło być lepiej"
-  - "😫 Źle spałem"
+**Question 1 — energy (skip if today's row already has an evening energy value):**
+`AskUserQuestion`, header "Energy", options: "🔋 Low (1-3)" / "⚡ Medium (4-6)" / "🔥 High (7-10)".
 
-After energy + sleep, use `AskUserQuestion`:
-- header: "Co poszło dobrze?"
-- options (generate 2-3 from today's completed tasks or context, plus):
-  - "[Completed task 1 from state/tasks.md]"
-  - "[Completed task 2 from state/tasks.md]"
-  - "Coś innego — powiem" (for non-task wins)
-
-If no completed tasks today → replace task options with:
-  - "Przetrwałem — to się liczy"
-  - "Odpoczywałem (i to OK)"
-  - "Coś innego — powiem"
-
+**Question 2 — the win (skip if the user already named one):**
+`AskUserQuestion`, header "What went well?", options generated from today's completed tasks (max 3) + "Something else".
+If no completed tasks today → options: "I got through it — that counts" / "I rested (and that's fine)" / "Something else".
 Never make a zero-task day feel like failure.
 
-If "Coś innego" → ask open text.
+**Question 3 — tomorrow's #1 (selection, not typing):**
+Read `state/tasks.md` → pending tasks. Sort: overdue first → high priority → matched to the user's morning peak. `AskUserQuestion`, header "Tomorrow", options: top 4 tasks + "Something else". Save the selection as tomorrow's #1.
 
-**If Health pack active:** Check habits.md for today's habits:
-- Did user work out? → if not tracked: "Był trening dziś? (tak/nie/odpoczynek)"
-- Hydration/reading/other tracked habits → quick yes/no per habit
-
-**Tomorrow's Priority (SELECTION, not typing):**
-1. Read state/tasks.md → get pending tasks for tomorrow + this week
-2. Generate top 3-5 most relevant tasks as AskUserQuestion options
-3. Add "Coś innego" as last option (opens text input only if selected)
-4. Pre-sort by: overdue first → high priority → energy-matched to morning peak
-
-Use `AskUserQuestion`:
-- header: "Jutro"
-- question: "Co jest #1 priorytetem na jutro?"
-- options: [generated from tasks.md, max 4] + "Coś innego"
-
-If "Coś innego" → ask open text. Otherwise → save selection as tomorrow's #1.
+Sleep quality, habits, and mood are **inferred or left blank** — they are not worth a question. If the user volunteers them, log them.
 
 ### Step 1B: Pattern Comparison (if 7+ entries in daily-log, runs after Step 1)
 
 **After user reports today's energy, compare with their baseline.**
 
-Check @boss agent memory for energy patterns. If 7-day average exists:
+Check native auto-memory for energy patterns. If 7-day average exists:
 
 - Today's energy vs 7-day average → show brief comparison:
   - Above average: "Energy [X] today vs your usual [Y]. [If exercise done: 'Training + good sleep = your winning combo.'] [If no trigger found: 'Good day. Note what you did differently.']"
@@ -105,57 +73,26 @@ Never crash because /morning didn't run. Always create what's missing.
 2. Append today's entry to `state/daily-log.md`:
    - Date, energy level (from Step 1), sleep quality (from explicit sleep question), mood (infer from conversation tone or ask: "Jak ogólnie nastrój? 😊/😐/😔"), exercise (from habit check or state/habits.md), win of the day (from "What went well?"), tomorrow #1 priority.
    - Format: `| YYYY-MM-DD | [energy] | [sleep] | [mood] | [exercise] | [win] | [tomorrow] |`
-3. If energy pattern is notable (3+ days of low energy, or sudden drop) → post to context-bus: `@boss → @wellness` with `Priority: normal`.
+3. If energy pattern is notable (3+ days of low energy, or sudden drop) → post to context-bus: `@boss → @coach` with `Priority: normal`.
 
 **Pro mode:** INSERT into daily_logs (energia, sleep, mood).
 
 ### Context Bus Writes (after logging)
 
-After writing today's log, post relevant signals to state/context-bus.md:
+After writing today's log, post relevant signals to state/context-bus.jsonl:
 
-| Condition | Write to context-bus.md |
+| Condition | Write to context-bus.jsonl |
 |-----------|------------------------|
 | Workout done today | `## [date] @boss → @trainer` / `Type: data` / `Priority: info` / `TTL: 3 days` / `Content: Workout logged [date]. Update streak.` / `Status: pending` |
-| Bad sleep 3+ consecutive days | `## [date] @boss → @wellness` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Poor sleep pattern: [X] days. Sleep hygiene check needed.` / `Status: pending` |
-| Energy pattern notable (3+ days low) | `## [date] @boss → @wellness` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Energy trend: [X] days below average.` / `Status: pending` |
+| Bad sleep 3+ consecutive days | `## [date] @boss → @coach` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Poor sleep pattern: [X] days. Sleep hygiene check needed.` / `Status: pending` |
+| Energy pattern notable (3+ days low) | `## [date] @boss → @coach` / `Type: insight` / `Priority: normal` / `TTL: 7 days` / `Content: Energy trend: [X] days below average.` / `Status: pending` |
 | Habit streak milestone (7, 14, 21, 30 days) | `## [date] @boss → @coach` / `Type: data` / `Priority: info` / `TTL: 3 days` / `Content: [habit] streak: [X] days!` / `Status: pending` |
 
 Use the canonical context-bus format from CLAUDE.md.
 
 **Rules:**
-- Check context-bus.md for existing signals before writing duplicates
+- Check context-bus.jsonl for existing signals before writing duplicates
 - Max 2 signals per /evening session
-
-### Step 2B: Timer check (if Business pack active)
-
-Check state/time-log.md Summary for active timer. If timer running:
-
-Use `AskUserQuestion`:
-- header: "Timer"
-- options:
-  - "Zatrzymaj timer" (description: "[projekt] — działa od [czas]")
-  - "Zostaw na jutro" (description: "Timer będzie kontynuowany")
-
-If "Zatrzymaj" → execute /timetrack stop logic inline (calculate elapsed, log, update projects.md).
-
-### Step 2C: Reflect suggestion (optional)
-
-If Life pack active AND user hasn't done /reflect today (check journal.md for today's date):
-
-Use `AskUserQuestion`:
-- header: "Reflect"
-- options:
-  - "Tak, szybki wpis (/reflect)" (description: "1 pytanie, 2 minuty")
-  - "Nie dziś" (description: "Kontynuuj zamknięcie dnia")
-
-If "Tak" → execute /reflect inline, then return to Step 3.
-If "Nie dziś" → continue.
-
-**Note:** Step numbering shifted — Step 2B = Timer check, Step 2C = Reflect suggestion.
-
-### Step 2D: Notes capture (before close)
-Quick check: "Chcesz coś zanotować na koniec dnia? (`n [text]`)"
-If user adds notes → save via /note flow. If "nie" / skip → move on.
 
 ### Step 3: Close
 ```
@@ -173,7 +110,7 @@ Get some rest. See you in the morning. ☀️"
 - Read today's daily-log entry + completed tasks + context-bus signals
 - Identify patterns: energy vs. sleep correlation, task completion vs. time-of-day, recurring blockers
 - If 7+ daily-log entries exist: compute/update 7-day rolling averages (energy, sleep, mood)
-- Update @boss agent memory with consolidated patterns (NOT raw data — only insights)
+- Update native auto-memory with consolidated patterns (NOT raw data — only insights)
 - Pattern format: `{date_range} | {pattern_type} | {insight} | {confidence}`
 
 #### 4B. Pre-Generate Morning Context
@@ -181,7 +118,7 @@ Get some rest. See you in the morning. ☀️"
 - Read tomorrow's calendar (if Google Calendar MCP connected) — silently, no output to user
 - Check pending tasks for tomorrow from tasks.md
 - Check context-bus for pending signals that need action tomorrow
-- Check notes.md for reminders due tomorrow → include in brief
+- Check state/reminders.md for reminders due tomorrow → include in brief
 - Write a pre-cached morning brief to `state/.pre-morning.md` (overwrite, always fresh):
   ```
   <!-- Auto-generated by /evening Sleep-Time Consolidation -->
@@ -201,8 +138,8 @@ Get some rest. See you in the morning. ☀️"
   - Worst day of week (lowest avg energy)
   - Sleep-to-energy correlation strength
   - Exercise-to-energy correlation strength
-- Store detected patterns in @boss agent memory (update, don't append)
-- Patterns used by /morning to give better recommendations and by /energy-map for visualization
+- Store detected patterns in native auto-memory (update, don't append)
+- Patterns used by /morning to give better recommendations and by /habit for visualization
 
 #### Rules for Sleep-Time Consolidation
 
@@ -220,31 +157,18 @@ Always close /evening with a win highlight — the single best thing from the da
 
 Never end with guilt or "should have done more." Always find the win.
 
-## Optional Agent Feedback (~1 in 3 evenings)
-
-If the user interacted with a specific agent today (check context-bus or session context), and @boss memory `feedback_asked_today` is false, approximately 1 in 3 sessions ask:
-
-"How was @[agent]'s advice today?" via `AskUserQuestion`:
-- "Trafne — exactly what I needed"
-- "OK — decent"
-- "Nietrafione — missed the mark"
-- "Skip"
-
-If asked → set `feedback_asked_today: true` in @boss memory. Save response to relevant agent memory.
-If not asked or "Skip" → proceed to close. Never make this feel required.
-
 ## Work Style Adaptation
 
 Read `profile.md` → `work_style` before starting the evening ritual.
 
-- **Sprinter** → After energy check, ask: "Sprint day czy rest day?" via `AskUserQuestion` (header: "Typ dnia", options: "🏃 Sprint day" / "🛋️ Rest day"). Sprint day → celebrate intensity. Rest day → validate: "Rest days fuel sprints. Dobra strategia."
-- **Scattered** → Compress to 1 question max (energy only). Skip "what went well" multi-select — instead: "Jedna rzecz, która dziś poszła dobrze?" (open text or skip). Goal: get in and out fast before attention drifts.
-- **Procrastinator** → Show tomorrow's deadlines prominently in close: "Jutro: [task] — deadline za [X]h. Zaczynam z samego rana."
+- **Sprinter** → Infer sprint vs rest day from what actually got logged; do NOT spend a question on it. Sprint day → celebrate intensity. Rest day → "Rest days fuel sprints."
+- **Scattered** → Compress to 1 question (energy only). Get in and out fast before attention drifts.
+- **Procrastinator** → Show tomorrow's deadlines prominently in the close: "Tomorrow: [task] — due in [X]h. Start with it."
 - **Steady** → Standard flow (no changes needed).
 
 ## Rules
-- Keep it to 3 questions MAX (including optional feedback — if asked, it counts)
+- 3 questions MAX, and fewer is better — every answer already in state or in the conversation replaces a question
 - Don't lecture about what wasn't done
 - Celebrate what WAS done ("Nice work on [X]")
 - If user reports low energy → "Rest is productive too. No guilt."
-- Save patterns to agent memory (energy trends, productive days)
+- Save patterns to native auto-memory (energy trends, productive days)

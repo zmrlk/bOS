@@ -1,272 +1,191 @@
 ---
 name: Inbox
-description: "View and manage messages from all channels (Telegram, Email, Slack, Discord, WhatsApp) in one place. Route messages to agents, reply through original channels."
+description: "AI email triage — reads Gmail + Outlook, categorizes (action/FYI/delegate/archive), filters noise, drafts replies, extracts tasks. Reduces decision fatigue. Use when user says 'maile', 'inbox', 'sprawdź pocztę', 'email triage', or during morning routine."
 user_invocable: true
 command: /inbox
 ---
 
-# /inbox — Unified Inbox
+# Email Triage (Alfred-style) — Gmail + Outlook
 
-All your messages. One place. Route to agents. Reply through original channel.
+Reads Gmail and Outlook via claude.ai connectors, categorizes, filters system noise, drafts responses, extracts tasks. User approves — zero decision fatigue.
 
----
+## Email Accounts
 
-## Usage
+| Account | Connector | Type |
+|---------|-----------|------|
+| `[your-email]` | Gmail (claude.ai) | Personal + business + newsletters |
+| Outlook (Microsoft 365) | Microsoft 365 (claude.ai) | [company-A]/[company-B]/[system-alerts] business |
 
-- `/inbox` — show unread messages grouped by channel
-- `/inbox [channel]` — filter by channel (telegram, email, slack, discord, whatsapp)
-- `/inbox reply [id]` — compose reply, send through original channel
-- `/inbox route [id] @agent` — route message to a specific agent for handling
-- `/inbox archive` — archive all read messages
-- `/inbox setup` — configure a new inbox channel
+## Noise Filters
 
----
+### Outlook — System Noise (ALWAYS filter)
+
+| Sender | Type | Triage behavior |
+|--------|------|-----------------|
+| `powiadomienia@[system-alerts@company.com]` | POS alerts, inventory, emergency sales | **Daily summary only** — count by type, don't show individually |
+| `noreply@[noreply@client-company.com]` | B2B system notifications | **Filter** unless subject contains "zamówienie" or "B2B" (real orders pass through) |
+| Any sender containing `inpost` | Parcel tracking | **Filter** completely |
+
+### Gmail — Category Filters
+
+| Category/Label | Triage behavior |
+|----------------|-----------------|
+| `CATEGORY_PROMOTIONS` | **Skip** — never show in triage |
+| `CATEGORY_SOCIAL` | **Skip** — never show in triage |
+| Label `9: newsletter` | **Skip in quick triage**, summarize in full triage |
+| Label `10: marketing` | **Skip** |
+| Label `1: urgent` | **ALWAYS show** — top priority |
+| Label `2: action needed` | **ALWAYS show** — high priority |
+| Label `8: payment` | **ALWAYS show** — financial |
+| Label `3: follow up` | Show if unread |
+
+### Priority Senders (ALWAYS surface, regardless of filters)
+
+- [client], [company-A], [company-B] contacts
+- FreelancePlatform (payments)
+- Anthropic, Stripe (billing)
+- Any real person (not automated/noreply)
 
 ## Protocol
 
-### Step 1: Batch data loading (1 turn, all parallel)
-
-Issue ALL reads in one batch:
-- `profile.md` (full) → language, inbox_channels, dnd_hours
-- `state/inbox.md` (Tier 1: first 25 lines → Summary) → unread count
-- If Pro mode → query `messages` table instead
-
-If `state/inbox.md` doesn't exist → create silently with schema from `state/SCHEMAS.md` (inbox.md section).
-
-### Step 2: Mode detection
-
-- **Pro mode** (Supabase connected): Read/write from `messages` table
-- **Lite mode**: Read/write from `state/inbox.md` (growing file format)
-
----
-
-### Subcommand: `/inbox` (default — show unread)
-
-**Pro mode query:**
-```sql
-SELECT id, channel, sender_name, subject, body, created_at, status
-FROM messages
-WHERE status IN ('unread', 'read', 'routed')
-ORDER BY created_at DESC
-LIMIT 20;
+### Step 0: Load tools (parallel)
+```
+ToolSearch("select:mcp__claude_ai_Gmail__gmail_search_messages,mcp__claude_ai_Gmail__gmail_read_message,mcp__claude_ai_Gmail__gmail_create_draft,mcp__claude_ai_Microsoft_365__outlook_email_search,mcp__claude_ai_Microsoft_365__read_resource")
 ```
 
-**Lite mode:** Read Active section of `state/inbox.md`.
+### Step 1: Fetch emails from BOTH accounts (parallel)
 
-**Display format:**
+**Gmail — 2 parallel searches:**
+1. Important: `is:unread newer_than:1d -category:promotions -category:social -label:9-newsletter -label:10-marketing`
+2. Urgent/payment: `is:unread (label:1-urgent OR label:2-action-needed OR label:8-payment)`
+
+**Outlook — 2 parallel searches:**
+1. Recent non-noise: `afterDateTime: last 24h, limit: 20` → then filter out noise senders in post-processing
+2. If doing full triage: separate search for `sender: powiadomienia@[system-alerts@company.com], afterDateTime: last 24h` → count only, for summary
+
+### Step 2: Filter and categorize
+
+**Post-fetch noise filtering (Outlook):**
+From Outlook results, separate:
+- `powiadomienia@[system-alerts@company.com]` → count by subject pattern:
+  - "Zamknięte punkty sprzedaży" → count as `pos_closed`
+  - "POS - sprzedaż awaryjna" → count as `pos_emergency`
+  - "Roznice magazynowe" → count as `inventory_diff`
+  - "Wykryto niedobory/nadwyżki" → count as `inventory_alert`
+- `noreply@[noreply@client-company.com]` → check subject for "zamówienie"/"B2B" → if yes, keep as ACTION; if no, filter
+- InPost → discard
+- Everything else → categorize normally
+
+**Categorization (both accounts):**
+
+| Category | Criteria | Icon |
+|----------|----------|------|
+| **ACTION** | Requires response or task from [user] | 🔴 |
+| **FYI** | Informational, no action needed | 🔵 |
+| **DELEGATE** | Someone else should handle | 🟡 |
+| **ARCHIVE** | Irrelevant or already handled | ⚪ |
+| **PAYMENT** | Financial — invoice, payment, billing | 💰 |
+
+### Step 3: Present triage summary
+
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📬  INBOX — [X] unread
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📬 INBOX TRIAGE — [date]
+  Gmail: [X] nowych | Outlook: [Y] nowych
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  📱 Telegram ([N] unread)
-  ┌──────────────────────────────────┐
-  │ [sender] — [preview 60 chars]   │
-  │ [sender] — [preview 60 chars]   │
-  └──────────────────────────────────┘
+🔴 ACTION ([N]):
+  1. 📧 [sender] — [subject] (1 line summary)
+     → Sugestia: [reply/task/meeting]
+  2. 📨 [sender] — [subject]
+     → Sugestia: [action]
 
-  📧 Email ([N] unread)
-  ┌──────────────────────────────────┐
-  │ [sender] — [subject]            │
-  │ [sender] — [subject]            │
-  └──────────────────────────────────┘
+💰 PAYMENT ([N]):
+  3. [sender] — [subject] → [amount if visible]
 
-  💬 Slack ([N] unread)
-  ┌──────────────────────────────────┐
-  │ [sender] — [preview 60 chars]   │
-  └──────────────────────────────────┘
+🔵 FYI ([N]):
+  4. [sender] — [subject] (1 line)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+🟡 DELEGATE ([N]):
+  5. [sender] — [subject] → kto: [person]
 
-**If inbox is empty:**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📬  INBOX — all clear
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚪ ARCHIVE: [count] emails skipped
 
-  No unread messages.
-
-  Channels: [list connected or "none yet"]
-
-  → /inbox setup to connect a channel
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-**Follow-up:** AskUserQuestion with options:
-- "Reply to a message" → prompt for ID, then `/inbox reply`
-- "Route to agent" → prompt for ID + agent
-- "Archive read" → `/inbox archive`
-- "Done"
-
----
-
-### Subcommand: `/inbox [channel]`
-
-Filter by channel. Same display as above but only one channel.
-
-Valid channels: `telegram`, `email`, `slack`, `discord`, `whatsapp`.
-
-If user provides invalid channel → "Unknown channel. Available: telegram, email, slack, discord, whatsapp."
-
----
-
-### Subcommand: `/inbox reply [id]`
-
-1. **Load message** — fetch by ID (Pro: SQL query, Lite: find in inbox.md)
-2. **Show context:**
-   ```
-   📨 Replying to [sender] via [channel]
-   ┌────────────────────────────────────┐
-   │ [full message body]               │
-   └────────────────────────────────────┘
-   ```
-3. **Compose reply** — ask user for reply text (open text field)
-4. **Send:**
-   - **Pro mode:** Update message row: `response = [text]`, `status = 'reply_pending'`, `replied_at = NOW()`
-     The outbox-router n8n workflow picks up `reply_pending` and sends through the original channel.
-   - **Lite mode:** Note the reply in inbox.md. Inform: "Reply saved. To send it, you'll need n8n outbox-router connected. /inbox setup for help."
-5. **Confirm:** "Reply sent via [channel] to [sender]."
-6. **Webhook:** Fire `message.replied` event if configured.
-
----
-
-### Subcommand: `/inbox route [id] @agent`
-
-1. **Load message** by ID
-2. **If @agent not specified** → suggest agent based on message content:
-   - Keywords: "faktura/invoice/payment" → @cfo
-   - Keywords: "spotkanie/meeting/call" → @coo
-   - Keywords: "bug/code/error/deploy" → @devlead
-   - Keywords: "content/post/marketing" → @cmo
-   - Keywords: "lead/deal/client" → @sales
-   - Default → @boss
-   Use AskUserQuestion with top 3 suggestions + "Other"
-3. **Route:**
-   - Update message: `routed_agent = @agent`, `status = 'routed'`
-   - Post to context-bus: `@boss → @[agent], Type: data, Priority: normal, Content: "Inbox message from [sender] via [channel]: [preview]"`
-4. **Confirm:** "Message routed to @[agent]. They'll see it next session."
-
-### Auto-routing (if `inbox_auto_route = on` in profile.md)
-
-On session-start, @boss checks unread messages and auto-routes based on keyword matching:
-
-| Keywords | Route to |
-|----------|----------|
-| faktura, invoice, payment, rachunek, płatność | @cfo |
-| spotkanie, meeting, call, zoom, teams | @coo |
-| bug, error, code, deploy, server, API | @devlead |
-| content, post, social, marketing, campaign | @cmo |
-| lead, deal, client, prospect, sale | @sales |
-| task, projekt, deadline, termin | @coo |
-
-Auto-routed messages get `status = 'routed'` and a context-bus signal. User sees in session-start nudge: "📬 [X] messages auto-routed. /inbox to review."
-
----
-
-### Subcommand: `/inbox archive`
-
-1. **Pro mode:** `UPDATE messages SET status = 'archived' WHERE status IN ('read', 'replied');`
-2. **Lite mode:** Move read/replied entries from Active to Archive section of inbox.md
-3. **Report:** "Archived [X] messages."
-
----
-
-### Subcommand: `/inbox setup`
-
-Guide user through connecting a new inbox channel.
-
-1. AskUserQuestion:
-   - header: "Channel"
-   - options:
-     - "Telegram" (description: "Receive Telegram messages in bOS")
-     - "Email" (description: "Poll email via IMAP")
-     - "Slack" (description: "Listen to Slack channel messages")
-     - "Discord" (description: "Discord bot integration")
-
-2. Based on selection, guide through n8n workflow setup:
-   - Show the relevant template from `templates/n8n/`
-   - Walk through credentials setup step by step
-   - Adapt instructions to `tech_comfort`:
-     - "I code" → show JSON, explain n8n nodes
-     - "I use apps" → step-by-step with screenshots references
-     - "not technical" → "This needs n8n (automation tool). I'll walk you through it. It takes ~10 minutes."
-
-3. After setup:
-   - Update `profile.md → inbox_channels` to include new channel
-   - Test: send a test message → verify it appears in inbox
-
----
-
-## Lite Mode Fallback
-
-When Supabase is not connected, inbox uses `state/inbox.md` (growing file format).
-
-### inbox.md Schema (Growing file — Summary/Active/Archive)
-
-```markdown
-# Inbox
-
-## Summary
-<!-- AUTO-UPDATED by @boss at session end -->
-Active section: lines XX-YY
-| Metric | Value |
-|--------|-------|
-| Unread | X |
-| Total active | X |
-| Channels | telegram, email |
-
----
-
-## Active
-
-| ID | Channel | Sender | Subject/Preview | Status | Date |
-|----|---------|--------|-----------------|--------|------|
-| 1 | telegram | Jan K. | Hej, masz chwilę? | unread | 2026-03-02 |
-| 2 | email | newsletter@ai.com | Weekly AI digest | read | 2026-03-02 |
-
----
-
-## Archive
-[older messages moved here]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🏭 POS-SYSTEM SUMMARY (last 24h)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  POS zamknięte: [X] alertów
+  POS awaryjna: [Y] dokumentów
+  Różnice magazynowe: [Z]
+  Niedobory/nadwyżki: [W]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Note:** In Lite mode, messages must be manually added (or via n8n writing to the file). The skill works as a viewer/manager regardless.
+Use 📧 for Gmail emails, 📨 for Outlook emails — so [user] knows which inbox.
 
----
+### Step 4: Process ACTION emails
 
-## DND Hours
+For each ACTION email, use AskUserQuestion:
 
-If `profile.md → dnd_hours` is set (e.g., "22:00-07:00"):
-- Auto-routing still happens (messages are categorized)
-- But NO nudges about new messages during DND hours
-- Messages are silently accumulated and presented at next active session
+"[icon] [sender]: [subject summary]"
+Options: [Wyślij draft odpowiedzi] [Dodaj jako task] [Pomiń] [Pokaż pełny mail]
 
----
+If "Wyślij draft":
+- Generate draft reply in [user]'s style (direct, concise, Polish unless email was English)
+- Gmail: use `gmail_create_draft` to save draft
+- Outlook: show draft text (no draft API available yet)
+- Confirm: "📝 Draft zapisany — sprawdź w Gmail/Outlook"
 
-## State Write Protocol
+If "Dodaj jako task":
+- Extract task → append to state/tasks.md
+- Confirm: "✅ Task dodany: [task name]"
 
-- **Owner:** @boss (inbox.md and messages table)
-- **Readers:** all agents (for routed messages)
-- @boss writes inbox.md Summary at session end (lazy)
-- Individual message status updates happen immediately (reply, route, archive)
+### Step 5: Extract tasks automatically
 
----
+From ALL emails (not just ACTION), detect task-like content:
+- Deadlines mentioned ("do piątku", "termin 25.03")
+- Requests ("proszę o", "potrzebujemy")
+- Meeting proposals ("spotkanie", "call")
+- Payment due ("faktura", "termin płatności")
 
-## Cross-Agent Signals
+```
+📋 Wyciągnięte taski:
+  → [task] (z maila od [sender])
+  → [task] (z maila od [sender])
+Dodać do tasks.md? [Tak, wszystkie] [Wybiorę] [Nie]
+```
 
-### I POST when:
-- New message received with auto-route match → target agent
-- High-priority message detected (keywords: urgent, pilne, ASAP) → @boss + target agent, Priority: critical
-- Inbox overflow (20+ unread) → @boss, Priority: normal
+### Step 6: Quick Actions
+AskUserQuestion at the end:
+- "Co dalej?" → [Odpowiedz na pierwszy ACTION] [Sprawdź [system-alerts] detale] [Gotowe]
 
-### I LISTEN for:
-- Agent responses to routed messages → update message status
-- DND schedule changes from @organizer/@wellness
+## Rules:
+- NEVER send emails without explicit user approval — only create DRAFTS
+- Draft language = Polish unless email was in English
+- Draft tone = [user]'s style: bezpośredni, konkretny, bez bullshitu
+- If email is from [client]/[company-A]/[company-B] → flag as priority
+- If email mentions money/log-expense → flag as PAYMENT category
+- Max 15 emails total per triage (paginate if more)
+- Privacy: read email content but never store full email bodies in state files — only summaries
+- [system-alerts] summary: show COUNTS not individual emails
+- Failed payment emails (Stripe, Anthropic) → always ACTION + 💰
+- B2B orders from [noreply@client-company.com] → always ACTION (pass through noise filter)
 
----
+## Integration with /morning and /evening
 
-## Webhook Events
+When called from /morning:
+- Use compact format (no Step 4-6, just the summary)
+- Max 5 most important emails shown
+- [system-alerts] summary in 1 line
 
-- `message.received` — fires when a new message enters the inbox
-- `message.replied` — fires when a reply is sent through any channel
+When called from /evening:
+- Show unprocessed ACTION emails from today
+- "Zostały [N] maile do ogarnięcia. Na jutro?" [Tak] [Ogarniam teraz]
+
+## Cron Integration (email-monitor.sh)
+
+A background cron runs every 15 minutes checking both accounts.
+- Filters same noise senders
+- Sends ntfy push ONLY for important new emails
+- State tracked in `state/.email-monitor-last-check`
+- Cooldown: max 1 push per 30 minutes

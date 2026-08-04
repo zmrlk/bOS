@@ -1,6 +1,6 @@
 ---
 name: Goal
-description: "Set, update, review, or complete goals. Works with @coach (life goals) and @ceo (business goals)."
+description: "Set, update, review, or complete goals. Works with @coach (life goals) and @boss (business goals)."
 user_invocable: true
 command: /goal
 ---
@@ -33,9 +33,9 @@ If user provides a goal without subcommand → treat as `/goal set`.
 ### Set goal
 1. If description provided → use it. If not → ask: "Jaki cel chcesz ustawić?"
 2. Auto-detect category from content:
-   - Business/work/revenue/clients → business → owner: @ceo
+   - Business/work/revenue/clients → business → owner: @boss
    - Health/fitness/weight/exercise → health → owner: @coach
-   - Learning/skill/language/read → learning → owner: @teacher or @mentor
+   - Learning/skill/language/read → learning → owner: @reader
    - Life/habit/routine/relationship → life → owner: @coach
 3. Use `AskUserQuestion` for target date:
    - header: "Termin"
@@ -98,5 +98,5 @@ Read `profile.md` → `adhd_indicators` before all goal operations.
 
 ## Agents
 - @coach owns life/health goals
-- @ceo owns business goals
-- @teacher/@mentor own learning/career goals
+- @boss owns business goals
+- @reader/@coach own learning/career goals

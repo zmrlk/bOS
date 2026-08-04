@@ -58,7 +58,7 @@ Write to `state/handoff.md` (overwrite previous — only latest matters):
 ### Step 3: Update state files (silent)
 
 - Mark completed tasks in `tasks.md`
-- Post any critical signals to `context-bus.md`
+- Post any critical signals to `context-bus.jsonl`
 - Update `daily-log.md` if energy/wins were mentioned but not logged
 
 ### Step 4: Confirm to user

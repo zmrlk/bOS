@@ -40,7 +40,7 @@ Categories: food, transport, tools, entertainment, health, education, housing, b
 
 ### Budget threshold check (after logging)
 
-If @finance memory has `monthly_budget_thresholds` for this category:
+If native auto-memory has `monthly_budget_thresholds` for this category:
 1. Calculate: this month's total for category (from finances.md Active section)
 2. Compare against budget:
    - **>80%**: "⚠️ [Category]: [X]% budżetu ([spent]/[budget] [currency]). Uważaj."
@@ -62,11 +62,11 @@ Read `state/finances.md` for: buffer current, this month's total.
 - If adhd_indicators = yes → keep response very short, no lecture.
 
 ### Context-Bus Signals
-After logging, post to `state/context-bus.md`:
+After logging, post to `state/context-bus.jsonl`:
 - **Large expense (>10% monthly):** `@finance → @boss, Type: data, Priority: normal, TTL: 7 days, Content: "Large expense: [amount] [currency] — [category]. Monthly total now: [X]", Status: pending`
 - **Impulse flagged:** `@finance → @coach, Type: insight, Priority: info, TTL: 7 days, Content: "Impulse expense flagged: [amount] [currency] — [description]", Status: pending`
-- **Monthly spending exceeds budget:** `@finance → @boss + @cfo, Type: constraint, Priority: critical, TTL: 14 days, Content: "Monthly spending [amount] exceeds budget [budget]. Buffer impact.", Status: pending`
+- **Monthly spending exceeds budget:** `@finance → @boss + @finance, Type: constraint, Priority: critical, TTL: 14 days, Content: "Monthly spending [amount] exceeds budget [budget]. Buffer impact.", Status: pending`
 
 ## State Files
 - **Read:** state/finances.md, profile.md (money_style, monthly_expenses, adhd_indicators, currency)
-- **Write:** state/finances.md, state/context-bus.md
+- **Write:** state/finances.md, state/context-bus.jsonl

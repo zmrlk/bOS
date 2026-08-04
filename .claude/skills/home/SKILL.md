@@ -24,7 +24,7 @@ One screen. Everything that matters. No scrolling required.
 - `state/daily-log.md` (first 25 lines — Summary) → today's energy, 7d trend
 - `state/habits.md` (full) → streaks (if Health or Life pack active)
 - `state/finances.md` (first 25 lines — Summary) → buffer %, spending today/week (if Finance active)
-- `state/notes.md` (full) → note count, nearest reminder
+- `state/reminders.md` (full) → pending count, nearest due
 
 **Pro mode (Supabase) — batch queries in one tool-use turn:**
 - `tasks` table → WHERE plan_date = CURRENT_DATE
@@ -92,20 +92,19 @@ Pick the highest-priority undone task for today. If no tasks → show primary_go
 
 ---
 
-## Block: NOTES (if notes.md has active entries)
+## Block: REMINDERS (if state/reminders.md has pending entries)
 
 ```
-  📌  NOTES
+  📌  REMINDERS
   ┌─────────────────────────────────┐
-  │  [total] active · Next: [reminder text] ([date])  │
+  │  [total] pending · Next: [text] ([date])  │
   └─────────────────────────────────┘
 ```
 
-- Only show if notes.md has Active entries (Total > 0)
-- Show total count + nearest reminder (if any has Due date)
-- If no reminders, just show count: "[N] active notes"
-- If no notes at all → skip this block entirely
-- Quick action hint: `n [text]` to add, `/note list` to see all
+- Only show if `state/reminders.md` has pending entries (Total > 0)
+- Show total count + the nearest due one
+- If nothing pending → skip this block entirely
+- Quick action hint: `/remind` to add one
 
 ---
 
@@ -118,42 +117,14 @@ Pick the highest-priority undone task for today. If no tasks → show primary_go
   │  📖 Reading   ▰▰▱▱▱  2 days  🏆  5  │
   │  💤 Sleep 7h+ ▰▰▰▱▱  3 days  🏆  8  │
   │  🧘 Mindful   ▰▱▱▱▱  1 day   🏆  3  │
-  │  🎯 Focus     ▰▰▰▱▱  3 sess  🏆  7  │
   └─────────────────────────────────┘
 ```
 
 - Show only habits that have at least 1 entry
 - Progress bar: ▰ = active day, ▱ = missed, show last 5 days
 - 🏆 = personal best streak (from habits.md Best column)
-- Focus sessions: show this week's count from @coo memory → focus_sessions_this_week
 - Max 5 habits shown
 - If no habits tracked yet → skip this block entirely (don't show empty)
-
----
-
-## Block: SPRINT BURNDOWN (if sprint_mode active)
-
-Show only if `profile.md → sprint_mode = active` AND @coo memory has `current_sprint`:
-
-```
-  🏃  SPRINT — Week of [date]
-  ┌─────────────────────────────────┐
-  │  Committed: [X] SP              │
-  │  Completed: [Y] SP              │
-  │  Remaining: [Z] SP              │
-  │                                 │
-  │  Day 1  ████████████  12 SP     │
-  │  Day 2  ██████████░░  10 SP     │
-  │  Day 3  ████████░░░░   8 SP ←   │
-  │  Day 4  ······░░░░░░  (ideal)   │
-  │  Day 5  ··········░░  (ideal)   │
-  └─────────────────────────────────┘
-```
-
-- SP data from @coo memory → current_sprint
-- ← marks current day
-- Dots (·) for future ideal line
-- If no active sprint → skip this block entirely
 
 ---
 
@@ -194,59 +165,17 @@ Show only if `profile.md → sprint_mode = active` AND @coo memory has `current_
 
 ---
 
-## Block: CODE (if @devlead active / Business pack with coding projects)
-
-Show only if user has used /code or has coding projects in projects.md:
+## Block: PROJECTS (if state/projects.md has active rows)
 
 ```
-  </> CODE
+  🗂️  PROJECTS
   ┌─────────────────────────────────┐
-  │  Last review: [score]/10        │
-  │  Quality trend: [↑/↓/→]        │
-  │  Active project: [name]         │
+  │  [name] — [status] · [next step]│
   └─────────────────────────────────┘
 ```
 
-- Pull from @devlead memory (last review score, quality trend)
-- If no code data yet → skip this block entirely
-
----
-
-## Block: INVOICES (Business pack with invoices)
-
-Show only if `state/invoices.md` has entries:
-
-```
-  🧾  INVOICES
-  ┌─────────────────────────────────┐
-  │  📬 Outstanding: [N] ([amount]) │
-  │  🔴 Overdue: [N] ([amount])     │
-  │  💰 Paid this month: [amount]   │
-  └─────────────────────────────────┘
-```
-
-- Pull from state/invoices.md
-- If no invoices → skip block entirely
-- Overdue = status != paid AND due date < today
-
----
-
-## Block: TIME (if /timetrack used)
-
-Show only if `state/time-log.md` has entries:
-
-```
-  ⏱️  TIME
-  ┌─────────────────────────────────┐
-  │  This week: [X]h               │
-  │  Active timer: [project] [Xh]  │
-  │  Top project: [name] ([X]h)    │
-  └─────────────────────────────────┘
-```
-
-- Pull from state/time-log.md Summary
-- If active timer running → show with elapsed time
-- If no time data → skip block entirely
+- Max 3 active projects, from the Dashboard table in `state/projects.md`
+- If no projects tracked → skip this block entirely
 
 ---
 
@@ -261,8 +190,8 @@ Show only if `state/time-log.md` has entries:
   └─────────────────────────────────┘
 ```
 
-- Pull from agent memory (@teacher, @reader)
-- If no learning data yet → "Start with '@teacher what should I learn?'"
+- Pull from native auto-memory
+- If no learning data yet → "Start with '@reader what should I learn?'"
 
 ---
 
@@ -286,7 +215,7 @@ Then use `AskUserQuestion` for quick actions:
 
 ## Rules
 
-1. Dashboard must fit on ONE screen — no scrolling. If too many blocks, prioritize: TODAY → NEXT ACTION → BUFFER → STREAKS → PIPELINE → LEARNING
+1. Dashboard must fit on ONE screen — no scrolling. If too many blocks, prioritize: TODAY → NEXT ACTION → REMINDERS → BUFFER → STREAKS → PIPELINE → PROJECTS → LEARNING
 2. Skip empty blocks entirely — don't show "No data" boxes
 3. Numbers are real — pull from state files or database. Never estimate or fabricate.
 4. If everything is empty (fresh install, no data) → show a **progress tracker dashboard** instead of empty blocks:

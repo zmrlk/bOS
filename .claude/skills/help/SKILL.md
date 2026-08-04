@@ -27,39 +27,44 @@ Show a clean, one-screen reference of everything available.
   ...
   Type @agent to talk directly to them.
 
-  ⌨️  DAILY RHYTHM
-  /morning (m)      — start your day
-  /evening (e)      — end your day
-  /home (h)         — dashboard
+  ⌨️  DAILY RHYTHM (on demand — bOS never nags you into these)
+  /morning          — start-of-day briefing
+  /evening          — end-of-day log
+  /home             — dashboard
 
-  📋  PLANNING
-  /plan-week (p)    — plan the week (Sunday)
-  /review-week (w)  — weekly review (Friday)
-  /standup (s)      — team standup
+  📋  WORK
+  /task             — add, list, complete tasks
+  /goal             — set and review goals
+  /decide           — structured decision with a verdict
+  /wrap-up          — close a session with a handoff note
+  /follow-up        — follow-up script for a contact
+  /ship             — review, commit, push
 
   💰  TRACKING
-  /expense (x)      — log spending
-  /workout          — log exercise
+  /log-expense      — log spending
+  /habit            — streaks, habits, quit tracker
+  /log-workout      — log exercise
+  /reflect          — one-question micro-journal
 
-  [Show BUSINESS commands only if Business pack active:]
-  📊  BUSINESS
-  /eval             — evaluate a project
-  /card             — shareable profile card
+  🔎  MEMORY & INBOX
+  /recall           — search past sessions
+  /remind           — set a timed reminder
+  /inbox            — email triage (Gmail + Outlook)
+  /network          — contacts and follow-ups
 
   ⚙️  SYSTEM
-  /note (n [text])  — quick capture — notes, reminders, ideas
-  /scan             — learn about you (files)
+  /setup            — onboarding / profile refresh
   /check            — system health check
+  /evolve           — audit and improve bOS itself
   /vault            — manage secrets/API keys
-  /connect-mobile   — phone access via Telegram
-  /build-agent      — create custom agent
-  /export           — export all your data
-  /delete-my-data   — delete all personal data
+  /connect          — manage MCP connections
+  /schedule         — run skills on a schedule
+  /build-agent      — create a custom agent
   /help             — this screen
 
   💬  JUST TALK
   You don't need commands. Just type naturally:
-  "good morning" · "plan my day" · "50 zl lunch"
+  "good morning" · "plan my day" · "50 for lunch"
   "how much did I spend" · "I need a workout"
 
   ⚙️  SETTINGS
@@ -71,12 +76,12 @@ Show a clean, one-screen reference of everything available.
 ```
 
 ## Rules
-1. Only show agents from `profile.md → active_agents` (not all 16)
+1. Only show agents from `profile.md → active_agents` (not the whole roster)
 2. Only show command groups relevant to active packs:
    - DAILY RHYTHM → always shown
-   - PLANNING → always shown (if Life or Business pack)
-   - TRACKING → show /expense always, /workout only if Health pack
-   - BUSINESS → only if Business pack active
+   - WORK → always shown; hide /ship and /follow-up without a Business pack
+   - TRACKING → show /log-expense always, /log-workout only if Health pack
+   - MEMORY & INBOX → always shown
    - SYSTEM → always shown
 3. Language matches user's language from profile.md
 4. Must fit on ONE screen — keep it tight

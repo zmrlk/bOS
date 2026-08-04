@@ -62,12 +62,12 @@ Gather information through conversation or structured questions:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-For Business type → also run @ceo's 5-dimension scoring (time-to-cash, rate, repeatability, reputation, feasibility, each 1-3, total /15).
+For Business type → also run @boss's 5-dimension scoring (time-to-cash, rate, repeatability, reputation, feasibility, each 1-3, total /15).
 For Financial type → check buffer status, apply loss framing if relevant.
 
 ### Step 5: Verdict
 
-@ceo delivers verdict:
+@boss delivers verdict:
 
 ```
   👔 @CEO — VERDICT
@@ -94,12 +94,12 @@ Write to `state/decisions.md`:
 **Decision:** [verdict]
 **Options considered:** [list]
 **Reasoning:** [CEO reasoning]
-**Owner:** @ceo
+**Owner:** @boss
 **Status:** active
 **Review date:** [date]
 ```
 
-Update @ceo memory:
+Update native auto-memory:
 ```
 pending_reviews:
   - title: [decision title]
@@ -119,7 +119,7 @@ Use `AskUserQuestion`:
 
 | Condition | Signal |
 |-----------|--------|
-| Major decision (GO or CONDITIONAL) | `@ceo → @boss + @coach, Type: decision, Priority: normal, TTL: 30 days, Content: Decision: [title] — [verdict]. Review: [date].` |
+| Major decision (GO or CONDITIONAL) | `@boss → @boss + @coach, Type: decision, Priority: normal, TTL: 30 days, Content: Decision: [title] — [verdict]. Review: [date].` |
 
 ## State Files
 - **Read:** profile.md, decisions.md (full), finances.md (S)
@@ -131,8 +131,8 @@ Use `AskUserQuestion`:
 3. All reads in 1 turn (parallel I/O)
 4. Summary-only reads for growing files
 5. Every GO/CONDITIONAL decision MUST have a review date
-6. @ceo tracks pending_reviews in memory
+6. @boss tracks pending_reviews in memory
 7. /morning checks for reviews due today
-8. /review-week shows upcoming reviews in next 7 days
+8. /evolve shows upcoming reviews in next 7 days
 9. Never decide FOR the user — present analysis + recommendation, user decides
 10. Language matches user's profile language

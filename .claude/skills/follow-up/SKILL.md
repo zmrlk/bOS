@@ -10,7 +10,7 @@ command: /follow-up
 Sprzedaż ginie w follow-upie. 80% deali zamykane jest po 5+ kontaktach — większość odpuszcza po 1.
 Ten skill mówi: kiedy napisać, co napisać, jak nie być nachalnym.
 
-**Agent:** @sales (skrypty) + @coo (timing + reminder)
+**Agent:** @cmo (scripts) + @boss (timing + reminder)
 
 ---
 
@@ -32,7 +32,7 @@ AskUserQuestion:
 - options:
   - "Wysłałem zimny kontakt, brak odpowiedzi" (description: "Follow-up po 3-5 dniach ciszy")
   - "Był meeting / rozmowa, czekam na decyzję" (description: "Follow-up po demo lub pierwszej rozmowie")
-  - "Wysłałem ofertę/proposal, brak odpowiedzi" (description: "Follow-up po wysłaniu wyceny")
+  - "Wysłałem ofertę/follow-up, brak odpowiedzi" (description: "Follow-up po wysłaniu wyceny")
   - "Klient powiedział 'nie teraz'" (description: "Zamknięty lead — kiedy i jak wrócić")
 
 ---
