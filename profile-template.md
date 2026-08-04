@@ -29,7 +29,7 @@
 | **Connected MCPs** | |
 | **System mode** | local (auto-upgrades to cloud if database connected) |
 | **Permissions mode** | (trusted / strict) |
-| **Proactive mode** | on (agents suggest things without being asked) |
+| **Proactive mode** | (observer / advisor / assistant / partner) |
 | **Agent taglines** | default (say "customize team" to change) |
 | **Profile generated** | |
 | **Last updated** | |
