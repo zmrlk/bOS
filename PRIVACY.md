@@ -36,7 +36,7 @@ Daily activity tracked in local markdown files:
 | `state/projects.md` | Active projects and hours (if Business pack active) |
 | `state/journal.md` | Micro-journal entries from /reflect (questions + your answers) |
 | `state/network.md` | Relationship contacts — names, context, follow-up dates |
-| `state/context-bus.md` | Cross-agent context signals |
+| `state/context-bus.jsonl` | Cross-agent context signals |
 | `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
 | `state/time-log.md` | Time tracking entries — project, duration, description |
 | `state/inbox.md` | Messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) — sender, subject, status |
@@ -44,16 +44,16 @@ Daily activity tracked in local markdown files:
 | `state/marketplace.md` | Installed marketplace skills — skill name, version, install date |
 | `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
 
-### Agent memory (`~/.claude/agent-memory/`)
+### Auto-memory (`~/.claude/projects/<project>/memory/`)
 Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.
 
-This is stored in `~/.claude/agent-memory/` — separate from bOS itself, managed by Claude Code.
+This is stored in `~/.claude/projects/<project>/memory/` — separate from bOS itself, managed by Claude Code.
 
-### Time-aware marker files (`state/.micro-morning-done`, `.evening-energy-asked`, `.evening-nudge-done`)
-Small files that store only today's date (e.g. `2026-03-08`). Used by lifecycle hooks to track which daily directives have already fired — preventing repeated morning briefings or evening energy prompts. These files contain **no personal data** — just a date string. They are overwritten daily and never synced to Supabase.
+### Runtime marker files (`state/.*`)
+Small dotfiles written by lifecycle hooks and skills during a session — for example `state/.last-message` (a timestamp) or `state/.working.md` (a crash buffer). They hold only what the hook needs to avoid repeating itself, they stay on your machine, and they are never synced to Supabase. All of them are gitignored, so they never travel with the distribution.
 
-### Cross-agent signals (`state/context-bus.md`)
-Agents share relevant information with each other to coordinate better. For example, when your stress is high, @wellness signals @finance to watch for impulse spending. When your budget is tight, @finance signals all agents to avoid recommending paid tools. These signals contain only the relevant data point — not your full profile or history.
+### Cross-agent signals (`state/context-bus.jsonl`)
+Agents share relevant information with each other to coordinate better. For example, when your stress is high, the wellness perspective signals @finance to watch for impulse spending. When your budget is tight, @finance signals all agents to avoid recommending paid tools. These signals contain only the relevant data point — not your full profile or history.
 
 ### Webhook configuration (`state/.webhooks.md`)
 If you use `/webhooks` to connect bOS to external tools (n8n, Zapier, Make), the webhook URLs and event mappings are stored in this file. bOS never logs full webhook URLs in cross-agent signals (they may contain tokens). Webhook execution is fire-and-forget — bOS sends a JSON payload when events occur but does not store responses.
@@ -121,7 +121,7 @@ In both modes, your secrets vault stays local. It never syncs to Supabase.
 Data stays until you delete it. There's no automatic expiration.
 
 - Profile, state files, secrets vault: until you run `/delete-my-data` or delete the files manually
-- Agent memory: until you clear it (`~/.claude/agent-memory/` — delete the folder)
+- Agent memory: until you clear it (`~/.claude/projects/<project>/memory/` — delete the folder)
 - Supabase data (Pro mode): until you delete it from your Supabase dashboard, or until you drop the tables
 
 ---
@@ -144,7 +144,7 @@ Run `/delete-my-data` to wipe everything:
 - Deletes `profile.md`
 - Resets state files to blank templates
 - Clears `.secrets/vault.json`
-- Does NOT delete agent memory automatically (that's in `~/.claude/agent-memory/` — you can delete that folder yourself)
+- Does NOT delete agent memory automatically (that's in `~/.claude/projects/<project>/memory/` — you can delete that folder yourself)
 - Does NOT delete Supabase data automatically — you can drop tables from the Supabase dashboard
 
 bOS will ask you to confirm before doing anything.
@@ -308,7 +308,7 @@ bOS uses lifecycle hooks (SessionStart, PreCompact, Stop) that run automatically
 - Read the current date and time from your local system clock
 - Count pending tasks and overdue items from local state files
 - Check your financial buffer status from `state/finances.md`
-- Scan `state/context-bus.md` for critical pending signals
+- Scan `state/context-bus.jsonl` for critical pending signals
 - Detect data gaps (stale daily-log, missing expenses, outdated task summary, missing weekly review) and inject `DATA_GAP` signals
 
 **No external service is involved.** Hooks are plain shell scripts that run locally. They do not send data anywhere — they only read local files and inject a summary into your session context. The same privacy rules apply as for interactive bOS use: everything stays on your machine.
@@ -420,6 +420,6 @@ bOS is an open system — you can read every file it creates. If you're ever uns
 - `profile.md` — your profile
 - `state/` — your activity data
 - `.secrets/vault.json` — your secrets (open the file to inspect it)
-- `~/.claude/agent-memory/` — agent memory
+- `~/.claude/projects/<project>/memory/` — agent memory
 
 Everything is readable text. Nothing is hidden.

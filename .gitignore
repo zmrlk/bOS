@@ -14,12 +14,18 @@ gumroad/
 # ─────────────────────────────────────────────
 profile.md
 .secrets/
-state/.setup-progress.md
-state/.mobile-setup-progress.md
-state/.maintenance-log.md
 state/archive/
 state/.backup/
 state/n8n-templates/
+
+# Runtime dotfiles written by hooks and skills during a session — per-user
+# state that must never ship in the distribution. Covers .last-message,
+# .setup-progress.md, .engage*, .morning-*, .evening-*, .micro-*, .working.md,
+# .pre-morning.md, .maintenance-log.md and anything added later.
+# state/.gitkeep is the one dotfile that IS tracked (keeps the dir alive).
+state/.*
+!state/.gitkeep
+.claude/logs/
 
 # ─────────────────────────────────────────────
 # EXPORTS & BACKUPS — User-generated
