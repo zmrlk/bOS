@@ -27,7 +27,7 @@ Based on active_packs from profile, verify state files exist:
 - Life/Health: `state/habits.md`
 - Life (if /reflect used): `state/journal.md`
 - Life (if /network used): `state/network.md`
-- Infrastructure: `state/archive/`, `state/.backup/`, `state/.maintenance-log.md`, `state/.webhooks.md` (if webhooks configured)
+- Infrastructure: `state/archive/`, `state/.backup/`, `state/tool-log.jsonl`, `state/skill-runs.jsonl`
 - Report: ✅ State files OK or ❌ Missing: [list]
 
 ### 3. Superpowers Check
@@ -95,7 +95,7 @@ After confirming files exist, validate STRUCTURE:
 - Auto-repair if possible (add missing headers, fix table alignment)
 
 ### 6. System Health
-- **Maintenance check:** Read `state/.maintenance-log.md`. If last maintenance was 30+ days ago OR file is empty/has zero entries → "⚠️ Maintenance overdue. Run /morning to trigger monthly cleanup."
+- **Maintenance check:** compare the mtime of `state/.backup/` against today. Nothing backed up in 30+ days → "⚠️ Maintenance overdue. Run /evolve for a full pass."
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
 - **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]. Updating..."
 - **Context-bus check:** Count entries in context-bus.jsonl. If >10 expired entries → "⚠️ Context-bus needs cleanup ([X] expired entries)."
@@ -220,11 +220,11 @@ Calculate completion by counting non-empty fields per section in profile.md:
 ```
 
 Each bar = (filled fields in section / total fields in section) × 10 blocks.
-If <50% overall → "Want to fill in some gaps? Each question takes 10 seconds."
-Offer AskUserQuestion with the most impactful empty sections.
+If under 50% overall → offer the most impactful empty sections through `AskUserQuestion`. Never ask in plain text.
 
-If issues found → offer to fix automatically:
-"Want me to fix these issues? (yes/no)"
+If issues found → offer to fix automatically via `AskUserQuestion` (never a plain-text question):
+- header: "Fix these?"
+- options: "Fix all" / "Let me pick" / "Not now"
 - Missing state files → create them
 - Missing profile fields → ask quick questions to fill them
 - MCP changes → update profile.md

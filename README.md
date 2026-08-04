@@ -1,8 +1,8 @@
 # bOS — Your Personal Operating System
 
-> 19 AI agents. 65+ skills. Your life — business, health, growth, money ��� managed like a system.
+> 10 AI agents. 26 skills. Your life — business, health, growth, money — managed like a system.
 >
-> **v0.10.0** — Proactive Skill Invocation, Plugin Routing, Dual Email (Gmail+Outlook), Evening Nudge, Skill Auto-Tracking.
+> **v0.11.0** — Refit: 26 skills, 10 agents, hooks actually wired, no ritual interrogations.
 
 ---
 
@@ -46,7 +46,7 @@
  ⚠️ Proposal deadline tomorrow — 2h estimated
  ✅ Invoice #12 paid (3 200 PLN)
 
-⏭️ /focus "proposal" — deep work session?
+⏭️ Start with the proposal — 90 min block?
 ```
 
 ### Ambient Capture (just talk naturally)
@@ -66,7 +66,7 @@ bOS: [responds to your actual question normally]
 
 **You don't need another chatbot.** You need a system that knows your goals, tracks your money, manages your energy, and tells you what matters — without you having to ask.
 
-bOS turns Claude Code into 19 specialized AI agents that share context through state files, cross-agent signals, and lifecycle hooks. It's not a prompt. It's an operating system for ambitious people.
+bOS turns Claude Code into 10 specialized AI agents (plus conversational personas) that share context through state files, cross-agent signals, and lifecycle hooks. It's not a prompt. It's an operating system for ambitious people.
 
 ---
 
@@ -101,56 +101,59 @@ bOS turns Claude Code into 19 specialized AI agents that share context through s
 
 ## Your Team
 
+Ten agents have their own file, because each of them hands back an artifact — a plan, a design, a draft, an analysis. Roles that are purely conversational (ceo, coo, cfo, sales, product, wellness, mentor, teacher, organizer, investor) are **personas**: @boss wears them in the conversation instead of spawning a subagent that can't talk to you.
+
 | Area | Agents | What they do |
 |------|--------|-------------|
-| 📊 **Business** | @ceo, @coo, @cto, @cfo, @cmo, @sales, @devlead, @advocate | Strategy, sprint planning, tech decisions, finances, marketing, sales, code quality, devil's advocate |
-| 🧭 **Life** | @coach, @organizer, @finance | Goals, decisions, daily planning, personal budgeting, habits |
-| 💪 **Health** | @trainer, @diet, @wellness | Workouts, meal planning, energy science, sleep, stress |
-| 📚 **Learning** | @teacher, @mentor, @reader | Learning roadmaps, career strategy, networking, books |
-| 💹 **Investing** | @investor | Investment education, stock/ETF checks, portfolio, market news |
-| 🤖 **Core** | @boss | Routes everything, orchestrates agents, system health |
+| 📊 **Business** | @cto, @cmo, @advocate | Tech decisions and code, marketing and GTM, devil's advocate |
+| 🎨 **Design** | @design | Brand, mockups, UI/UX — owns every visual decision |
+| 🧭 **Life** | @coach, @finance | Goals, habits, energy, personal budget and buffer |
+| 💪 **Health** | @trainer, @diet | Training plans, meal plans and macros |
+| 📚 **Learning** | @reader | Reading recommendations, book synthesis |
+| 🤖 **Core** | @boss | Routes everything, carries the personas, system health |
 
 ---
 
 ## Daily Rhythm
 
 ```
-/morning  →  Priorities + energy check + calendar + email
-/focus    →  Deep work session with timer
-/evening  →  Reflect + log energy + plan tomorrow
+/morning  →  Priorities + calendar + email (reads state first, doesn't interrogate)
+/home     →  Dashboard — everything at a glance
+/evening  →  Reflect + log the day + pick tomorrow's #1 (max 3 questions)
 /wrap-up  →  Save session context for next time
 ```
 
-Or just talk: "good morning", "50 zl lunch", "plan my day", "how much did I spend?"
+Nothing here nags you. These run when you ask for them.
+
+Or just talk: "good morning", "50 for lunch", "plan my day", "how much did I spend?"
 
 ---
 
-## Key Skills (65+ total)
+## Skills (26 total)
 
 | Skill | What it does |
 |-------|-------------|
-| `/morning` `/evening` | Daily bookends — briefing and shutdown |
-| `/task` `/goal` | Manage tasks and long-term goals |
-| `/focus` | ADHD-friendly deep work timer |
+| `/morning` `/evening` | Daily bookends — briefing and shutdown, on demand |
 | `/home` | Dashboard — everything at a glance |
-| `/budget` `/money-flow` | Budget builder and cash flow visualization |
-| `/habit` `/quit` | Streaks, milestones, smoking cessation tracker |
+| `/task` `/goal` | Manage tasks and long-term goals |
+| `/decide` | Structured GO/NO-GO decisions |
+| `/habit` | Streaks, milestones, quit tracker, workouts |
+| `/log-expense` `/log-workout` | Quick logging — spending and training |
+| `/reflect` | One-question micro-journal |
 | `/remind` | Time-based push notifications (ntfy) |
 | `/recall` | Search across past sessions |
-| `/decide` | Structured GO/NO-GO decisions |
-| `/evolve` | Self-improve — audit, learn, optimize |
-| `/code` | Code pipeline — plan, write, review, secure |
-| `/inbox-triage` | AI email triage — Gmail + Outlook, noise filters |
-| `/pitch` `/follow-up` | Sales pitch practice and lead follow-up scripts |
-| `/stock-check` `/market-news` `/portfolio` | Investment tracking and market intelligence |
-| `/meal-plan` `/paragon` | Meal planning and receipt scanning |
-| `/proposal` `/competitive` | Client proposals and market analysis |
-| `/wrap-up` | Session handoff for continuity |
+| `/inbox` | AI email triage — Gmail + Outlook, noise filters |
+| `/network` `/follow-up` | Contacts, follow-up timing and scripts |
+| `/ship` | Review, commit, push |
+| `/evolve` `/check` | Self-improvement audit and health check |
+| `/connect` `/vault` `/schedule` | MCP connections, secrets, scheduled runs |
+| `/build-agent` `/skill-creator` | Build your own agents and skills |
+| `/setup` `/help` `/wrap-up` | Onboarding, command reference, session handoff |
 
 <details>
-<summary>All 65+ skills →</summary>
+<summary>All 26 skills →</summary>
 
-`/morning` `/evening` `/home` `/task` `/goal` `/focus` `/reflect` `/habit` `/quit` `/budget` `/money-flow` `/energy-map` `/decide` `/sprint` `/plan-week` `/review-week` `/standup` `/remind` `/recall` `/wrap-up` `/log-expense` `/log-workout` `/invoice` `/timetrack` `/code` `/analyze` `/ship` `/proposal` `/competitive` `/design` `/repurpose` `/verify` `/skill-creator` `/build-agent` `/evolve` `/connect` `/connect-mobile` `/inbox` `/inbox-triage` `/schedule` `/marketplace` `/sync` `/export` `/vault` `/check` `/card` `/scan-context` `/webhooks` `/network` `/learn-path` `/note` `/proactive-check` `/project-eval` `/setup` `/help` `/pitch` `/follow-up` `/meal-plan` `/paragon` `/stock-check` `/market-news` `/portfolio` `/invest-learn` `/mobile-sync`
+`/build-agent` `/check` `/connect` `/decide` `/evening` `/evolve` `/follow-up` `/goal` `/habit` `/help` `/home` `/inbox` `/log-expense` `/log-workout` `/morning` `/network` `/recall` `/reflect` `/remind` `/schedule` `/setup` `/ship` `/skill-creator` `/task` `/vault` `/wrap-up`
 
 </details>
 
@@ -177,8 +180,8 @@ bOS includes launchd crons for automated background tasks. These are **optional*
 |------|----------|-------------|
 | `morning-push` | 07:30 daily | Push notification with today's priorities via ntfy |
 | `email-monitor` | Every 15 min | Checks Gmail + Outlook for important emails, pushes via ntfy |
-| `evening-nudge` | 20:00 daily | Reminds you to run /evening |
-| `proactive` | Every 3h | Checks triggers, sends alerts if needed |
+
+Both hard-fail without an ntfy topic configured, so an unconfigured install never publishes anything.
 
 ### Installation
 
@@ -212,29 +215,26 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bos.morning-push.pli
 bOS is powerful but it's important to know what it is and isn't:
 
 - **Not a daemon.** bOS runs inside Claude Code sessions. It doesn't run in the background 24/7 (optional morning push via launchd is the exception).
-- **Not true multi-agent.** It's one LLM with 19 specialized system prompts + experimental Agent Teams. Routing is prompt-based (~80% accurate), not code-enforced. @boss handles most work.
+- **Not true multi-agent.** It's one LLM with 10 specialized system prompts plus personas. Routing is prompt-based (~80% accurate), not code-enforced. @boss handles most work.
 - **Not a mobile app.** Phone access works via Remote Control or Telegram, but it's not a native app.
-- **Telemetry is improving.** Session counts tracked by hooks. Skill execution auto-logged to skill-runs.jsonl (v0.10.0). Agent performance metrics improving.
+- **Telemetry is improving.** Session counts tracked by hooks. Skill execution auto-logged to skill-runs.jsonl. Agent performance metrics improving.
 - **Prompt-based features are best-effort.** Ambient capture, affect modulation, ADHD formatting — these work ~70-80% of the time, not 100%. They're prompt instructions, not code.
 - **Data quality depends on you.** bOS can track expenses, habits, energy — but only if you actually mention them. Email triage (Gmail+Outlook) is automatic via cron.
 
 ---
 
-## What's New in v0.10.0
+## What's New in v0.11.0
 
-- **Proactive Skill Invocation** — bOS detects context and invokes skills automatically. User typing /command = system failure.
-- **Plugin Routing** — Anthropic official plugins (productivity, finance, sales, etc.) integrated alongside bOS skills. Smart routing: personal context → bOS skill, business → plugin.
-- **Dual Email** — Gmail + Outlook (Microsoft 365) monitoring. Cron every 15 min. Noise filters for system alerts.
-- **Evening Nudge** — ntfy push at 20:00 reminding to run /evening.
-- **Skill Auto-Tracking** — PostToolUse hook logs every skill execution to skill-runs.jsonl.
-- **Project Tracker** — `state/projects.md` tracks all active projects. Loaded at session start.
-- **@investor Agent** — Investment education, stock/ETF checks, market news, portfolio tracking.
-- **11 New Skills** — `/inbox-triage`, `/pitch`, `/follow-up`, `/stock-check`, `/market-news`, `/portfolio`, `/invest-learn`, `/quit`, `/paragon`, `/meal-plan`, `/mobile-sync`
-- **55 Skill Fixes** — Removed model overrides that blocked skill execution.
-- **4 New Hooks** — email-monitor, evening-nudge, protect-state, tool-logger.
+- **Skills 65 → 26.** Everything that existed only as an aspiration is gone. `/quit` merged into `/habit` (one tracker: habits, cessation, workouts), the aspirational multi-channel `/inbox` replaced by the one that actually reads Gmail and Outlook.
+- **Agents 19 → 10.** A file exists for a domain that hands back an artifact; purely conversational roles (ceo, coo, cfo, sales, product, wellness, mentor, teacher, organizer, investor) are now @boss personas. New: **@design** (owns every visual decision) and **@cmo** (marketing and GTM).
+- **Hooks actually wired.** `protect-state.sh` (PreToolUse) and `tool-logger.sh` (PostToolUse) were documented but never connected to `settings.json`. They are now — state protection and telemetry are real, not a promise.
+- **No more ritual interrogations.** `/morning` reads your state before it considers asking anything; `/evening` is capped at 3 questions; the time-aware hook lost eight directives that nagged about energy and offered rituals every session. Energy and expenses are still captured ambiently from what you say.
+- **Numbers in the docs match the disk.** Skill and agent counts, hook wiring and cron list are generated from the actual tree, not from memory.
 
 <details>
 <summary>Previous versions →</summary>
+
+**v0.10.0** — Proactive skill invocation, plugin routing, dual email (Gmail + Outlook), skill auto-tracking, project tracker.
 
 **v0.9.2** — Tool memory (PostToolUse hook), Progressive Search, iMCP (8 macOS services), Skill outcome tracking, Hook profiling.
 
