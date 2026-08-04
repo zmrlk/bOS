@@ -51,18 +51,19 @@ SNAPSHOT="$BACKUP_DIR/pre-compact-$TIMESTAMP.md"
 ls -t "$BACKUP_DIR"/pre-compact-*.md 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null
 
 # Validate daily-log Summary against raw data
+CURRENT_YEAR=$(date +%Y)
 DAILY_LOG="$BOS_DIR/state/daily-log.md"
 if [ -f "$DAILY_LOG" ]; then
   # Count actual energy entries (non-empty AM or PM fields)
-  ENERGY_COUNT=$(awk -F'|' '/^\| 2026/ { am=$3; pm=$4; gsub(/[ —-]/, "", am); gsub(/[ —-]/, "", pm); if (am != "" || pm != "") count++ } END { print count+0 }' "$DAILY_LOG")
+  ENERGY_COUNT=$(awk -F'|' -v yr="$CURRENT_YEAR" '$0 ~ "^\\| " yr { am=$3; pm=$4; gsub(/[ —-]/, "", am); gsub(/[ —-]/, "", pm); if (am != "" || pm != "") count++ } END { print count+0 }' "$DAILY_LOG")
 
   # Count entries with dates this month
   CURRENT_MONTH=$(date '+%Y-%m')
   MONTH_ENTRIES=$(grep -c "^| $CURRENT_MONTH" "$DAILY_LOG" 2>/dev/null || echo 0)
 
   # Calculate AM and PM averages
-  AM_AVG=$(awk -F'|' '/^\| 2026/ { v=$3; gsub(/[ ]/, "", v); if (v ~ /^[0-9]+$/) { sum+=v; n++ } } END { if(n>0) printf "%.1f", sum/n; else print "—" }' "$DAILY_LOG")
-  PM_AVG=$(awk -F'|' '/^\| 2026/ { v=$4; gsub(/[ ]/, "", v); if (v ~ /^[0-9]+$/) { sum+=v; n++ } } END { if(n>0) printf "%.1f", sum/n; else print "—" }' "$DAILY_LOG")
+  AM_AVG=$(awk -F'|' -v yr="$CURRENT_YEAR" '$0 ~ "^\\| " yr { v=$3; gsub(/[ ]/, "", v); if (v ~ /^[0-9]+$/) { sum+=v; n++ } } END { if(n>0) printf "%.1f", sum/n; else print "—" }' "$DAILY_LOG")
+  PM_AVG=$(awk -F'|' -v yr="$CURRENT_YEAR" '$0 ~ "^\\| " yr { v=$4; gsub(/[ ]/, "", v); if (v ~ /^[0-9]+$/) { sum+=v; n++ } } END { if(n>0) printf "%.1f", sum/n; else print "—" }' "$DAILY_LOG")
 
   # Output validation for Claude to see
   echo "DAILY-LOG-VALIDATION: energy_entries=$ENERGY_COUNT month_entries=$MONTH_ENTRIES AM_avg=$AM_AVG PM_avg=$PM_AVG"
