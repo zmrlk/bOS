@@ -1,0 +1,43 @@
+# ============================================
+# bOS — .gitignore
+# Only excludes internal business docs and runtime artifacts.
+# All product files ship to users.
+# ============================================
+
+# ─────────────────────────────────────────────
+# INTERNAL — Business docs (not part of product)
+# ─────────────────────────────────────────────
+gumroad/
+
+# ─────────────────────────────────────────────
+# RUNTIME — Generated during usage, not part of product
+# ─────────────────────────────────────────────
+profile.md
+.secrets/
+state/.setup-progress.md
+state/.mobile-setup-progress.md
+state/.maintenance-log.md
+state/archive/
+state/.backup/
+state/n8n-templates/
+
+# ─────────────────────────────────────────────
+# EXPORTS & BACKUPS — User-generated
+# ─────────────────────────────────────────────
+bos-export-*.md
+
+# ─────────────────────────────────────────────
+# TEMP / BUILD
+# ─────────────────────────────────────────────
+.trash-cross-platform/
+node_modules/
+state/.pre-morning.md
+
+# ─────────────────────────────────────────────
+# OS ARTIFACTS
+# ─────────────────────────────────────────────
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
