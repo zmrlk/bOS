@@ -1,6 +1,6 @@
 ---
 name: Task
-description: "Add, list, complete, or manage tasks. Works with @coo (work tasks) and @organizer (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
+description: "Add, list, complete, or manage tasks. Works with @boss (work tasks) and @boss (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
 user_invocable: true
 command: /task
 ---
@@ -35,8 +35,8 @@ Gotowe: [X]/[Y] ([%])
 ### Add task
 1. If description provided → use it. If not → ask.
 2. Auto-detect context from content:
-   - Work/project/client/meeting → work → owner: @coo
-   - Personal/home/errands/life → personal → owner: @organizer
+   - Work/project/client/meeting → work → owner: @boss
+   - Personal/home/errands/life → personal → owner: @boss
    - Unclear → default to personal
 3. Auto-detect energy from task type:
    - Creative/strategic/building → H
@@ -102,15 +102,15 @@ Read `profile.md` → `adhd_indicators`, `work_style` before displaying or addin
 - **Steady** → Standard display (no changes needed).
 
 ## Context-Bus Signals
-After state changes, post to `state/context-bus.md`:
-- **Task completed:** `@coo → @boss, Type: data, Priority: info, TTL: 7 days, Content: "Task #X completed: [description]", Status: pending` — if all today's tasks done, Priority: normal
-- **Task skipped 3+ times:** `@coo → @coach, Type: insight, Priority: normal, TTL: 14 days, Content: "Task '[description]' skipped 3x — possible avoidance pattern", Status: pending`
-- **Goal-connected task done:** `@coo → @coach, Type: data, Priority: info, TTL: 7 days, Content: "Goal progress: [task] completed for goal #[X]", Status: pending`
+After state changes, post to `state/context-bus.jsonl`:
+- **Task completed:** `@boss → @boss, Type: data, Priority: info, TTL: 7 days, Content: "Task #X completed: [description]", Status: pending` — if all today's tasks done, Priority: normal
+- **Task skipped 3+ times:** `@boss → @coach, Type: insight, Priority: normal, TTL: 14 days, Content: "Task '[description]' skipped 3x — possible avoidance pattern", Status: pending`
+- **Goal-connected task done:** `@boss → @coach, Type: data, Priority: info, TTL: 7 days, Content: "Goal progress: [task] completed for goal #[X]", Status: pending`
 
 ## State Files
 - **Read:** state/tasks.md, state/daily-log.md (energy for matching), profile.md (work_style, adhd_indicators)
-- **Write:** state/tasks.md (Today, This Week, Backlog), state/context-bus.md (signals)
+- **Write:** state/tasks.md (Today, This Week, Backlog), state/context-bus.jsonl (signals)
 
 ## Agents
-- @coo owns work tasks
-- @organizer owns personal/life tasks
+- @boss owns work tasks
+- @boss owns personal/life tasks

@@ -284,7 +284,7 @@ If target contains "supabase" or is a remote operation → BLOCK and warn:
 ## SECURITY RULES
 
 1. **NEVER** print a secret value in a response unless the user explicitly selects "Yes — show me the full value" via `AskUserQuestion`.
-2. **NEVER** store secrets in agent memory, `memory` Supabase table, state files, or any file outside `.secrets/`.
+2. **NEVER** store secrets in native auto-memory, `memory` Supabase table, state files, or any file outside `.secrets/`.
 3. **NEVER** echo back a secret the user just pasted (even partially).
 4. If a user pastes a secret in regular conversation → acknowledge, offer to store in vault, do NOT memorize the value.
 5. `.secrets/vault.json` permissions must be `chmod 600` — readable only by the current user.

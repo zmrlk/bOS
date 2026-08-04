@@ -60,7 +60,7 @@ ORDER BY is_active DESC, next_run ASC;
   2. ✅ evening — /evening @ 21:00 daily → telegram
      Last: [date] | Next: [date]
 
-  3. ⏸️ standup — /standup @ 9:00 Mon → in-app (paused)
+  3. ⏸️ standup — /home @ 9:00 Mon → in-app (paused)
      Last: [date]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -77,7 +77,7 @@ ORDER BY is_active DESC, next_run ASC;
   Popular schedules:
   → /morning at 8:00 daily
   → /evening at 21:00 daily
-  → /standup at 9:00 Monday
+  → /home at 9:00 Monday
 
   → /schedule add to create one
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -94,7 +94,7 @@ AskUserQuestion:
 - options:
   - "/morning — Morning briefing" (description: "Daily energy check + priorities")
   - "/evening — Evening shutdown" (description: "Day review + tomorrow prep")
-  - "/standup — Team standup" (description: "All agents report in")
+  - "/home — Team standup" (description: "All agents report in")
   - "/home — Dashboard" (description: "Quick status overview")
 
 If user picks "Other" → ask which skill command.
@@ -116,7 +116,7 @@ AskUserQuestion:
 - options (based on skill):
   - For /morning: "7:00", "8:00 (Recommended)", "9:00"
   - For /evening: "20:00", "21:00 (Recommended)", "22:00"
-  - For /standup: "8:00", "9:00 (Recommended)", "10:00"
+  - For /home: "8:00", "9:00 (Recommended)", "10:00"
   - For others: "8:00", "12:00", "18:00"
 
 If "Custom cron" was selected → ask for cron expression (text input).
@@ -219,7 +219,7 @@ Parse cron expression, compare `last_run` + timezone to current time.
 |------|-------|------|---------|--------|----------|----------|
 | morning | /morning | 0 8 * * * | telegram | yes | 2026-03-02 08:00 | 2026-03-03 08:00 |
 | evening | /evening | 0 21 * * * | in-app | yes | 2026-03-01 21:00 | 2026-03-02 21:00 |
-| standup | /standup | 0 9 * * 1 | in-app | paused | 2026-02-24 09:00 | — |
+| standup | /home | 0 9 * * 1 | in-app | paused | 2026-02-24 09:00 | — |
 ```
 
 ---
@@ -239,4 +239,4 @@ Parse cron expression, compare `last_run` + timezone to current time.
 
 ### I LISTEN for:
 - Timezone changes from profile.md → recalculate all next_run values
-- DND hours from @wellness/@organizer → suppress in-app delivery during DND
+- DND hours from profile.md → suppress in-app delivery during DND

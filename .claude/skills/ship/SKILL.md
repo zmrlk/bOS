@@ -2,7 +2,7 @@
 
 ## Meta
 - **Trigger:** `/ship`, "ship it", "zrób commit", "push to git", "commituj", "wypchnij"
-- **Agent:** @devlead (routes to @cto for architecture concerns)
+- **Agent:** @cto
 - **Model:** haiku (quick) → sonnet if issues found
 - **Context needed:** git status, changed files
 - **When to use:** After coding session — review → commit → push in one flow
@@ -34,7 +34,7 @@ For each changed file:
 - Check if tests exist (if test file exists in project)
 
 **Rules:**
-- Max 30 seconds of review — this is FAST lane, not /code review
+- Max 30 seconds of review — this is FAST lane, not /ship review
 - Flag only BLOCKERS (would break prod) and WARNINGS (should fix soon)
 - Skip style nitpicks
 

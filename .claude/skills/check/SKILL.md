@@ -22,7 +22,7 @@ Runs a quick diagnostic of your bOS installation. Checks that everything is work
 
 ### 2. State Files Check
 Based on active_packs from profile, verify state files exist:
-- Always: `state/tasks.md`, `state/decisions.md`, `state/weekly-log.md`, `state/goals.md`, `state/daily-log.md`, `state/context-bus.md`
+- Always: `state/tasks.md`, `state/decisions.md`, `state/weekly-log.md`, `state/goals.md`, `state/daily-log.md`, `state/context-bus.jsonl`
 - Business: `state/finances.md`, `state/pipeline.md`, `state/projects.md`, `state/invoices.md`, `state/time-log.md`
 - Life/Health: `state/habits.md`
 - Life (if /reflect used): `state/journal.md`
@@ -74,7 +74,7 @@ After confirming files exist, validate STRUCTURE:
    - weekly-log.md: Has at least one ## Week section
    - finances.md: Has Budget and Buffer sections
    - goals.md: Has Active Goals section
-   - context-bus.md: Can be empty (valid)
+   - context-bus.jsonl: Can be empty (valid)
 3. If structure is invalid:
    - Show: "⚠️ [filename] — format uszkodzony. Naprawiam..."
    - Backup corrupted file to state/.backup/[filename]-corrupted-[date].md
@@ -98,7 +98,7 @@ After confirming files exist, validate STRUCTURE:
 - **Maintenance check:** Read `state/.maintenance-log.md`. If last maintenance was 30+ days ago OR file is empty/has zero entries → "⚠️ Maintenance overdue. Run /morning to trigger monthly cleanup."
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
 - **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]. Updating..."
-- **Context-bus check:** Count entries in context-bus.md. If >10 expired entries → "⚠️ Context-bus needs cleanup ([X] expired entries)."
+- **Context-bus check:** Count entries in context-bus.jsonl. If >10 expired entries → "⚠️ Context-bus needs cleanup ([X] expired entries)."
 - **Invoices check:** If state/invoices.md exists → validate table structure, check for overdue invoices (status != paid AND due date < today). Report: "🧾 [N] invoices, [M] overdue" or "✅ No overdue invoices."
 - **Time-log check:** If state/time-log.md exists → validate Summary/Active/Archive structure, check for orphaned active timer (running for 24+ hours). Report: "⏱️ Time log OK ([N] entries)" or "⚠️ Active timer running for [X]h — stale?"
 
@@ -138,8 +138,8 @@ Run shell diagnostics to surface system-level issues:
   ```
   🎯 SKILL HEALTH ([N] runs logged)
   ✅ /morning — 0.92 avg (12 runs, stable)
-  ⚠️ /code — 0.65 avg (5 runs, declining ↓)
-  ❌ /invoice — 0.40 avg (3 runs, broken)
+  ⚠️ /ship — 0.65 avg (5 runs, declining ↓)
+  ❌ /log-expense — 0.40 avg (3 runs, broken)
   ```
 - If no skill-runs.jsonl or empty → "🎯 Skill health: no data yet (tracking started)"
 - If <10 total runs → "🎯 Skill health: collecting data ([N] runs so far)"
@@ -174,7 +174,7 @@ Count Agent Calibrations entries by freshness (using "Last updated" column).
 ```
 
 - Only show sections for active packs
-- If any section is ❌ expired → "Run /review-week to update stale data."
+- If any section is ❌ expired → "Run /evolve to update stale data."
 - If all fresh → "✅ All memory data is current."
 - This check uses already-loaded profile.md — zero extra reads
 

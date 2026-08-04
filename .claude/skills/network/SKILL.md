@@ -99,7 +99,7 @@ Sort contacts by staleness (most overdue first). Show top 3 with conversation st
 
 | Condition | Signal |
 |-----------|--------|
-| Inner circle overdue (7+ days past follow-up) | @mentor proactive nudge in /morning: "Dawno nie rozmawiałeś z [Name]. Napisz dziś?" |
+| Inner circle overdue (7+ days past follow-up) | @coach proactive nudge in /morning: "Dawno nie rozmawiałeś z [Name]. Napisz dziś?" |
 
 ## State Files
 - **Read:** profile.md, network.md (full)
