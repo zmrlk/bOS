@@ -86,14 +86,14 @@ PROMPT="You are bOS email monitor. Check both Gmail and Outlook for NEW importan
 TIME WINDOW: since $LAST_CHECK
 
 STEP 1 — Gmail:
-Call gmail_search_messages with q='is:unread newer_than:1d -from:[company-system.com] -from:[client-company.com] -from:inpost -category:promotions -category:social' maxResults=10
+Call gmail_search_messages with q='is:unread newer_than:1d -category:promotions -category:social' maxResults=10
+Then drop anything from a sender listed in profile.md under email_noise_senders (if that field exists).
 
 STEP 2 — Outlook:
 Call outlook_email_search with afterDateTime='$LAST_CHECK' limit=10
-From Outlook results, IGNORE emails from these senders (system noise):
-- powiadomienia@[company-system.com]
-- noreply@[client-company.com]
-- Any sender containing 'inpost'
+From Outlook results, IGNORE system noise:
+- Any sender listed in profile.md under email_noise_senders
+- Automated senders (noreply@, notifications@, alerts@) unless the subject names money, a deadline, or an order
 
 STEP 3 — Evaluate:
 Count truly important emails (not noise, not newsletters). Important = requires action, is from a real person, mentions money/deadline/urgent, or is a new B2B order.

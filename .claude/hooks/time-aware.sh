@@ -33,13 +33,11 @@ fi
 # Update last message timestamp (ALWAYS, at every message)
 echo "$TODAY $TIME_DISPLAY" > "$LAST_MSG_FILE"
 
-# ─── Determine time block (adapted to [user]'s profile) ───
-# Peak: 11-15 (profile), Sauna: 16-17, Evening: 18-22
-if [ "$HOUR_NUM" -ge 6 ] && [ "$HOUR_NUM" -lt 11 ]; then
+# ─── Determine time block (neutral clock, not a personal rhythm) ───
+# A user's own peak hours belong in profile.md, not hardcoded here.
+if [ "$HOUR_NUM" -ge 6 ] && [ "$HOUR_NUM" -lt 12 ]; then
   TIME_BLOCK="MORNING"
-elif [ "$HOUR_NUM" -ge 11 ] && [ "$HOUR_NUM" -lt 15 ]; then
-  TIME_BLOCK="PEAK"
-elif [ "$HOUR_NUM" -ge 15 ] && [ "$HOUR_NUM" -lt 18 ]; then
+elif [ "$HOUR_NUM" -ge 12 ] && [ "$HOUR_NUM" -lt 18 ]; then
   TIME_BLOCK="AFTERNOON"
 elif [ "$HOUR_NUM" -ge 18 ] && [ "$HOUR_NUM" -lt 22 ]; then
   TIME_BLOCK="EVENING"
@@ -61,11 +59,9 @@ BLOCK_CHANGED="false"
 if [ -n "$LAST_MSG_HOUR" ]; then
   LAST_HOUR_NUM=$((10#$LAST_MSG_HOUR))
   # Determine last message's time block
-  if [ "$LAST_HOUR_NUM" -ge 6 ] && [ "$LAST_HOUR_NUM" -lt 11 ]; then
+  if [ "$LAST_HOUR_NUM" -ge 6 ] && [ "$LAST_HOUR_NUM" -lt 12 ]; then
     LAST_BLOCK="MORNING"
-  elif [ "$LAST_HOUR_NUM" -ge 11 ] && [ "$LAST_HOUR_NUM" -lt 15 ]; then
-    LAST_BLOCK="PEAK"
-  elif [ "$LAST_HOUR_NUM" -ge 15 ] && [ "$LAST_HOUR_NUM" -lt 18 ]; then
+  elif [ "$LAST_HOUR_NUM" -ge 12 ] && [ "$LAST_HOUR_NUM" -lt 18 ]; then
     LAST_BLOCK="AFTERNOON"
   elif [ "$LAST_HOUR_NUM" -ge 18 ] && [ "$LAST_HOUR_NUM" -lt 22 ]; then
     LAST_BLOCK="EVENING"
@@ -75,61 +71,12 @@ if [ -n "$LAST_MSG_HOUR" ]; then
   [ "$LAST_BLOCK" != "$TIME_BLOCK" ] && BLOCK_CHANGED="true"
 fi
 
-# ─── Get last energy (format: "AM→PM") ───
-LAST_ENERGY=""
-if [ -f "$BOS_DIR/state/daily-log.md" ]; then
-  LAST_LINE=$(grep "^| 20" "$BOS_DIR/state/daily-log.md" 2>/dev/null | head -1)
-  if [ -n "$LAST_LINE" ]; then
-    ENERGY_AM=$(echo "$LAST_LINE" | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}')
-    ENERGY_PM=$(echo "$LAST_LINE" | awk -F'|' '{gsub(/^ +| +$/,"",$4); print $4}')
-    LAST_ENERGY="${ENERGY_AM}→${ENERGY_PM}"
-  fi
-fi
-
-# ─── Get today's task count ───
-TASK_COUNT=0
-if [ -f "$BOS_DIR/state/tasks.md" ]; then
-  TASK_COUNT=$(grep -c '☐' "$BOS_DIR/state/tasks.md" 2>/dev/null || echo "0")
-fi
-
-# ─── Check if energy AM/PM logged today ───
-ENERGY_AM_TODAY="false"
-ENERGY_PM_TODAY="false"
-if [ -f "$BOS_DIR/state/daily-log.md" ]; then
-  TODAY_LINE=$(grep "^| $TODAY" "$BOS_DIR/state/daily-log.md" 2>/dev/null)
-  if [ -n "$TODAY_LINE" ]; then
-    AM_VAL=$(echo "$TODAY_LINE" | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}')
-    PM_VAL=$(echo "$TODAY_LINE" | awk -F'|' '{gsub(/^ +| +$/,"",$4); print $4}')
-    echo "$AM_VAL" | grep -q '^[0-9]' && ENERGY_AM_TODAY="true"
-    echo "$PM_VAL" | grep -q '^[0-9]' && ENERGY_PM_TODAY="true"
-  fi
-fi
-
-# ─── Check skip memory (if user skipped 3x in row, silence for 3 days) ───
-SKIP_SILENCED="false"
-SKIP_FILE="$BOS_DIR/state/.micro-morning-skips"
-if [ -f "$SKIP_FILE" ]; then
-  SKIP_COUNT=$(head -1 "$SKIP_FILE" 2>/dev/null || echo "0")
-  SKIP_UNTIL=$(sed -n '2p' "$SKIP_FILE" 2>/dev/null || echo "")
-  if [ -n "$SKIP_UNTIL" ] && [ "$TODAY" \< "$SKIP_UNTIL" -o "$TODAY" = "$SKIP_UNTIL" ]; then
-    SKIP_SILENCED="true"
-  elif [ "$SKIP_COUNT" -ge 3 ] 2>/dev/null; then
-    SILENCE_UNTIL=$(date -v+3d '+%Y-%m-%d' 2>/dev/null || date -d '+3 days' '+%Y-%m-%d' 2>/dev/null || echo "")
-    if [ -n "$SILENCE_UNTIL" ]; then
-      echo "0" > "$SKIP_FILE"
-      echo "$SILENCE_UNTIL" >> "$SKIP_FILE"
-      SKIP_SILENCED="true"
-    fi
-  fi
-fi
-
 # ─── Output context ───
 echo "<bos-time-context>"
 # Circadian mode based on time block
 case "$TIME_BLOCK" in
   MORNING)  MODE="STRATEGIST — plan, decide, set priorities" ;;
-  PEAK)     MODE="EXECUTOR — deep work, build, ship" ;;
-  AFTERNOON) MODE="EXECUTOR — continue work, meetings OK" ;;
+  AFTERNOON) MODE="EXECUTOR — deep work, build, ship" ;;
   EVENING)  MODE="MAINTAINER — review, log, wind down" ;;
   NIGHT)    MODE="MINIMAL — short responses, defer to tomorrow" ;;
 esac
@@ -138,159 +85,29 @@ echo "time: $TIME_DISPLAY | block: $TIME_BLOCK | mode: $MODE | day: $DAY | first
 [ "$BLOCK_CHANGED" = "true" ] && echo "block_transition: $LAST_BLOCK → $TIME_BLOCK"
 
 # ═══════════════════════════════════════════════════════════════
-# DIRECTIVES — smart triggers based on time transitions
+# DIRECTIVES — deliberately minimal
 # ═══════════════════════════════════════════════════════════════
+# bOS does not interrogate. The hook carries the working mode and nothing
+# else: no energy questions, no ritual offers, no repeating nudges. Energy
+# and expenses are captured AMBIENTLY from what the user actually says.
+# /morning, /evening and /reflect run ONLY when the user asks for them.
 
-# ─── 1. MICRO-MORNING: first message of new day (even in same session) ───
-FIRST_TODAY_FILE="$BOS_DIR/state/.micro-morning-done"
-if [ "$FIRST_TODAY" = "true" ] && [ "$SKIP_SILENCED" = "false" ]; then
-  echo "directive: MICRO-MORNING"
-  VARIANT=$((DAY % 5))  # 0-4 rotation for ADHD novelty
-  case $VARIANT in
-    0) echo "instruction: Prepend 3-line micro-briefing. Format:"
-       echo "  [top priority or alert]"
-       echo "  Energia wczoraj: $LAST_ENERGY"
-       echo "  $TASK_COUNT taskow otwartych"
-       ;;
-    1) echo "instruction: Prepend a CHALLENGE micro-briefing. Format:"
-       echo "  Wyzwanie dnia: [top task framed as challenge]"
-       echo "  $LAST_ENERGY -> dzisiejszy target?"
-       ;;
-    2) echo "instruction: Prepend ULTRA-SHORT briefing (1 line max):"
-       echo "  [single most important thing today + task count]"
-       ;;
-    3) echo "instruction: Prepend a SCORE briefing. Format:"
-       echo "  Wczoraj: energia $LAST_ENERGY | Dzis: $TASK_COUNT taskow"
-       echo "  [streak or progress note from context if available]"
-       ;;
-    4) echo "instruction: Prepend a QUESTION briefing. Format:"
-       echo "  Co dzis jest #1? [suggest based on tasks/alerts, let user confirm]"
-       echo "  ($TASK_COUNT taskow czeka)"
-       ;;
-  esac
-  echo "Then proceed normally. MAX 3 lines. If user says skip/krotko, respect AND increment skip counter."
-  echo "$TODAY" > "$FIRST_TODAY_FILE"
+# ─── Late-hour production gate ───
+# After 22:00 a mutation to anything live gets a dry-run and a rollback plan
+# stated in three lines BEFORE it is executed.
+if [ "$TIME_BLOCK" = "NIGHT" ]; then
+  echo "directive: LATE-HOUR-GATE"
+  echo "instruction: Late hour. Before mutating anything live (deploy, migration, mass update, send), state the dry-run and the rollback plan in 3 lines and get a go-ahead."
 fi
 
-# ─── 2. MORNING ENERGY: first message of the day, ask AM energy ───
-# If day changed AND morning block AND AM energy not logged
-MORNING_ENERGY_FILE="$BOS_DIR/state/.morning-energy-asked"
-MORNING_ENERGY_ASKED="false"
-[ -f "$MORNING_ENERGY_FILE" ] && [ "$(cat "$MORNING_ENERGY_FILE" 2>/dev/null)" = "$TODAY" ] && MORNING_ENERGY_ASKED="true"
-
-if [ "$FIRST_TODAY" = "true" ] && [ "$ENERGY_AM_TODAY" = "false" ] && [ "$MORNING_ENERGY_ASKED" = "false" ]; then
-  echo "directive: MORNING-ENERGY"
-  echo "instruction: Ask AM energy in micro-morning or as 1 line: 'Energia rano? (1-10)'. Log to daily-log.md AM column."
-  echo "$TODAY" > "$MORNING_ENERGY_FILE"
-fi
-
-# ─── 3. /morning: new day + gap >1h → AskUserQuestion or auto-trigger ───
-MORNING_RUN_FILE="$BOS_DIR/state/.morning-run-today"
-MORNING_RUN_TODAY="false"
-[ -f "$MORNING_RUN_FILE" ] && [ "$(cat "$MORNING_RUN_FILE" 2>/dev/null)" = "$TODAY" ] && MORNING_RUN_TODAY="true"
-
-if [ "$FIRST_TODAY" = "true" ] && [ "$MORNING_RUN_TODAY" = "false" ] && [ "$HOURS_SINCE_LAST" -ge 1 ]; then
-  # If user's first message has no specific intent (greeting/empty), auto-run /morning
-  # If user has specific request, use AskUserQuestion to offer
-  echo "directive: MORNING-OFFER"
-  echo "instruction: Nowy dzień (${HOURS_SINCE_LAST}h przerwy). Jeśli user pisze powitanie/ogólnie → odpal /morning automatycznie. Jeśli ma konkretny request → po odpowiedzi użyj AskUserQuestion: 'Morning briefing?' z opcjami: [Tak] [Nie, dzięki]. NIGDY nie pisz tylko tekstu 'możesz odpalić /morning' — albo odpal albo daj klikalne opcje."
-fi
-
-# ─── 4. EVENING ENERGY: entering evening block OR late afternoon + no PM energy ───
-EVENING_ASKED_FILE="$BOS_DIR/state/.evening-energy-asked"
-EVENING_ALREADY_ASKED="false"
-[ -f "$EVENING_ASKED_FILE" ] && [ "$(cat "$EVENING_ASKED_FILE" 2>/dev/null)" = "$TODAY" ] && EVENING_ALREADY_ASKED="true"
-
-# Trigger when: entering EVENING block, OR already in evening, OR approaching end of work day (20:00+)
-SHOULD_ASK_EVENING="false"
-if [ "$ENERGY_PM_TODAY" = "false" ] && [ "$EVENING_ALREADY_ASKED" = "false" ]; then
-  # Entering evening block from earlier block
-  if [ "$TIME_BLOCK" = "EVENING" ] && [ "$BLOCK_CHANGED" = "true" ]; then
-    SHOULD_ASK_EVENING="true"
-  fi
-  # Already evening, first message after >1h gap
-  if [ "$TIME_BLOCK" = "EVENING" ] && [ "$HOURS_SINCE_LAST" -ge 1 ]; then
-    SHOULD_ASK_EVENING="true"
-  fi
-  # Late evening (20:00+) — approaching end of day, last chance
-  if [ "$HOUR_NUM" -ge 20 ] && [ "$HOUR_NUM" -lt 23 ]; then
-    SHOULD_ASK_EVENING="true"
-  fi
-fi
-
-if [ "$SHOULD_ASK_EVENING" = "true" ]; then
-  echo "directive: EVENING-ENERGY-ONCE"
-  echo "instruction: BLOCKING — PREPEND to your response: 'Energia dzis? (1-10) + co sie udalo?' THEN answer normally. This is NOT optional. After this one ask, do NOT repeat."
-  echo "$TODAY" > "$EVENING_ASKED_FILE"
-fi
-
-# ─── 5. /evening NUDGE: 18:00+ with AskUserQuestion, escalating ───
-EVENING_NUDGE_FILE="$BOS_DIR/state/.evening-nudge-done"
-EVENING_NUDGE_SENT="false"
-[ -f "$EVENING_NUDGE_FILE" ] && [ "$(cat "$EVENING_NUDGE_FILE" 2>/dev/null)" = "$TODAY" ] && EVENING_NUDGE_SENT="true"
-
-if [ "$ENERGY_PM_TODAY" = "false" ] && [ "$EVENING_NUDGE_SENT" = "false" ]; then
-  if [ "$HOUR_NUM" -ge 20 ]; then
-    # 20:00+ — stronger nudge
-    echo "directive: EVENING-NUDGE-STRONG"
-    echo "instruction: 20:00+ bez /evening. Użyj AskUserQuestion: 'Evening shutdown?' z opcjami: [Tak, lecimy] [Tylko energia] [Skip]. Po odpowiedzi usera: odpal /evening lub zaloguj energię."
-    echo "$TODAY" > "$EVENING_NUDGE_FILE"
-  elif [ "$HOUR_NUM" -ge 18 ] && [ "$BLOCK_CHANGED" = "true" ]; then
-    # 18:00+ entering evening — gentle nudge
-    echo "directive: EVENING-NUDGE-GENTLE"
-    echo "instruction: Wchodzisz w wieczór. Na KOŃCU odpowiedzi użyj AskUserQuestion: 'Kończysz na dziś?' z opcjami: [/evening] [Jeszcze pracuję]"
-    echo "$TODAY" > "$EVENING_NUDGE_FILE"
-  fi
-fi
-
-# ─── 6. NIGHT MODE: user still active after 22:00 ───
-if [ "$TIME_BLOCK" = "NIGHT" ] && [ "$BLOCK_CHANGED" = "true" ]; then
-  echo "nudge: 22:00+ — rozważ /evening i shutdown. Sen > produktywność."
-fi
-
-# ─── 7. CRITICAL DATA_GAP: daily-log gap > 5 days ───
+# ─── Data gap (informational only — never a question) ───
 if [ -f "$BOS_DIR/state/daily-log.md" ]; then
-  # Get most recent entry date from Active section (first data row, newest-first order)
   LAST_LOG_DATE=$(grep '^| 20' "$BOS_DIR/state/daily-log.md" 2>/dev/null | head -1 | grep -o '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' | head -1)
   if [ -n "$LAST_LOG_DATE" ] && date -j -f "%Y-%m-%d" "$LAST_LOG_DATE" "+%s" >/dev/null 2>&1; then
     LAST_SEC=$(date -j -f "%Y-%m-%d" "$LAST_LOG_DATE" "+%s")
     LOG_GAP=$(( (NOW_SEC - LAST_SEC) / 86400 ))
-    if [ "$LOG_GAP" -ge 5 ]; then
-      echo "directive: CRITICAL-DATA-GAP"
-      echo "instruction: ${LOG_GAP}-day gap in daily-log. PREPEND to your response: ask energy (1-10) in 1 line. Do NOT skip. Do NOT wait for 'natural moment'. User explicitly requested this behavior."
-    fi
+    [ "$LOG_GAP" -ge 5 ] && echo "note: daily-log has a ${LOG_GAP}-day gap (context only — do NOT ask the user about it)"
   fi
-fi
-
-# ─── 8. WEEKLY NUDGES (persistent through weekend) ───
-REVIEW_DONE_FILE="$BOS_DIR/state/.review-week-done"
-REVIEW_DONE="false"
-if [ -f "$REVIEW_DONE_FILE" ]; then
-  REVIEW_WEEK=$(cat "$REVIEW_DONE_FILE" 2>/dev/null)
-  # Check if review was done this week (same ISO week)
-  THIS_WEEK=$(date '+%Y-W%V')
-  [ "$REVIEW_WEEK" = "$THIS_WEEK" ] && REVIEW_DONE="true"
-fi
-
-# Friday 16:00+ through Sunday — keep nudging until review is done
-if [ "$DAY" -ge 5 ] && [ "$REVIEW_DONE" = "false" ]; then
-  if [ "$DAY" = "5" ] && [ "$HOUR_NUM" -ge 16 ]; then
-    echo "directive: WEEKLY-REVIEW-DUE"
-    echo "instruction: Piątek — zaproponuj /review-week. Użyj AskUserQuestion: 'Piątkowy review?' z opcjami: [Tak, lecimy] [Później] [Skip this week]"
-  elif [ "$DAY" -ge 6 ]; then
-    echo "directive: WEEKLY-REVIEW-OVERDUE"
-    echo "instruction: Weekend bez review — zaproponuj /review-week. Użyj AskUserQuestion z opcjami: [Tak] [Nie, skip]"
-  fi
-fi
-
-# Sunday plan nudge
-PLAN_DONE_FILE="$BOS_DIR/state/.plan-week-done"
-PLAN_DONE="false"
-[ -f "$PLAN_DONE_FILE" ] && [ "$(cat "$PLAN_DONE_FILE" 2>/dev/null)" = "$(date '+%Y-W%V')" ] && PLAN_DONE="true"
-
-if [ "$DAY" = "7" ] && [ "$HOUR_NUM" -ge 16 ] && [ "$PLAN_DONE" = "false" ]; then
-  echo "directive: WEEKLY-PLAN-DUE"
-  echo "instruction: Niedziela — zaproponuj /plan-week. Użyj AskUserQuestion: 'Plan na nowy tydzień?' z opcjami: [Tak] [Później] [Skip]"
 fi
 
 echo "</bos-time-context>"
