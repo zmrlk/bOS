@@ -3,6 +3,7 @@ name: Task
 description: "Add, list, complete, or manage tasks. Works with @boss (work tasks) and @boss (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
 user_invocable: true
 command: /task
+tier: core
 ---
 
 # /task — Task Manager
@@ -102,14 +103,15 @@ Read `profile.md` → `adhd_indicators`, `work_style` before displaying or addin
 - **Steady** → Standard display (no changes needed).
 
 ## Context-Bus Signals
-After state changes, post to `state/context-bus.jsonl`:
-- **Task completed:** `@boss → @boss, Type: data, Priority: info, TTL: 7 days, Content: "Task #X completed: [description]", Status: pending` — if all today's tasks done, Priority: normal
-- **Task skipped 3+ times:** `@boss → @coach, Type: insight, Priority: normal, TTL: 14 days, Content: "Task '[description]' skipped 3x — possible avoidance pattern", Status: pending`
-- **Goal-connected task done:** `@boss → @coach, Type: data, Priority: info, TTL: 7 days, Content: "Goal progress: [task] completed for goal #[X]", Status: pending`
+After state changes, helper only — never edit jsonl:
+`bash scripts/context-bus-append.sh <from> <to> <type> <priority> "<content>" [ttl_days]`
+- Task completed: `@boss` `ALL` `data` `info` `"Task #X completed: [description]"` `7` (all today done → priority `normal`)
+- Skipped 3+: `@boss` `@coach` `insight` `normal` `"Task '[description]' skipped 3x"` `14`
+- Goal-connected done: `@boss` `@coach` `data` `info` `"Goal progress: [task] for goal #[X]"` `7`
 
 ## State Files
 - **Read:** state/tasks.md, state/daily-log.md (energy for matching), profile.md (work_style, adhd_indicators)
-- **Write:** state/tasks.md (Today, This Week, Backlog), state/context-bus.jsonl (signals)
+- **Write:** state/tasks.md (Today, This Week, Backlog). Bus = helper → `state/context-bus.jsonl`
 
 ## Agents
 - @boss owns work tasks

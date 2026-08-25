@@ -3,6 +3,7 @@ name: Habit
 description: "Unified habit and quit tracker — view streaks, add/remove habits, log completions, track cessation (days free, money saved, health milestones). Gamified with milestones and personal bests. Use when the user says 'habit', 'streak', 'done', 'quit', 'how many days', 'how much saved', or logs a completed habit."
 user_invocable: true
 command: /habit
+tier: core
 ---
 
 # /habit — Habit & Quit Tracker

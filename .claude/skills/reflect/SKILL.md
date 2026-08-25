@@ -4,6 +4,7 @@ description: "Micro-journal — one question, one answer. Daily reflection pract
 user_invocable: true
 command: /reflect
 allowed-tools: Read, Write, Edit, Glob
+tier: optional
 ---
 
 # /reflect — Micro-Journal

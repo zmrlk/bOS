@@ -3,6 +3,7 @@ name: Decide
 description: "Structured decision-making — capture the decision, analyze options, get a GO/NO-GO verdict, and schedule a review. Use when the user faces a decision with trade-offs or uncertainty, or explicitly asks to decide."
 user_invocable: true
 command: /decide
+tier: core
 ---
 
 # /decide — Decision Journal
@@ -64,6 +65,10 @@ Gather information through conversation or structured questions:
 
 For Business type → also run @boss's 5-dimension scoring (time-to-cash, rate, repeatability, reputation, feasibility, each 1-3, total /15).
 For Financial type → check buffer status, apply loss framing if relevant.
+
+### Step 4b: Premortem (mandatory, 5 lines)
+
+Assume the choice shipped and failed in 6 months. List: what broke, who got hurt, what warning you ignored. If you cannot name a failure mode, the analysis is incomplete.
 
 ### Step 5: Verdict
 

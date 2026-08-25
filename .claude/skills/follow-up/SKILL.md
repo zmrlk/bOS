@@ -3,6 +3,7 @@ name: Follow Up
 description: "Automated follow-up scripts for [your-company] leads. When to follow up, what to say, how not to be pushy. Use when the user needs to follow up with a potential client or cold contact."
 user_invocable: true
 command: /follow-up
+tier: optional
 ---
 
 # /follow-up — Lead Follow-up Generator
@@ -128,6 +129,8 @@ Generuj: konkretną datę przypomnienia + gotową wiadomość na powrót.
 - Osobiste — jedno szczegółowe zdanie odnoszące się do ich firmy/sytuacji
 - Pytanie zamknięte na końcu (tak/nie/kiedy) — nie otwarte
 - Break-up message zawsze zostawia furtkę ("Jeśli się coś zmieni...")
+
+**Anti-fit:** If the lead is not ready (no budget, no owner, wrong problem), do **not** sell the expensive path. Say no or offer a cheaper/no-go. A bad-fit close is a failure.
 
 **DON'T:**
 - "Chciałem się przypomnieć" — najgorsze zdanie w follow-upie

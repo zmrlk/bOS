@@ -116,13 +116,10 @@ if [[ -f "$BOS_DIR/state/tasks.md" ]]; then
 fi
 
 CRITICAL_SIGNALS=""
-if [[ -f "$BOS_DIR/state/context-bus.md" ]]; then
-  # Pull critical entries (3 lines after each Priority: critical marker)
-  CRITICAL_SIGNALS=$(grep -A 3 'Priority: critical' "$BOS_DIR/state/context-bus.md" 2>/dev/null \
-    | grep -v '^--$\|^Priority:\|^Type:\|^TTL:\|^Status:' \
-    | grep 'Content:' \
-    | sed 's/Content: *//' \
-    | head -2 \
+if [[ -f "$BOS_DIR/state/context-bus.jsonl" ]]; then
+  CRITICAL_SIGNALS=$(grep '"priority":"critical"' "$BOS_DIR/state/context-bus.jsonl" 2>/dev/null \
+    | tail -2 \
+    | sed -n 's/.*"content":"\([^"]*\)".*/\1/p' \
     | tr '\n' ' ')
 fi
 

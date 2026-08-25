@@ -1,3 +1,11 @@
+---
+name: Ship
+description: "Review changes and commit. Push is a separate ask. Use when the user says /ship, ship it, commit, or wypchnij."
+user_invocable: true
+command: /ship
+tier: core
+---
+
 # /ship — Vibecoding Fast Lane
 
 ## Meta
@@ -5,7 +13,7 @@
 - **Agent:** @cto
 - **Model:** haiku (quick) → sonnet if issues found
 - **Context needed:** git status, changed files
-- **When to use:** After coding session — review → commit → push in one flow
+- **When to use:** After coding — review → commit. Push is a separate, explicit ask.
 
 ---
 
@@ -13,7 +21,8 @@
 
 Replaces the manual 4-step vibecoding workflow:
 ```
-code → review changes → write commit msg → git add → git commit → git push
+code → review → commit message → git add → git commit
+(push only after a second, explicit yes)
 ```
 
 With one command that does it intelligently.
@@ -70,19 +79,18 @@ Show message + ask: "OK" / "Zmień" / "Anuluj"
 
 If "Zmień" → user types custom message (1 open text field).
 
-### Step 5: Ship
+### Step 5: Commit (default)
 ```bash
 git add .
 git commit -m "[message]"
-git push
 ```
 
-Show output. If push fails (e.g. upstream not set) → show exact fix command.
+Do **not** `git push`. `settings.json` denies `git push`. If the user still wants push: AskUserQuestion "Push to remote?" [Not now] [Yes, push]. Only then run `git push` after they pick Yes.
 
 ### Step 6: Confirm
 ```
-✅ Shipped: [commit hash] — [message]
-Branch: [branch] → [remote]
+✅ Committed: [commit hash] — [message]
+Push: not done (ask if you want it)
 ```
 
 ---
@@ -105,7 +113,7 @@ If multiple repos detected → ask which one (AskUserQuestion, show changed file
 
 ## Rules
 
-1. **Never push without showing commit message first** — always confirm
+1. **Never push inside the default flow** — commit only; push needs a second yes
 2. **Never git add -f** — if file is gitignored, it's gitignored for a reason
 3. **Never rebase/force-push** — /ship is safe-only. For risky ops → direct git
 4. **Secrets check** — scan diff for patterns: `API_KEY`, `SECRET`, `PASSWORD`, `token=` → hard BLOCK

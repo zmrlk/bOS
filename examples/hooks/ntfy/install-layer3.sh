@@ -9,10 +9,10 @@ set -euo pipefail
 
 # ── Paths ────────────────────────────────────────────────────
 BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
-PLIST_SRC="$BOS_DIR/com.bos.morning-push.plist"
+PLIST_SRC="$BOS_DIR/examples/hooks/ntfy/com.bos.morning-push.plist"
 PLIST_NAME="com.bos.morning-push"
 PLIST_DEST="$HOME/Library/LaunchAgents/${PLIST_NAME}.plist"
-HOOK_SCRIPT="$BOS_DIR/.claude/hooks/morning-push.sh"
+HOOK_SCRIPT="$BOS_DIR/examples/hooks/ntfy/morning-push.sh"
 LOG_DIR="$HOME/.claude/logs"
 SECRETS_FILE="$BOS_DIR/.secrets/ntfy.env"
 

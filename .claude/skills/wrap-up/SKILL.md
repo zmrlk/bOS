@@ -3,6 +3,7 @@ name: Wrap Up
 description: "Structured session close with handoff notes for next session continuity. Eliminates re-discovery time. Use when user says wrap-up, zamykam, koniec sesji, or before significant breaks between sessions."
 user_invocable: true
 command: /wrap-up
+tier: core
 ---
 
 # /wrap-up — Session Handoff
@@ -34,31 +35,32 @@ Write to `state/handoff.md` (overwrite previous — only latest matters):
 <!-- Generated: {datetime} -->
 <!-- Session topic: {1-line summary} -->
 
-## Done this session
-- {action 1}
-- {action 2}
+## Goal
+{what this session was for}
 
-## In progress
-- {task} — status: {where it stands}, next: {what to do next}
+## Done
+- {action}
 
 ## Blocked
 - {item} — waiting on: {what}
 
-## Decisions made
-- {decision}: {rationale in 1 line}
+## Next
+{1 concrete action}
 
-## Context for next session
-- {insight or preference that isn't in state files}
-- {mental model or approach being used}
+## Why
+{why that next action — not just status}
 
-## Suggested first action
-{1 concrete thing to do next, ready to execute}
+## Source
+{this session / file locator}
+
+## Date
+{ISO date}
 ```
 
 ### Step 3: Update state files (silent)
 
 - Mark completed tasks in `tasks.md`
-- Post any critical signals to `context-bus.jsonl`
+- Post critical signals via `bash scripts/context-bus-append.sh` (not hand-edit jsonl)
 - Update `daily-log.md` if energy/wins were mentioned but not logged
 
 ### Step 4: Confirm to user

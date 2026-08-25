@@ -25,6 +25,9 @@ state/n8n-templates/
 # state/.gitkeep is the one dotfile that IS tracked (keeps the dir alive).
 state/.*
 !state/.gitkeep
+state/ping.md
+state/handoff.md
+state/context-bus.jsonl
 .claude/logs/
 
 # ─────────────────────────────────────────────

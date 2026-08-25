@@ -6,6 +6,8 @@
 # stdout → Claude sees as system context.
 
 BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=ping-inject.sh
+. "$BOS_DIR/.claude/hooks/ping-inject.sh"
 HOUR=$(date '+%H')
 HOUR_NUM=$((10#$HOUR))  # force decimal (strip leading 0)
 DAY=$(date '+%u')  # 1=Monday, 7=Sunday
@@ -111,4 +113,5 @@ if [ -f "$BOS_DIR/state/daily-log.md" ]; then
 fi
 
 echo "</bos-time-context>"
+_bos_inject_ping
 exit 0
