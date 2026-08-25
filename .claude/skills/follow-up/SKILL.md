@@ -1,5 +1,5 @@
 ---
-name: Follow Up
+name: follow-up
 description: "Automated follow-up scripts for your leads. When to follow up, what to say, how not to be pushy. Use when the user needs to follow up with a potential client or cold contact."
 user_invocable: true
 command: /follow-up

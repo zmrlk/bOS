@@ -1,5 +1,5 @@
 ---
-name: Evolve
+name: evolve
 description: "On-demand audit of bOS. Use when the user says /evolve, improve yourself, or audit the system. Never auto-run weekly or monthly."
 user_invocable: true
 command: /evolve

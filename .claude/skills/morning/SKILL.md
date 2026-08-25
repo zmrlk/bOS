@@ -1,5 +1,5 @@
 ---
-name: Morning
+name: morning
 description: "Daily morning briefing from state files. Use when the user asks /morning, good morning, or start of day. Never auto-run on a greeting."
 user_invocable: true
 command: /morning

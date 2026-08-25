@@ -1,5 +1,5 @@
 ---
-name: Reflect
+name: reflect
 description: "Micro-journal — one question, one answer. Daily reflection practice that builds self-awareness over time."
 user_invocable: true
 command: /reflect

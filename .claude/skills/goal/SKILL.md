@@ -1,5 +1,5 @@
 ---
-name: Goal
+name: goal
 description: "Set, update, review, or complete goals. Works with @coach (life goals) and @boss (business goals)."
 user_invocable: true
 command: /goal

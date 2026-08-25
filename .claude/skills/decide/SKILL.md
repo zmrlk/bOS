@@ -1,5 +1,5 @@
 ---
-name: Decide
+name: decide
 description: "Structured decision-making — capture the decision, analyze options, get a GO/NO-GO verdict, and schedule a review. Use when the user faces a decision with trade-offs or uncertainty, or explicitly asks to decide."
 user_invocable: true
 command: /decide

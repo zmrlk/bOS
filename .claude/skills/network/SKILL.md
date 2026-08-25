@@ -1,5 +1,5 @@
 ---
-name: Network
+name: network
 description: "Personal relationship manager — log contacts, track follow-ups, get reminded who to reach out to. Your network is your net worth. Use to log meetings, track follow-ups, or see who needs outreach. Trigger on: contact, networking, follow-up."
 user_invocable: true
 command: /network

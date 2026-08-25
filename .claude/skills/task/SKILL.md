@@ -1,5 +1,5 @@
 ---
-name: Task
+name: task
 description: "Add, list, complete, or manage tasks. Works with @boss (work tasks) and @coach (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
 user_invocable: true
 command: /task

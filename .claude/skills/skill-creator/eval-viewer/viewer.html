@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eval Review</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
   <style>
     :root {
@@ -29,7 +26,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Lora', Georgia, serif;
+      font-family: Georgia, 'Times New Roman', serif;
       background: var(--bg);
       color: var(--text);
       height: 100vh;
@@ -48,7 +45,7 @@
       flex-shrink: 0;
     }
     .header h1 {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       font-size: 1.25rem;
       font-weight: 600;
     }
@@ -81,7 +78,7 @@
       flex-shrink: 0;
     }
     .section-header {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       padding: 0.75rem 1rem;
       font-size: 0.75rem;
       font-weight: 500;
@@ -100,7 +97,7 @@
       display: inline-block;
       padding: 0.2rem 0.625rem;
       border-radius: 9999px;
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       font-size: 0.6875rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -333,7 +330,7 @@
       flex-shrink: 0;
     }
     .view-tab {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       padding: 0.625rem 1.25rem;
       font-size: 0.8125rem;
       font-weight: 500;
@@ -373,7 +370,7 @@
       border: 1px solid var(--border);
     }
     .benchmark-table th {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       background: var(--header-bg);
       color: var(--header-text);
       font-weight: 500;
@@ -398,7 +395,7 @@
       padding: 1rem;
     }
     .benchmark-notes h3 {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       font-size: 0.875rem;
       margin-bottom: 0.75rem;
     }
@@ -429,7 +426,7 @@
       flex-shrink: 0;
     }
     .nav-btn {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       padding: 0.5rem 1.25rem;
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -449,7 +446,7 @@
       cursor: not-allowed;
     }
     .done-btn {
-      font-family: 'Poppins', sans-serif;
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
       padding: 0.5rem 1.5rem;
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -830,6 +827,10 @@
     function renderXlsx(container, b64Data) {
       try {
         const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        if (typeof XLSX === "undefined") {
+          container.innerHTML = "<p>XLSX preview needs the SheetJS script (loaded from cdn.sheetjs.com) — offline, so no preview. The file itself is fine; open it in a spreadsheet app.</p>";
+          return;
+        }
         const wb = XLSX.read(raw, { type: "array" });
 
         for (let i = 0; i < wb.SheetNames.length; i++) {

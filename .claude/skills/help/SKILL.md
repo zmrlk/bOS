@@ -1,5 +1,5 @@
 ---
-name: Help
+name: help
 description: "Show all available commands, agents, and shortcuts. The go-to reference when users don't know what to do."
 user_invocable: true
 command: /help

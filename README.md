@@ -32,6 +32,8 @@ Live skill list: [config/roster.md](config/roster.md) (generated; do not hand-ed
 2. `git clone https://github.com/zmrlk/bOS.git` and open the folder in your CLI.
 3. Say "hi". If `profile.md` is empty, the system runs `/setup` — a 3-minute onboarding.
 
+Windows note: `.agents/skills/` uses git symlinks. Clone with `git clone -c core.symlinks=true …` (requires Developer Mode or admin) — otherwise Codex-style agents see plain text files instead of the skills.
+
 Per-CLI notes:
 
 - **Claude Code:** hooks are fully wired — SessionStart injects your state summary automatically.

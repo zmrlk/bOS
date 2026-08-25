@@ -1,5 +1,5 @@
 ---
-name: Ship
+name: ship
 description: "Review changes and commit. Push is a separate ask. Use when the user says /ship, ship it, commit, or wypchnij."
 user_invocable: true
 command: /ship

@@ -39,7 +39,7 @@ One skill to manage all your connections. Add tools, test connections, discover 
 
 ### MODE: `/connect` (status overview)
 
-Show current connection status, adapted to `tech_comfort`:
+Show current connection status, adapted to `tech_comfort`. The tool names below are EXAMPLE output — always render the user's actual connections:
 
 **"not technical":**
 ```

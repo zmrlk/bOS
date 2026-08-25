@@ -16,8 +16,8 @@ VERSION 0.12.1
 | help | core | 3323 | ok | no |
 | home | core | 895 | ok | yes |
 | inbox | optional | 7209 | ok | no |
-| log-expense | core | 2906 | ok | no |
-| log-workout | optional | 1940 | ok | no |
+| log-expense | core | 2910 | ok | no |
+| log-workout | optional | 1944 | ok | no |
 | morning | core | 1291 | ok | yes |
 | network | optional | 3983 | ok | no |
 | recall | core | 3825 | ok | no |
