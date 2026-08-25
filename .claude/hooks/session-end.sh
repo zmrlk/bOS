@@ -33,7 +33,7 @@ mkdir -p "$BOS_DIR/state/.backup"
 mkdir -p "$BOS_DIR/state/archive"
 
 # Clean up old pre-compact snapshots (keep last 5, aligned with pre-compact.sh)
-ls -t "$BOS_DIR/state/.backup"/pre-compact-*.md 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null
+ls -t "$BOS_DIR/state/.backup"/pre-compact-*.md 2>/dev/null | tail -n +6 | while IFS= read -r f; do rm -f "$f"; done
 
 # Log session to session-log.md (deduplicated — max 1 entry per hour)
 CURRENT_HOUR=$(date '+%Y-%m-%d %H')
@@ -105,7 +105,7 @@ fi
 # If it's evening + .pre-morning.md exists → push plan to ntfy
 # This ensures user has briefing on phone even if Mac sleeps through morning slots
 # IDEMPOTENCY: max 1 evening push per day (sessions close multiple times)
-EVENING_SENT_FILE="$HOME/.claude/logs/.evening-push-last-date"
+EVENING_SENT_FILE="$BOS_DIR/state/.evening-push-last-date"
 if [ "$HOUR" -ge 18 ] && [ "$HOUR" -lt 23 ]; then
   # Skip if already pushed today
   if [ -f "$EVENING_SENT_FILE" ] && [ "$(cat "$EVENING_SENT_FILE" 2>/dev/null)" = "$TODAY" ]; then
@@ -124,7 +124,7 @@ if [ "$HOUR" -ge 18 ] && [ "$HOUR" -lt 23 ]; then
       # Extract key info (first 5 non-empty, non-header lines)
       PLAN=$(grep -v '^#\|^$\|^---' "$PRE_MORNING" 2>/dev/null | head -5 | tr '\n' ' ' | cut -c1-250)
       if [ -n "$PLAN" ]; then
-        TOMORROW=$(date -v+1d '+%a %d.%m' 2>/dev/null || date -d '+1 day' '+%a %d.%m' 2>/dev/null || echo "jutro")
+        TOMORROW=$(date -v+1d '+%a %d.%m' 2>/dev/null || date -d '+1 day' '+%a %d.%m' 2>/dev/null || echo "tomorrow")
         curl -s -o /dev/null \
           -H "Title: bOS plan $TOMORROW" \
           -H "Priority: default" \
@@ -153,7 +153,7 @@ if [ ! -f "$DIGEST_FILE" ]; then
     TOPIC=""
     if [ -n "$LATEST_SNAPSHOT" ]; then
       # Try: first ## header that isn't "Context" or "State", then first bullet, then first non-empty line
-      TOPIC=$(grep -E -m1 '^## [^(Context|State)]' "$LATEST_SNAPSHOT" 2>/dev/null | head -1 | sed 's/^## //')
+      TOPIC=$(grep '^## ' "$LATEST_SNAPSHOT" 2>/dev/null | grep -vE '^## (Context|State)' | head -1 | sed 's/^## //')
       [ -z "$TOPIC" ] && TOPIC=$(grep -E -m1 '^- ' "$LATEST_SNAPSHOT" 2>/dev/null | head -1 | sed 's/^- //')
       [ -z "$TOPIC" ] && TOPIC=$(grep -E -m1 '.{10,}' "$LATEST_SNAPSHOT" 2>/dev/null | head -1)
     fi
@@ -179,7 +179,7 @@ if [ ! -f "$DIGEST_FILE" ]; then
   } > "$DIGEST_FILE" 2>/dev/null
 
   # Rotate: keep only last 30 digests
-  ls -t "$DIGEST_DIR"/*.md 2>/dev/null | tail -n +31 | xargs rm -f 2>/dev/null
+  ls -t "$DIGEST_DIR"/*.md 2>/dev/null | tail -n +31 | while IFS= read -r f; do rm -f "$f"; done
 fi
 
 echo "Session ended. State preserved."

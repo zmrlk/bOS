@@ -7,7 +7,7 @@
 set -euo pipefail
 
 # ── Config ──────────────────────────────────────────────────
-BOS_DIR="${BOS_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+BOS_DIR="${BOS_DIR:-$(cd "$(dirname "$0")/../../.." && pwd)}"  # repo root (script lives in examples/hooks/ntfy/)
 LOG_DIR="$HOME/.claude/logs"
 LOG_FILE="$LOG_DIR/morning-push-$(date '+%Y%m%d').log"
 SECRETS_FILE="$BOS_DIR/.secrets/ntfy.env"   # optional: NTFY_TOPIC=xxx
@@ -25,6 +25,9 @@ if [[ "$DOW" -ge 6 && "${MORNING_PUSH_SKIP_WEEKENDS:-0}" == "1" ]]; then
   exit 0
 fi
 
+# ── Dry run: print what would happen, send nothing ─────────
+DRY_RUN="${MORNING_PUSH_DRY_RUN:-0}"
+
 # ── Idempotency: only push ONCE per day ───────────────────
 SENT_FILE="$LOG_DIR/.morning-push-last-date"
 TODAY=$(date '+%Y-%m-%d')
@@ -39,8 +42,8 @@ echo "════════════════════════�
 
 # ── Source environment ──────────────────────────────────────
 # launchd gives a bare environment — manually bring in what we need.
-export LANG="pl_PL.UTF-8"
-export LC_ALL="pl_PL.UTF-8"
+export LANG="${MORNING_PUSH_LOCALE:-en_US.UTF-8}"
+export LC_ALL="${MORNING_PUSH_LOCALE:-en_US.UTF-8}"
 
 # Homebrew
 [[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
@@ -94,16 +97,13 @@ if [[ -z "$NTFY_TOPIC" && -f "$SECRETS_FILE" ]]; then
   source "$SECRETS_FILE" 2>/dev/null || true
 fi
 
-if [[ -z "$NTFY_TOPIC" && -f "$BOS_DIR/state/schedules.md" ]]; then
-  NTFY_TOPIC=$(grep -i 'ntfy_topic' "$BOS_DIR/state/schedules.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d ' \r\n') || true
-fi
+# (No fallback to state files — the topic works like a password; keep it in .secrets/ or env only.)
 
 if [[ -z "$NTFY_TOPIC" ]]; then
   echo "[morning-push] ERROR: NTFY_TOPIC not configured."
   echo "[morning-push] Set it in:"
   echo "  1. $SECRETS_FILE  → NTFY_TOPIC=your-topic"
   echo "  2. Environment variable NTFY_TOPIC"
-  echo "  3. state/schedules.md  → ntfy_topic: your-topic"
   # Never publish user data to a shared public topic — refuse to run instead.
   exit 1
 fi
@@ -156,7 +156,7 @@ Buffer: ${BUFFER_STATUS:-(unknown)}"
   # Minimal prompt — saves tokens, focused task
   PROMPT="You are bOS morning push agent. Using the data below, call send_notification ONCE with:
 - title: 'bOS $DATE_LABEL'
-- message: max 250 chars, Polish, key tasks + critical alerts (if any). No markdown, plain text.
+- message: max 250 chars, in the user's language, key tasks + critical alerts (if any). No markdown, plain text.
 - priority: high
 - tags: [\"sunrise\", \"calendar\"]
 - topic: $NTFY_TOPIC
@@ -166,11 +166,20 @@ $CONTEXT_DATA
 
 Call send_notification now. No other output."
 
-  "$CLAUDE_BIN" -p "$PROMPT" \
-    --allowedTools "mcp__bos-compound__send_notification" \
-    --mcp-config "$BOS_DIR/.mcp.json" \
-    --output-format text \
-    2>&1 | head -30 && PUSH_SUCCESS=1 || true
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "[morning-push] DRY RUN — would call claude -p with prompt:"
+    echo "$PROMPT"
+    PUSH_SUCCESS=1
+  elif [[ -f "$BOS_DIR/.mcp.json" ]]; then
+    # Requires a notification MCP tool in your own .mcp.json (not shipped with bOS).
+    "$CLAUDE_BIN" -p "$PROMPT" \
+      --allowedTools "mcp__bos-compound__send_notification" \
+      --mcp-config "$BOS_DIR/.mcp.json" \
+      --output-format text \
+      2>&1 | head -30 && PUSH_SUCCESS=1 || true
+  else
+    echo "[morning-push] No .mcp.json in $BOS_DIR — skipping claude -p, using curl fallback."
+  fi
 
   if [[ "$PUSH_SUCCESS" -eq 1 ]]; then
     echo "[morning-push] claude -p succeeded."
@@ -191,6 +200,12 @@ if [[ "$PUSH_SUCCESS" -eq 0 ]]; then
   [[ -n "$CRITICAL_SIGNALS" ]] && FALLBACK_MSG="$FALLBACK_MSG | !! $CRITICAL_SIGNALS"
   FALLBACK_MSG="${FALLBACK_MSG:0:250}"  # hard cap
 
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "[morning-push] DRY RUN — would curl to $NTFY_BASE_URL/<topic> with: $FALLBACK_MSG"
+    echo "[morning-push] DRY RUN complete. Nothing was sent."
+    exit 0
+  fi
+
   CURL_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
     -H "Title: bOS $DATE_LABEL" \
     -H "Priority: high" \
@@ -207,6 +222,10 @@ if [[ "$PUSH_SUCCESS" -eq 0 ]]; then
 fi
 
 # ── Done ─────────────────────────────────────────────────────
+if [[ "$DRY_RUN" == "1" ]]; then
+  echo "[morning-push] DRY RUN complete. Nothing was sent."
+  exit 0
+fi
 if [[ "$PUSH_SUCCESS" -eq 1 ]]; then
   echo "$TODAY" > "$SENT_FILE"
   echo "[morning-push] DONE ✓ $(date '+%H:%M:%S') — marked $TODAY as sent"

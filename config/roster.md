@@ -4,30 +4,30 @@ VERSION 0.12.1
 ## Skills
 | name | tier | bytes | 8KB | refs |
 |------|:----:|------:|:---:|:----:|
-| build-agent | optional | 3002 | ok | no |
+| build-agent | optional | 2990 | ok | no |
 | check | core | 1067 | ok | yes |
 | connect | optional | 963 | ok | yes |
-| decide | core | 4653 | ok | no |
+| decide | core | 4666 | ok | no |
 | evening | core | 1038 | ok | yes |
 | evolve | core | 823 | ok | yes |
-| follow-up | optional | 5685 | ok | no |
-| goal | core | 4135 | ok | no |
+| follow-up | optional | 5592 | ok | no |
+| goal | core | 4070 | ok | no |
 | habit | core | 7582 | ok | no |
-| help | core | 3335 | ok | no |
+| help | core | 3323 | ok | no |
 | home | core | 895 | ok | yes |
-| inbox | optional | 7063 | ok | no |
-| log-expense | core | 2913 | ok | no |
+| inbox | optional | 7209 | ok | no |
+| log-expense | core | 2906 | ok | no |
 | log-workout | optional | 1940 | ok | no |
-| morning | core | 1327 | ok | yes |
-| network | optional | 3970 | ok | no |
-| recall | core | 4102 | ok | no |
-| reflect | optional | 5580 | ok | no |
-| remind | core | 1656 | ok | no |
+| morning | core | 1291 | ok | yes |
+| network | optional | 3983 | ok | no |
+| recall | core | 3825 | ok | no |
+| reflect | optional | 5682 | ok | no |
+| remind | core | 1748 | ok | no |
 | setup | core | 1069 | ok | yes |
-| ship | core | 3352 | ok | no |
+| ship | core | 3305 | ok | no |
 | skill-creator | core | 907 | ok | yes |
-| task | core | 4867 | ok | no |
-| wrap-up | core | 2447 | ok | no |
+| task | core | 4841 | ok | no |
+| wrap-up | core | 2429 | ok | no |
 
 count 24 · core 17 · optional 7 · over_8kb 0
 
@@ -38,7 +38,7 @@ count 24 · core 17 · optional 7 · over_8kb 0
 | boss | 1345 |
 | cmo | 2512 |
 | coach | 5239 |
-| cto | 4018 |
+| cto | 4106 |
 | design | 3294 |
 | diet | 3478 |
 | finance | 3722 |

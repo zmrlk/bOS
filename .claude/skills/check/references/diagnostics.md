@@ -10,7 +10,7 @@ command: /check
 ## What This Does
 Runs a quick diagnostic of your bOS installation. Checks that everything is working and tells you if something needs attention.
 
-**Adapt to tech_comfort:** "not technical" → "Połączenia: Pliki ✅, Kalendarz ❌" (friendly names). "I use apps" → name tools: "Desktop Commander ✅". "I code" → show MCP IDs, config paths.
+**Adapt to tech_comfort:** "not technical" → "Connections: Files ✅, Calendar ❌" (friendly names). "I use apps" → name tools: "Desktop Commander ✅". "I code" → show MCP IDs, config paths.
 
 ## Protocol
 
@@ -27,7 +27,7 @@ Based on active_packs from profile, verify state files exist:
 - Life/Health: `state/habits.md`
 - Life (if /reflect used): `state/journal.md`
 - Life (if /network used): `state/network.md`
-- Infrastructure: `state/archive/`, `state/.backup/`, `state/tool-log.jsonl`, `state/skill-runs.jsonl`
+- Infrastructure: `state/archive/`, `state/.backup/`, `state/tool-log.md`, `state/skill-runs.jsonl` (all created at runtime by hooks — absent on a fresh clone)
 - Report: ✅ State files OK or ❌ Missing: [list]
 
 ### 3. Superpowers Check
@@ -43,19 +43,19 @@ If any superpowers are ❌ OR user has tools detected in profile without corresp
 
 Use `AskUserQuestion`:
 - header: "Discovery"
-- question: "Masz niepodłączone narzędzia. Chcesz, żebym przeszukał internet w poszukiwaniu sprawdzonych rozszerzeń?"
+- question: "You have unconnected tools. Want me to search the internet for verified extensions?"
 - options:
-  - "Szukaj rozszerzeń w internecie" (description: "Przeszukam Reddit, GitHub i agregatory MCP")
-  - "Nie trzeba" (description: "Kontynuuj health check")
+  - "Search the internet for extensions" (description: "I'll search Reddit, GitHub and MCP aggregators")
+  - "No need" (description: "Continue the health check")
 
-**If "Szukaj rozszerzeń"** → run the same discovery flow as setup Step 5C:
+**If "Search the internet for extensions"** → run the same discovery flow as setup Step 5C:
 1. Batch WebSearch queries based on missing superpowers and user's tools
 2. Filter through security checklist (≥50 stars, recent commits, open source, positive reviews, no root access, clear permissions)
 3. Show max 3 verified results adapted to tech_comfort
 4. Offer installation with user confirmation
 5. Update profile.md → connected_mcps after installation
 
-**If "Nie trzeba"** → continue to Agent Check.
+**If "No need"** → continue to Agent Check.
 
 ### 4. Agent Check
 - List active agents from profile
@@ -76,28 +76,26 @@ After confirming files exist, validate STRUCTURE:
    - goals.md: Has Active Goals section
    - context-bus.jsonl: missing or empty is valid. Do not treat the `.md` stub as the live bus.
 3. If structure is invalid:
-   - Show: "⚠️ [filename] — format uszkodzony. Naprawiam..."
-   - Backup corrupted file to state/.backup/[filename]-corrupted-[date].md
-   - Recreate with correct schema headers from SCHEMAS.md
-   - If any data was recoverable → migrate to new file
+   - Show: "⚠️ [filename] — structure corrupted." and PROPOSE the repair (backup to state/.backup/, recreate headers from SCHEMAS.md, migrate recoverable rows)
+   - Apply only after the user approves — /check itself never rewrites files
 4. Show results:
    ```
    📁 State files:
    ✅ tasks.md — OK (12 tasks)
    ✅ daily-log.md — OK (7 entries)
-   ⚠️ habits.md — naprawiony (3 habits recovered)
+   ⚠️ habits.md — repaired (3 habits recovered)
    ✅ finances.md — OK
    ```
 
 - For each state file that exists → verify it has valid headers/table structure
 - Check for corruption: orphaned rows, missing columns, broken markdown tables
 - Report: ✅ State files healthy or ⚠️ [file] may need repair: [issue]
-- Auto-repair if possible (add missing headers, fix table alignment)
+- Propose the repair (add missing headers, fix table alignment) — apply only on user approval
 
 ### 6. System Health
 - **Maintenance check:** compare the mtime of `state/.backup/` against today. Nothing backed up in 30+ days → "⚠️ Maintenance overdue. Run /evolve for a full pass."
 - **Backup check:** Check `state/.backup/` for profile backups. Report: "Last backup: [date]" or "⚠️ No profile backup found."
-- **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]. Updating..."
+- **Version check:** Compare `VERSION` file with `profile.md → bos_version`. If different → "⚠️ Version mismatch: file says [X], profile says [Y]." Suggest the fix; do not write it yourself.
 - **Context-bus check:** If `state/context-bus.jsonl` exists, count lines. Helper `scripts/context-bus-append.sh` must exist. Do not rewrite expired rows (TTL is a read filter).
 - **Kanon check:** `AGENTS.md` exists; `wc -l AGENTS.md` ≤ 150. `VERSION` matches README if it cites a version.
 - **Skill count:** `ls .claude/skills | wc -l` must match the Lite list in AGENTS.md (no `/vault`, no `/schedule`).
@@ -105,7 +103,7 @@ After confirming files exist, validate STRUCTURE:
 - **Invoices check:** If state/invoices.md exists → validate table structure, check for overdue invoices (status != paid AND due date < today). Report: "🧾 [N] invoices, [M] overdue" or "✅ No overdue invoices."
 - **Time-log check:** If state/time-log.md exists → validate Summary/Active/Archive structure, check for orphaned active timer (running for 24+ hours). Report: "⏱️ Time log OK ([N] entries)" or "⚠️ Active timer running for [X]h — stale?"
 
-### 6C. Infrastructure Diagnostics (Antec Doctor pattern)
+### 6C. Infrastructure Diagnostics
 
 Run shell diagnostics to surface system-level issues:
 
@@ -133,7 +131,7 @@ Run shell diagnostics to surface system-level issues:
 - Check `.claude/hooks/` files exist and are executable
 - Report: "✅ Hooks: [N] installed" or "⚠️ Hook [name] not executable"
 
-**Skill health (Cognee pattern):**
+**Skill health:**
 - Read `state/skill-runs.jsonl` if it exists
 - Calculate per-skill: total runs, avg score, trend (7d vs 30d)
 - Flag degrading skills: avgScore < 0.7 OR declining trend (7d avg < 30d avg - 0.15)
@@ -147,7 +145,7 @@ Run shell diagnostics to surface system-level issues:
 - If no skill-runs.jsonl or empty → "🎯 Skill health: no data yet (tracking started)"
 - If <10 total runs → "🎯 Skill health: collecting data ([N] runs so far)"
 
-**Tool health (ReMe pattern):**
+**Tool health:**
 - Read `state/tool-log.md` if it exists
 - Count total calls, unique tools, fail rate
 - Flag tools with >20% fail rate
@@ -225,9 +223,10 @@ Calculate completion by counting non-empty fields per section in profile.md:
 Each bar = (filled fields in section / total fields in section) × 10 blocks.
 If under 50% overall → offer the most impactful empty sections through `AskUserQuestion`. Never ask in plain text.
 
-If issues found → offer to fix automatically via `AskUserQuestion` (never a plain-text question):
+If issues found → list them and let the user choose via `AskUserQuestion` (never a plain-text question):
 - header: "Fix these?"
-- options: "Fix all" / "Let me pick" / "Not now"
+- options: "Let me pick" / "Not now"
+- No blanket "fix all": each fix is named and applied only after the user picks it.
 - Missing state files → create them
 - Missing profile fields → ask quick questions to fill them
 - MCP changes → update profile.md

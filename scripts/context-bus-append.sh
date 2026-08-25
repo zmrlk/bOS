@@ -10,7 +10,7 @@
 # Types: insight|decision|constraint|data|calibration|session-status|plan|system-migration|incident
 # Priority: critical|normal|info
 # from: @agent | session:name | cron-name
-# calibration content MUST contain: BYŁO: | JEST: | ŹRÓDŁO:
+# calibration content MUST contain: WAS: | NOW: | SOURCE:
 # BUS_FILE override is for tests only.
 
 set -euo pipefail
@@ -40,12 +40,12 @@ if [ "${#CONTENT}" -gt 2000 ]; then
 fi
 if [ "$TYPE" = "calibration" ]; then
   MISSING=""
-  case "$CONTENT" in *"BYŁO:"*) ;; *) MISSING="$MISSING BYŁO:" ;; esac
-  case "$CONTENT" in *"JEST:"*) ;; *) MISSING="$MISSING JEST:" ;; esac
-  case "$CONTENT" in *"ŹRÓDŁO:"*) ;; *) MISSING="$MISSING ŹRÓDŁO:" ;; esac
+  case "$CONTENT" in *"WAS:"*) ;; *) MISSING="$MISSING WAS:" ;; esac
+  case "$CONTENT" in *"NOW:"*) ;; *) MISSING="$MISSING NOW:" ;; esac
+  case "$CONTENT" in *"SOURCE:"*) ;; *) MISSING="$MISSING SOURCE:" ;; esac
   if [ -n "$MISSING" ]; then
     echo "BUS-REJECT: calibration missing:$MISSING" >&2
-    echo "  Format: 'FAKT: <what> | BYŁO: <old literal> | JEST: <new> | ŹRÓDŁO: <Karol, date | file | live test>'" >&2
+    echo "  Format: 'FACT: <what> | WAS: <old literal> | NOW: <new> | SOURCE: <user, date | file | live test>'" >&2
     exit 1
   fi
 fi

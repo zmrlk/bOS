@@ -97,7 +97,6 @@
       "Bash(git fetch*)",
       "Bash(git checkout origin*)",
       "Bash(git clone*)",
-      "Bash(npx *)",
       "Bash(which *)",
       "Bash(uname *)",
       "Bash(bash scripts/bos-roster.sh*)",
@@ -113,7 +112,6 @@
       "Bash(sudo *)",
       "Bash(curl *)",
       "Bash(wget *)",
-      "Bash(python*)",
       "Bash(node -e *)",
       "Bash(pbcopy*)",
       "Bash(git push*)"

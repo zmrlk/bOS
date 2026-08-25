@@ -44,7 +44,7 @@ Weight toward the user's active packs:
 
   [Question text]
 
-  (Napisz cokolwiek. Bez oceniania.)
+  (Write anything. No judgment.)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -60,7 +60,7 @@ Append to `state/journal.md`:
 ### Step 5: Acknowledge
 
 Brief, warm acknowledgment:
-"Zapisane. Dzięki za moment z sobą."
+"Saved. Thanks for taking a moment with yourself."
 
 No analysis, no follow-up questions, no advice. Just acknowledgment.
 
@@ -74,72 +74,72 @@ If journal.md has 30+ entries AND this runs during /evolve → @coach generates 
 ## Question Pool (~50, organized by category)
 
 ### Self-awareness (Q1-Q10)
-1. Co dziś poszło lepiej niż się spodziewałeś?
-2. Co Cię dziś zaskoczyło?
-3. Gdybyś mógł cofnąć jedną decyzję z dziś — którą?
-4. Co Cię dziś najbardziej denerwowało? Dlaczego?
-5. W czym byłeś dziś najlepszą wersją siebie?
-6. Co dziś zrobiłeś z przyzwyczajenia, a nie z wyboru?
-7. Jaka myśl wracała do Ciebie cały dzień?
-8. Co odkładasz, a wiesz że jest ważne?
-9. Kiedy dziś czułeś się najbardziej sobą?
-10. Co byś powiedział sobie z rana, gdybyś wiedział jak potoczy się dzień?
+1. What went better today than you expected?
+2. What surprised you today?
+3. If you could take back one decision from today — which one?
+4. What annoyed you most today? Why?
+5. Where were you the best version of yourself today?
+6. What did you do today out of habit rather than choice?
+7. What thought kept coming back to you all day?
+8. What are you putting off that you know matters?
+9. When did you feel most like yourself today?
+10. What would you have told your morning self, knowing how the day turned out?
 
 ### Gratitude (Q11-Q20)
-11. Za co jesteś dziś wdzięczny?
-12. Kto dziś sprawił, że Twój dzień był lepszy?
-13. Jaki mały moment dziś doceniasz?
-14. Co masz, o czym rok temu marzyłeś?
-15. Za jaką porażkę z przeszłości jesteś teraz wdzięczny?
-16. Co w Twoim życiu działa dobrze i nie wymaga naprawy?
-17. Kogo dawno nie doceniłeś?
-18. Jaki zwykły element dnia sprawiłby Ci brak, gdyby zniknął?
-19. Co dobrego wynika z Twojej obecnej sytuacji?
-20. Za co w sobie jesteś wdzięczny?
+11. What are you grateful for today?
+12. Who made your day better today?
+13. What small moment from today do you appreciate?
+14. What do you have now that you were dreaming about a year ago?
+15. Which past failure are you grateful for now?
+16. What in your life works well and doesn't need fixing?
+17. Who haven't you appreciated in a while?
+18. What ordinary part of your day would you miss if it disappeared?
+19. What good is coming out of your current situation?
+20. What do you appreciate about yourself?
 
 ### Growth (Q21-Q30)
-21. Czego się dziś nauczyłeś?
-22. W czym jesteś lepszy niż miesiąc temu?
-23. Jaki nawyk chciałbyś mieć za rok?
-24. Co Cię ostatnio przerosło? Czego to uczy?
-25. Gdybyś miał mentora — co by Ci powiedział?
-26. Jaka umiejętność otworzyłaby Ci największe drzwi?
-27. Co robisz dobrze, ale mógłbyś robić świetnie?
-28. Jaki błąd powtarzasz? Co go uruchamia?
-29. Co by się zmieniło, gdybyś poważnie potraktował swój potencjał?
-30. Jakie 1% improvement mógłbyś zrobić jutro?
+21. What did you learn today?
+22. What are you better at than you were a month ago?
+23. What habit would you like to have a year from now?
+24. What has been too much for you lately? What is it teaching you?
+25. If you had a mentor — what would they tell you?
+26. What skill would open the biggest doors for you?
+27. What do you do well that you could do brilliantly?
+28. What mistake do you keep repeating? What triggers it?
+29. What would change if you took your own potential seriously?
+30. What 1% improvement could you make tomorrow?
 
 ### Energy (Q31-Q40)
-31. Kiedy dziś miałeś najwięcej energii? Co ją dało?
-32. Co Cię dziś najbardziej zmęczyło?
-33. Czy odpoczywałeś dziś naprawdę, czy udawałeś?
-34. Co zabiera Ci energię, a mogłoby nie?
-35. Jak wyglądał Twój idealny dzień pod kątem energii?
-36. Co możesz usunąć ze swojego jutra?
-37. Kiedy ostatnio czułeś flow?
-38. Co robisz dla zdrowia, a co dla nawyku?
-39. Ile z dzisiejszej energii poszło na rzeczy, które mają znaczenie?
-40. Co mogłoby Ci dać +1 do energii jutro?
+31. When did you have the most energy today? What gave it to you?
+32. What tired you out most today?
+33. Did you truly rest today, or just go through the motions?
+34. What drains your energy that doesn't have to?
+35. What would your ideal day look like, energy-wise?
+36. What could you remove from your tomorrow?
+37. When did you last feel flow?
+38. What do you do for your health, and what just out of habit?
+39. How much of today's energy went into things that actually matter?
+40. What could give you +1 energy tomorrow?
 
 ### Future (Q41-Q45)
-41. Gdzie chcesz być za 90 dni?
-42. Co się stanie, jeśli nic nie zmienisz?
-43. Czego boisz się chcieć?
-44. Jaka decyzja Cię czeka, a Ty ją odkładasz?
-45. Gdyby pieniądze nie grały roli — co byś robił?
+41. Where do you want to be in 90 days?
+42. What happens if you change nothing?
+43. What are you afraid to want?
+44. What decision is waiting for you that you keep putting off?
+45. If money didn't matter — what would you be doing?
 
 ### Relationships (Q46-Q50)
-46. Z kim dawno nie rozmawiałeś, a chciałbyś?
-47. Kto Ci pomógł dojść tam, gdzie jesteś?
-48. Jaką relację chciałbyś wzmocnić?
-49. Komu możesz pomóc w tym tygodniu?
-50. Kto jest w Twoim życiu dlatego, że wybrał tam być?
+46. Who haven't you talked to in a while, but would like to?
+47. Who helped you get to where you are?
+48. Which relationship would you like to strengthen?
+49. Who could you help this week?
+50. Who is in your life because they chose to be?
 
 ## Context-Bus Signals
 
 | Condition | Signal |
 |-----------|--------|
-| 3+ days without /reflect | @coach proactive nudge: "Masz chwilę na /reflect?" (during /morning or session-start) |
+| 3+ days without /reflect | @coach proactive nudge: "Got a minute for /reflect?" (during /morning or session-start) |
 
 ## State Files
 - **Read:** profile.md, journal.md (full)

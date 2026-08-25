@@ -2,13 +2,13 @@
 # ============================================================
 # bOS Layer 3 — Installation Script
 # Installs morning-push LaunchAgent + runs a dry-run test.
-# Usage: zsh .claude/hooks/install-layer3.sh [--dry-run] [--uninstall]
+# Usage: zsh examples/hooks/ntfy/install-layer3.sh [--dry-run] [--uninstall]
 # ============================================================
 
 set -euo pipefail
 
 # ── Paths ────────────────────────────────────────────────────
-BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+BOS_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"  # repo root (script lives in examples/hooks/ntfy/)
 PLIST_SRC="$BOS_DIR/examples/hooks/ntfy/com.bos.morning-push.plist"
 PLIST_NAME="com.bos.morning-push"
 PLIST_DEST="$HOME/Library/LaunchAgents/${PLIST_NAME}.plist"
@@ -120,12 +120,7 @@ if [[ -z "$NTFY_TOPIC" ]]; then
     echo "NTFY_TOPIC=$TOPIC" > "$SECRETS_FILE"
     chmod 600 "$SECRETS_FILE"
     NTFY_TOPIC="$TOPIC"
-    ok "Saved to $SECRETS_FILE"
-    # Also patch the plist with the topic
-    if [[ -f "$PLIST_SRC" ]]; then
-      # Replace the empty NTFY_TOPIC string in plist
-      sed -i '' "s|<key>NTFY_TOPIC</key>.*$|<key>NTFY_TOPIC</key>|" "$PLIST_SRC" 2>/dev/null || true
-    fi
+    ok "Saved to $SECRETS_FILE (the runtime script reads the topic from there)"
   else
     warn "Skipped. The script will look for topic in .secrets/ntfy.env at runtime."
   fi
@@ -137,13 +132,11 @@ fi
 mkdir -p "$LOG_DIR"
 ok "Log directory: $LOG_DIR"
 
-# 7. MCP compound server built
-MCP_INDEX="$BOS_DIR/pcc/bos-compound-mcp/dist/index.js"
-if [[ ! -f "$MCP_INDEX" ]]; then
-  warn "bos-compound MCP not built: $MCP_INDEX"
-  warn "Run: cd $BOS_DIR/pcc/bos-compound-mcp && npm run build"
+# 7. Optional MCP config for the claude -p path
+if [[ -f "$BOS_DIR/.mcp.json" ]]; then
+  ok ".mcp.json found — claude -p will try your notification MCP tool first."
 else
-  ok "bos-compound MCP: $MCP_INDEX"
+  warn "No .mcp.json in $BOS_DIR — the push uses the plain curl fallback (works fine)."
 fi
 
 echo ""
@@ -227,7 +220,7 @@ echo ""
 echo "  Useful commands:"
 echo "    Test now   : launchctl start $PLIST_NAME"
 echo "    Status     : launchctl list | grep bos"
-echo "    Uninstall  : zsh $BOS_DIR/.claude/hooks/install-layer3.sh --uninstall"
+echo "    Uninstall  : zsh $BOS_DIR/examples/hooks/ntfy/install-layer3.sh --uninstall"
 echo "    Logs today : tail -f $LOG_DIR/morning-push-$(date '+%Y%m%d').log"
 echo ""
 echo "  To change time: edit Hour/Minute in $PLIST_DEST"

@@ -27,7 +27,7 @@
 | **Currency** | |
 | **Timezone** | |
 | **Connected MCPs** | |
-| **System mode** | local (auto-upgrades to cloud if database connected) |
+| **System mode** | local |
 | **Permissions mode** | (trusted / strict) |
 | **Proactive mode** | (observer / advisor / assistant / partner) |
 | **Agent taglines** | default (say "customize team" to change) |
@@ -170,8 +170,8 @@
 
 | Type | Name | Details | Cost | Source |
 |------|------|---------|------|--------|
-| Benefit card | | (e.g. Multisport Plus, Medicover Sport, FitProfit, MyBenefit) | (employer-paid / co-paid / self-paid) | (employer / self) |
-| Health plan | | (e.g. Medicover, Luxmed, Enel-Med — package name) | | |
+| Benefit card | | (e.g. gym/sports benefit card from your employer) | (employer-paid / co-paid / self-paid) | (employer / self) |
+| Health plan | | (private healthcare provider — package name) | | |
 | Gym/fitness | | (which gym/club, via benefit card or direct) | | |
 | Streaming | | (Netflix, Spotify, HBO, Disney+, etc.) | | |
 | Productivity | | (Notion, Todoist, Canva Pro, etc.) | | |

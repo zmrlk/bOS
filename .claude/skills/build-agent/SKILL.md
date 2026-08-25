@@ -8,7 +8,7 @@ tier: optional
 
 # Custom Agent Builder
 
-**Adapt to tech_comfort:** "not technical" → "Stwórzmy nowego pomocnika. Powiedz mi jakiego potrzebujesz." Guide through every step. "I code" → show agent YAML structure directly.
+**Adapt to tech_comfort:** "not technical" → "Let's create a new helper. Tell me what kind you need." Guide through every step. "I code" → show agent YAML structure directly.
 
 ## Protocol
 
@@ -90,9 +90,9 @@ After saving new agent file to .claude/agents/[name].md:
 3. Add new row: `| @[name] | [emoji] | [Name] | [domain description] |`
 4. Find the natural language routing table
 5. Add entry: `| "[trigger phrases]" | route to @[name] |`
-6. Confirm: "✅ @[name] dodany do systemu. Możesz go wywołać przez @[name] lub [natural language triggers]."
+6. Confirm: "✅ @[name] added to the system. Call them with @[name] or [natural language triggers]."
 
-If CLAUDE.md edit fails → inform user: "Agent stworzony ale musisz ręcznie dodać go do routingu w CLAUDE.md."
+If CLAUDE.md edit fails → inform user: "Agent created, but you need to add it to the routing in CLAUDE.md manually."
 
 ```
 "✅ @[name] is live! Try talking to them:

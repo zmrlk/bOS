@@ -1,7 +1,7 @@
 # Agent Telemetry
 
 <!-- Summary (auto-updated by @boss at session end) -->
-Sessions: 6 | Since: (setup date)
+Sessions: 0 | Since: (setup date)
 Top agents: (no data yet)
 Avg satisfaction: (no data yet)
 Routing accuracy: (no data yet)

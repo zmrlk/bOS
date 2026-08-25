@@ -41,7 +41,6 @@ Daily activity tracked in local markdown files:
 | `state/context-bus.jsonl` | Cross-agent context signals (append via helper only) |
 | `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
 | `state/time-log.md` | Time tracking entries — project, duration, description |
-| `state/inbox.md` | Messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) — sender, subject, status |
 | `state/schedules.md` | Only if you copy `examples/skills/schedule/` — not Lite |
 | `state/marketplace.md` | Not used by Lite (no skill registry) |
 | `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
@@ -79,7 +78,7 @@ When you run `/evolve` **and you consent to a file-name scan**, bOS may look for
 
 ### What it looks for
 - **Email patterns** (if Gmail/email connected): Searches for emails from known subscription providers by sender domain. It does NOT read email content — only checks if emails from specific senders exist.
-- **Specific domains searched:** Benefit providers (benefitsystems.pl, medicover.pl, lux-med.pl, etc.), streaming services (netflix.com, spotify.com), AI tools (anthropic.com, openai.com), productivity tools (notion.so, figma.com).
+- **Specific domains searched:** common subscription senders — streaming services (netflix.com, spotify.com), AI tools (anthropic.com, openai.com), productivity tools (notion.so, figma.com), plus gym/health-benefit providers typical for your region.
 - **App presence:** Checks installed applications (names only) to infer likely subscriptions.
 - **Calendar patterns:** Recurring events at gyms, clinics, or studios may indicate memberships.
 
@@ -134,14 +133,11 @@ Lite has **no** `/export` skill. Copy `profile.md` and `state/*.md` yourself (or
 
 ## Deleting your data
 
-To wipe everything, delete `profile.md`, `state/*.md`, and `.secrets/` yourself (ask the agent to list paths first):
-- Deletes `profile.md`
-- Resets state files to blank templates
-- Clears `.secrets/` if present
-- Does NOT delete agent memory automatically (that's in `~/.claude/projects/<project>/memory/` — you can delete that folder yourself)
-- Does NOT delete Supabase data automatically — you can drop tables from the Supabase dashboard
-
-bOS will ask you to confirm before doing anything.
+There is no delete skill — you delete files yourself (ask the agent to list the paths first):
+- Delete `profile.md` and reset `state/*.md` to blank templates
+- Delete `.secrets/` if present
+- Agent memory is separate: `~/.claude/projects/<project>/memory/` — delete that folder yourself if you want it gone
+- Optional cloud data (if you set up the Supabase examples) is separate — drop the tables from your Supabase dashboard
 
 ---
 
@@ -229,7 +225,7 @@ Your phone → Telegram servers → n8n (your account) → Supabase (your databa
 ### How to disconnect
 1. Delete the Telegram bot via @BotFather (`/deletebot`)
 2. Deactivate n8n workflows
-3. In bOS, say "disconnect mobile" — updates your profile
+3. Remove any Telegram-related notes you added to `profile.md` yourself
 
 Your Supabase data and local bOS data remain intact after disconnecting Telegram.
 
@@ -262,13 +258,13 @@ If you enable push notifications, bOS uses [ntfy.sh](https://ntfy.sh) to send al
 
 ## Ambient data capture
 
-bOS passively captures data mentioned in natural conversation — for example, if you say "wydałem 50 zł na lunch," bOS logs that expense without you running `/expense`. Similarly, energy levels, task completions, sleep quality, and exercise are captured when mentioned.
+bOS passively captures data mentioned in natural conversation — for example, if you say "wydałem 50 zł na lunch" ("I spent 50 zł on lunch" — capture works in your language), bOS logs that expense without you running `/expense`. Similarly, energy levels, task completions, sleep quality, and exercise are captured when mentioned.
 
 **What gets captured:** Only structured data points — amounts, energy scores (1-10), task status changes, sleep hours. General conversation text is NOT stored.
 
 **Where it goes:** The same state files as explicit skill commands — `state/finances.md`, `state/daily-log.md`, `state/tasks.md`. No new storage locations.
 
-**How you know:** bOS confirms each capture at the end of its response — e.g., "Zapisałem: lunch 50 zł." You can correct or undo immediately.
+**How you know:** bOS confirms each capture at the end of its response — e.g., "⏳ Logged: lunch 50 zł." You can correct or undo immediately.
 
 **What it does NOT do:**
 - Does NOT capture vague statements — only clear data points with numbers

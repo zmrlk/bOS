@@ -1,5 +1,6 @@
 # bOS — Supabase Setup Guide (Pro Mode)
 
+> "Pro mode" simply means: this optional Supabase-backed setup. bOS Lite works entirely from local files and never writes to the cloud; anywhere the docs say "if Pro mode", it means "only if you completed this guide yourself".
 > This guide walks you through setting up Supabase for persistent memory and advanced tracking.
 > Time: ~15 minutes. You need: a free Supabase account.
 
@@ -25,7 +26,7 @@
 
 1. In your Supabase dashboard, go to **SQL Editor** (left sidebar)
 2. Click **New Query**
-3. Copy the ENTIRE contents of `supabase/schema-core.sql` and paste it
+3. Copy the ENTIRE contents of `examples/supabase/schema-core.sql` and paste it
 4. Click **Run** (or Ctrl+Enter)
 5. You should see "Success. No rows returned" — this is correct
 
@@ -40,7 +41,7 @@ For each active pack, create a **New Query** and run the corresponding schema:
 | Learning | `schema-learning.sql` | reading_log, study_sessions |
 | Life | *(no extra tables — uses core tables)* | — |
 
-### v0.6.1 Feature Schemas (recommended — run all)
+### Feature Schemas (recommended — run all)
 
 | Feature | File | Tables added |
 |---------|------|-------------|
@@ -50,17 +51,21 @@ For each active pack, create a **New Query** and run the corresponding schema:
 
 **Don't know which packs you'll use?** Run all of them. Empty tables cost nothing.
 
+### Required last: security schema (RLS)
+
+After ALL other schemas, create a **New Query** and run the ENTIRE contents of `examples/supabase/schema-security.sql`. It enables Row Level Security policies on every table. **Do not skip this step** — without it your tables are wide open to anyone with your anon key.
+
 ## Step 5: Create Views
 
 1. Still in SQL Editor, create a **New Query**
-2. Copy the ENTIRE contents of `supabase/views.sql` and paste it
+2. Copy the ENTIRE contents of `examples/supabase/views.sql` and paste it
 3. Click **Run**
 4. Verify by going to **Database** → **Views** — you should see 4 views
 
 ## Step 6: Seed Initial Data
 
 1. New Query in SQL Editor
-2. Copy the ENTIRE contents of `supabase/seed-data.sql` and paste it
+2. Copy the ENTIRE contents of `examples/supabase/seed-data.sql` and paste it
 3. Click **Run**
 4. Verify: Go to **Table Editor** → **memory** — you should see seed rows
 
@@ -132,9 +137,9 @@ schema-business.sql   → finances, leads, projects, contacts, communications,
                         subscriptions, invoices, time_entries, content_calendar
 schema-health.sql     → workouts, meals
 schema-learning.sql   → reading_log, study_sessions
-schema-inbox.sql      → messages (v0.6.1)
-schema-schedules.sql  → schedules (v0.6.1)
-schema-sync.sql       → sync_log, sync_state (v0.6.1)
+schema-inbox.sql      → messages
+schema-schedules.sql  → schedules
+schema-sync.sql       → sync_log, sync_state
 schema-security.sql   → RLS policies for ALL tables (run last)
 views.sql             → v_monthly_summary, v_pipeline_summary,
                         v_weekly_completion, v_project_hours

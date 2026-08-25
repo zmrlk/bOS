@@ -1,9 +1,4 @@
----
-name: Evening
-description: "On-request evening shutdown — log energy if missing, one win, tomorrow's #1. Use when the user says /evening, end of day, or zamykam dzień. Never auto-nudge."
-user_invocable: true
-command: /evening
----
+<!-- Loaded by evening/SKILL.md — reference detail, not a skill. -->
 
 # /evening — on request, max 3 questions
 

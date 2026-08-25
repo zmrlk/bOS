@@ -15,10 +15,10 @@ SNAPSHOT="$BACKUP_DIR/pre-compact-$TIMESTAMP.md"
   echo "# Pre-Compact Snapshot — $TIMESTAMP"
   echo ""
   echo "## Pending Context-Bus Entries (critical first)"
-  if [ -f "$BOS_DIR/state/context-bus.md" ]; then
-    grep -B1 -A4 'Priority: critical' "$BOS_DIR/state/context-bus.md" 2>/dev/null | head -30
+  if [ -f "$BOS_DIR/state/context-bus.jsonl" ]; then
+    grep '"priority":"critical"' "$BOS_DIR/state/context-bus.jsonl" 2>/dev/null | tail -5
     echo "---"
-    grep -A3 'Status: pending' "$BOS_DIR/state/context-bus.md" 2>/dev/null | head -20
+    tail -10 "$BOS_DIR/state/context-bus.jsonl" 2>/dev/null
   fi
   echo ""
   echo "## Active Goals"
@@ -48,7 +48,7 @@ SNAPSHOT="$BACKUP_DIR/pre-compact-$TIMESTAMP.md"
 } > "$SNAPSHOT" 2>/dev/null
 
 # Rotate: keep only last 5 snapshots
-ls -t "$BACKUP_DIR"/pre-compact-*.md 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null
+ls -t "$BACKUP_DIR"/pre-compact-*.md 2>/dev/null | tail -n +6 | while IFS= read -r f; do rm -f "$f"; done
 
 # Validate daily-log Summary against raw data
 CURRENT_YEAR=$(date +%Y)

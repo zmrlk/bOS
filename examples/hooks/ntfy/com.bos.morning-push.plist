@@ -58,8 +58,8 @@
     <string></string>
     <key>NTFY_BASE_URL</key>
     <string>https://ntfy.sh</string>
-    <!-- Weekend push: set to 1 to push on Sat/Sun too         -->
-    <key>MORNING_PUSH_WEEKENDS</key>
+    <!-- Weekends push by default; set to 1 to SKIP Sat/Sun    -->
+    <key>MORNING_PUSH_SKIP_WEEKENDS</key>
     <string>0</string>
   </dict>
 

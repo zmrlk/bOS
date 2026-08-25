@@ -8,7 +8,7 @@ BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 echo "## bOS start"
 echo "Date: $(date '+%Y-%m-%d %H:%M %Z (%A)')"
-echo "Kanon: AGENTS.md. Locators: state/tasks.md | state/finances.md | state/handoff.md | state/ping.md | state/rules.md | state/context-bus.jsonl"
+echo "Contract: AGENTS.md. Locators: state/tasks.md | state/finances.md | state/handoff.md | state/ping.md | state/rules.md | state/context-bus.jsonl"
 echo ""
 
 WORKING_FILE="$BOS_DIR/state/.working.md"
@@ -41,6 +41,28 @@ if [ -f "$BOS_DIR/state/handoff.md" ]; then
   echo "### Handoff"
   head -20 "$BOS_DIR/state/handoff.md"
   echo ""
+fi
+
+# Overdue reminders (written by /remind; ntfy-less fallback surfaces here)
+if [ -f "$BOS_DIR/state/reminders.md" ]; then
+  TODAY_DATE=$(date '+%Y-%m-%d')
+  NOW_HM=$(date '+%H:%M')
+  OVERDUE=$(grep -E '^\| [0-9]{4}-[0-9]{2}-[0-9]{2}' "$BOS_DIR/state/reminders.md" 2>/dev/null \
+    | grep -v 'done' \
+    | while IFS= read -r line; do
+        # column 2 = "{YYYY-MM-DD HH:MM}" per remind/SKILL.md
+        R_DT=$(printf '%s' "$line" | awk -F'|' '{sub(/^ +/,"",$2); sub(/ +$/,"",$2); print $2}')
+        R_DATE=$(printf '%s' "$R_DT" | cut -c1-10)
+        R_TIME=$(printf '%s' "$R_DT" | cut -c12-16)
+        if [ "$R_DATE" \< "$TODAY_DATE" ] || { [ "$R_DATE" = "$TODAY_DATE" ] && [ -n "$R_TIME" ] && [ "$R_TIME" \< "$NOW_HM" ]; }; then
+          echo "$line"
+        fi
+      done | head -5)
+  if [ -n "$OVERDUE" ]; then
+    echo "### Overdue reminders"
+    echo "$OVERDUE"
+    echo ""
+  fi
 fi
 
 # Critical bus: read-filter by TTL. Do not rewrite jsonl.

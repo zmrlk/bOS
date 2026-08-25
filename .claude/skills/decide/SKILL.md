@@ -26,17 +26,17 @@ Issue ALL reads in one batch:
 ### Step 2: Capture topic
 
 If user specified in args (e.g., `/decide should I take this freelance project?`) → use that.
-If no args → ask: "Jaka decyzja Cię czeka?"
+If no args → ask: "What decision are you facing?"
 
 ### Step 3: Decision type
 
 Use `AskUserQuestion`:
-- header: "Typ decyzji"
+- header: "Decision type"
 - options:
-  - "💼 Biznesowa" (description: "Projekt, klient, inwestycja, pivot")
-  - "🌍 Życiowa" (description: "Przeprowadzka, relacja, zmiana stylu życia")
-  - "💰 Finansowa" (description: "Zakup, wydatek, oszczędności")
-  - "🎓 Karierowa" (description: "Zmiana pracy, nowe umiejętności, ścieżka")
+  - "💼 Business" (description: "Project, client, investment, pivot")
+  - "🌍 Life" (description: "Relocation, relationship, lifestyle change")
+  - "💰 Financial" (description: "Purchase, expense, savings")
+  - "🎓 Career" (description: "Job change, new skills, path")
 
 ### Step 4: Structured analysis
 
@@ -44,7 +44,7 @@ Gather information through conversation or structured questions:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📋  ANALIZA — [topic]
+  📋  ANALYSIS — [topic]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   ✅ PROS:
@@ -63,7 +63,7 @@ Gather information through conversation or structured questions:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-For Business type → also run @boss's 5-dimension scoring (time-to-cash, rate, repeatability, reputation, feasibility, each 1-3, total /15).
+For Business type → also score 5 dimensions (time-to-cash, rate, repeatability, reputation, feasibility — each 1-3, total /15). The scale drives the verdict thresholds below.
 For Financial type → check buffer status, apply loss framing if relevant.
 
 ### Step 4b: Premortem (mandatory, 5 lines)
@@ -75,7 +75,7 @@ Assume the choice shipped and failed in 6 months. List: what broke, who got hurt
 @boss delivers verdict:
 
 ```
-  👔 @CEO — VERDICT
+  👔 @boss — VERDICT
 
   [GO / NO-GO / WAIT / CONDITIONAL]
 
@@ -114,11 +114,11 @@ pending_reviews:
 ### Step 7: Close
 
 Use `AskUserQuestion`:
-- header: "Co dalej?"
+- header: "What next?"
 - options:
-  - "✅ Działam zgodnie z decyzją" (description: "Zamknij i przejdź do akcji")
-  - "🤔 Chcę porozmawiać z zespołem" (description: "Structured Debate — więcej perspektyw")
-  - "📋 Pokaż poprzednie decyzje" (description: "Lista decyzji z decisions.md")
+  - "✅ Act on the decision" (description: "Close and move to action")
+  - "🤔 I want to talk it over with the team" (description: "Structured Debate — more perspectives")
+  - "📋 Show past decisions" (description: "List of decisions from decisions.md")
 
 ## Context-Bus Signals
 

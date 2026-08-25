@@ -27,7 +27,7 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "model", "value": "claude-sonnet-4-6" },
+            { "name": "model", "value": "claude-sonnet-5" },
             { "name": "max_tokens", "value": "2048" },
             { "name": "system", "value": "REPLACE_SYSTEM_PROMPT" },
             { "name": "messages", "value": "[{\"role\":\"user\",\"content\":\"REPLACE_SKILL_COMMAND\"}]" }
@@ -74,10 +74,10 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "timezone": "Europe/Warsaw"
+    "timezone": "UTC"
   },
   "_meta": {
-    "description": "bOS v0.6.1 — Template for custom scheduled skills. Replace: CRON_EXPRESSION, SYSTEM_PROMPT, SKILL_COMMAND, CHAT_ID.",
+    "description": "bOS — Template for custom scheduled skills. Replace: CRON_EXPRESSION, SYSTEM_PROMPT, SKILL_COMMAND, CHAT_ID.",
     "placeholders": {
       "REPLACE_CRON_EXPRESSION": "Standard cron (e.g., '0 12 * * *' = noon daily, '0 9 * * 1-5' = weekdays 9am)",
       "REPLACE_SYSTEM_PROMPT": "System prompt for the skill context",

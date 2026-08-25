@@ -2,7 +2,7 @@
 # bOS Tool Memory Logger (PostToolUse hook)
 # Inspired by ReMe's Tool Memory — tracks MCP tool usage for learning.
 # Logs: tool name, timestamp, success/failure to state/tool-log.md
-# Goal: Build data on which tools work, fail, are slow — inform Smart Model Router + agent decisions.
+# Goal: build data on which tools work, fail, are slow — informs agent decisions.
 
 # Hook profiling: BOS_HOOK_PROFILE=minimal|standard|strict (default: standard)
 # minimal = skip this hook entirely (saves ~50ms per tool call)
@@ -10,6 +10,7 @@
 
 BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 TOOL_LOG="$BOS_DIR/state/tool-log.md"
+TOOL_LOG_JSONL="$BOS_DIR/state/tool-log.jsonl"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
 TODAY=$(date '+%Y-%m-%d')
 

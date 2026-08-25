@@ -8,7 +8,9 @@ allowed-tools: Read, Write, Edit, Bash
 
 # /vault — Secrets Manager
 
-**Adapt to tech_comfort:** "not technical" → "Sejf na hasła i klucze. Bezpieczne, na Twoim komputerze." "I use apps" → explain what API keys are. "I code" → show paths and permissions.
+> **Example — NOT installed.** bOS Lite ships without `/vault` (managing secrets through chat is a risk surface; the default is editing `.secrets/` in your own editor). If you accept that trade-off, copy this folder to `.claude/skills/vault/`. As an example it is exempt from the Lite 8 KB SKILL.md limit and has no `tier:`.
+
+**Adapt to tech_comfort:** "not technical" → "A safe for passwords and keys. Secure, on your own computer." "I use apps" → explain what API keys are. "I code" → show paths and permissions.
 
 Vault stores API keys, tokens, and credentials locally in `.secrets/vault.json` with chmod 600 permissions.
 It NEVER prints secret values in responses unless the user explicitly types "show full".
@@ -271,13 +273,13 @@ If cancelled:
 
 After creating or modifying .secrets/ files:
 1. Verify permissions: `ls -la .secrets/` — should show `-rw-------` (600)
-2. If permissions are wrong → fix: note to user "Uprawnienia pliku naprawione na 600 (tylko Ty masz dostęp)"
+2. If permissions are wrong → fix: note to user "File permissions fixed to 600 (only you have access)"
 3. On every /vault read → re-check permissions. If changed → warn and fix.
 4. .secrets/ directory should be 700 (drwx------). Verify on each access.
 
 **Supabase guard:** Before ANY write operation, check target path.
 If target contains "supabase" or is a remote operation → BLOCK and warn:
-"⚠️ Vault jest tylko lokalny. Sekrety NIGDY nie trafiają do chmury."
+"⚠️ The vault is local only. Secrets NEVER go to the cloud."
 
 ---
 
