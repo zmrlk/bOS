@@ -57,10 +57,9 @@ if echo "$FILE_PATH" | grep -q 'state/\.backup/'; then
   exit 2
 fi
 
-# Block overwriting .claude/settings.json (use update-config skill instead)
-# Exception: allow when /update-config skill is active (detected by update-config in conversation)
+# Block overwriting .claude/settings.json from inside a session (no exceptions)
 if echo "$FILE_PATH" | grep -q '\.claude/settings\.json$'; then
-  echo "BLOCKED: Use /update-config skill to modify settings.json safely."
+  echo "BLOCKED: settings.json is not editable from a session. Edit it in your own editor."
   exit 2
 fi
 

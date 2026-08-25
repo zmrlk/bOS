@@ -27,7 +27,7 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "model", "value": "claude-sonnet-4-6" },
+            { "name": "model", "value": "claude-sonnet-5" },
             { "name": "max_tokens", "value": "2048" },
             { "name": "system", "value": "You are bOS standup coordinator. Generate a Monday team standup. Each active agent reports their status in 2-3 sentences. End with week's top 3 priorities. Keep it under 400 words." },
             { "name": "messages", "value": "[{\"role\":\"user\",\"content\":\"/standup\"}]" }
@@ -44,7 +44,7 @@
     {
       "parameters": {
         "operation": "sendMessage",
-        "chatId": "REPLACE_ME",
+        "chatId": "REPLACE_CHAT_ID",
         "text": "={{ $json.content[0].text }}"
       },
       "id": "send-telegram",
@@ -74,10 +74,10 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "timezone": "Europe/Warsaw"
+    "timezone": "UTC"
   },
   "_meta": {
-    "description": "bOS v0.6.1 — Sends Monday standup at 9:00 via Telegram.",
+    "description": "bOS — Sends Monday standup at 9:00 via Telegram.",
     "setup_steps": [
       "1. Set ANTHROPIC_API_KEY in n8n environment variables",
       "2. Add Telegram Bot credentials",

@@ -1,10 +1,4 @@
-<!-- Loaded by /morning SKILL.md. Ignore any leftover personal sender lists; use profile.md noise senders. -->
----
-name: Morning
-description: "Daily morning briefing — priorities, energy check, quick win. Run at the start of each day."
-user_invocable: true
-command: /morning
----
+<!-- Loaded by morning/SKILL.md — reference detail, not a skill. Newsletter/noise senders come from profile.md if set. -->
 
 # Morning Briefing
 
@@ -66,7 +60,7 @@ Fallback: skip silently if MCP unavailable.
 ToolSearch("select:mcp__claude_ai_Gmail__gmail_search_messages,mcp__claude_ai_Microsoft_365__outlook_email_search")
 ```
 Run 3 parallel email searches:
-1. **Gmail newsletters:** `from:(rundown OR bensbites OR dharmesh OR mrugalski OR taaft) newer_than:1d`
+1. **Gmail newsletters:** `from:(<your newsletter senders from profile.md>) newer_than:1d` — skip if none set
 2. **Gmail important:** `is:unread newer_than:1d -category:promotions -category:social -label:9-newsletter -label:10-marketing`
 3. **Outlook important:** `afterDateTime: yesterday, limit: 15`
 
@@ -111,7 +105,7 @@ Topics to search: AI/agents, Claude/Anthropic, SaaS/startup, Polish tech.
 Before calling any MCP tool, use `ToolSearch` to verify the tool schema is available.
 If ToolSearch returns no match → skip that data source. Never error on unavailable tools.
 
-**Rule: NEVER show "brak danych do pokazania". Either show real data or skip the section entirely.**
+**Rule: NEVER show "no data to display". Either show real data or skip the section entirely.**
 
 ## Step 1A: Proactive Checks (after data loading, before pattern insight)
 
@@ -122,7 +116,7 @@ If any decision has `review_date` ≤ today → nudge:
 ```
 Offer: AskUserQuestion "Review now" / "Remind me tomorrow" / "Decision still stands"
 
-**Goal Alarm** (PROP-001 — evolution 2026-03-21):
+**Goal Alarm:**
 Read `state/goals.md` Active Goals + Milestones. If any milestone has target_date < today AND status != done:
 ```
 🚨 OVERDUE MILESTONE: "[milestone]" (goal: [goal name])
@@ -139,15 +133,8 @@ AskUserQuestion: "Work on this today" / "Update status" / "Deprioritize goal"
 **Network nudge** (from @coach — inner circle overdue):
 If network.md has inner circle contacts with follow-up date 7+ days past → nudge (max 1):
 ```
-👥 Dawno nie rozmawiałeś z [Name]. Napisz dziś?
+👥 You haven't talked to [Name] in a while. Reach out today?
 ```
-
-**Crash prediction** (requires 60+ days daily-log data, from @boss Predictive Nudges):
-If @boss detects crash probability based on sprint length vs avg crash pattern:
-```
-⚡ Heads up: your pattern suggests lower energy today. Lighter plan.
-```
-→ Auto-reduce task suggestions to match predicted energy.
 
 **Reminders** (from `state/reminders.md`, written by /remind):
 If any reminder is due today or tomorrow:
@@ -156,52 +143,11 @@ If any reminder is due today or tomorrow:
 ```
 Max 2. If more → "...and [N] more. Say /remind list."
 
-## Step 1B: Pattern Insight OR Serendipity Insight (pick ONE — never both)
+## Step 1B: Pattern Insight (optional)
 
-**After Step 1 data loading, check native auto-memory for patterns AND cross-domain correlations.**
+If `state/daily-log.md` holds enough history (14+ entries), you may surface ONE insight computed directly from the data — e.g. "Heads up: [day_of_week] is usually your low-energy day (avg [X]/10)", "Yesterday you trained → your data shows +[X] energy the next day", or "Low energy for [X] days straight — minimum viable day: 1 task + water + rest."
 
-**Priority:** Serendipity Insight > Pattern Insight (cross-domain is rarer and more valuable). Show exactly 1, never both.
-
-### Option A: Serendipity Insight (cross-domain correlation)
-
-Check native auto-memory for `serendipity.correlations` (computed during /evolve). If a correlation exists with strength moderate+ AND is relevant to today's context → show it:
-
-**Cross-domain correlations to surface:**
-
-| Domain A | Domain B | Insight template |
-|----------|----------|-----------------|
-| Exercise | Energy | "Kiedy trenujesz, następny dzień masz średnio +[X] energii. [Wczoraj trenowałeś → dziś powinno być dobrze / Dawno nie trenowałeś → rozważ]" |
-| Sleep | Task completion | "Dni po dobrym śnie: [X]% tasków done. Po złym: [Y]%. Sen = Twój mnożnik produktywności." |
-| Spending | Energy | "Twoje dane sugerują: w dni niskiej energii wydajesz więcej. Nie oceniam — flaguję pattern." |
-| Workout streak | Other habits | "Kiedy regularnie trenujesz, inne nawyki trzymają się lepiej. Trening kotwiczny." |
-| Planning | Completion | "Tygodnie z /task mają [X]% wyższy completion. Planowanie jest boostem." |
-
-**Rules:**
-- Minimum 14 data points across BOTH domains
-- Hedging language: "Twoje dane sugerują...", "Wygląda na pattern..."
-- Max 1 serendipity insight per session
-- Only actionable insights — skip if no clear "try this"
-- Never moralize — state correlation, user decides
-- Track in native auto-memory: `last_serendipity_surfaced: [date]`, don't repeat same correlation within 7 days
-
-### Option B: Pattern Insight (single-domain, fallback if no serendipity)
-
-If no serendipity insight is relevant today → fall back to pattern insight:
-
-**Energy-based insights (pick the most relevant ONE):**
-- Low-energy day pattern: "Heads up: [day_of_week] is usually your low-energy day (avg [X]/10). I've scheduled lighter tasks."
-- Post-rest day: "Yesterday was a rest day. Your data shows energy drops after rest days — consider a short walk to kickstart."
-- Bad sleep detected: "Bad sleep recently → your energy averages [X] lower after poor sleep. Lighter plan today."
-- Exercise boost: "Yesterday you trained → your data shows +[X] energy boost the next day. Let's use that!"
-- Energy crash (2+ days low): "Low energy for [X] days straight. This is a pattern, not a failure. Minimum viable day: 1 task + water + rest."
-
-### Rules (both options):
-- Max 1 insight per /morning (serendipity OR pattern, never both)
-- Only show when confidence is medium+ (14+ data points)
-- Never show on first 7 days (not enough data)
-- Hedging language for medium confidence, confident for high
-- If no pattern or serendipity matches today → skip this step silently
-- Serendipity and Variable Rewards are mutually exclusive per session (boss.md rule)
+Rules: max 1 insight per /morning; only from numbers actually present in the files (never fabricate averages); hedging language ("your data suggests…"); skip silently in the first 2 weeks or when nothing fits today.
 
 ## Step 2: Briefing (personalized to energy level)
 
@@ -209,9 +155,9 @@ If no serendipity insight is relevant today → fall back to pattern insight:
 
 Read `profile.md` → `work_style`. This shapes how tasks are presented in the briefing:
 
-- **Sprinter** → Ask first: "Sprint day czy rest day?" via `AskUserQuestion` (header: "Tryb dnia", options: "🏃 Sprint — pełna moc" / "🛋️ Rest — minimum viable"). Sprint → show 3-5 tasks in sprint blocks. Rest → show 1 micro-task only + "Reszta poczeka."
-- **Scattered** → Show exactly 1 priority: "Dziś jedno: [top task]." Hide everything else. After completing → reveal next. Never show a full task list.
-- **Procrastinator** → Show deadlines with countdowns: "⏰ [task] — deadline za [X]h" for each task. Add: "Pierwszy krok: [smallest sub-task]. Zrób to w najbliższe 15 min."
+- **Sprinter** → Ask first: "Sprint day or rest day?" via `AskUserQuestion` (header: "Day mode", options: "🏃 Sprint — full power" / "🛋️ Rest — minimum viable"). Sprint → show 3-5 tasks in sprint blocks. Rest → show 1 micro-task only + "The rest can wait."
+- **Scattered** → Show exactly 1 priority: "Today, one thing: [top task]." Hide everything else. After completing → reveal next. Never show a full task list.
+- **Procrastinator** → Show deadlines with countdowns: "⏰ [task] — deadline in [X]h" for each task. Add: "First step: [smallest sub-task]. Do it in the next 15 min."
 - **Steady** → Standard plan, consistent structure. Match what's been working.
 
 If `work_style` is empty → skip this step (standard plan).
@@ -220,8 +166,8 @@ If `work_style` is empty → skip this step (standard plan).
 - Open business tasks
 - Any follow-ups due? (check pipeline.md → follow-up dates per @cmo Day 0/3/7/14 framework)
 - Any deadlines within 3 days?
-- **Invoices:** Check state/invoices.md for overdue or due-today invoices → "⚠️ Faktura [#] [klient] — płatna dziś/zaległa [X dni]"
-- **Active timer:** Check state/time-log.md Summary for active timer → if running → "⏱️ Timer dla [projekt] działa od [czas]. Kontynuujesz czy zatrzymać?"
+- **Invoices:** Check state/invoices.md for overdue or due-today invoices → "⚠️ Invoice [#] [client] — due today/overdue [X days]"
+- **Active timer:** Check state/time-log.md Summary for active timer → if running → "⏱️ Timer for [project] running since [time]. Keep going or stop?"
 
 ### If Life pack active:
 - Today's #1 priority (matched to energy level)
@@ -248,47 +194,45 @@ Assemble the briefing from the data collected. **Only include sections that have
 [mode_icon] [MODE] | [HH:MM] | ⚡ [energy] | 🌤️ [temp]°C [weather_emoji]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-☀️ Dzień dobry, [name]!
+☀️ Good morning, [name]!
 
-[Pattern insight — jeśli jest, 1 linia]
-
-[🧠 bOS INSIGHTS — jeśli Pro mode i insights istnieją]
+[Pattern insight — if present, 1 line]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🗓️ DZIŚ — [dzień tygodnia, data]
+🗓️ TODAY — [day of week, date]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[czas] [event name] [ew. lokalizacja lub link]
-[czas] [event name]
+[time] [event name] [location or link, if any]
+[time] [event name]
 ...
-🌅 Jutro: [1-2 najważniejsze eventy z jutra lub "brak eventów"]
+🌅 Tomorrow: [1-2 most important events tomorrow, or "no events"]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 MAILE — ostatnie 24h
+📧 EMAIL — last 24h
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✉️ [Nadawca] — [temat] → [1 zdanie co to jest + czy wymaga odpowiedzi]
-✉️ [Nadawca] — [temat] → [...]
-[lub: 📧 Skrzynka czysta.]
+✉️ [Sender] — [subject] → [1 sentence: what it is + does it need a reply]
+✉️ [Sender] — [subject] → [...]
+[or: 📧 Inbox clear.]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📰 NEWSY — AI / Tech / Biznes
+📰 NEWS — AI / Tech / Business
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤖 [Źródło]: [1-2 zdania kluczowego insightu]
-📧 [Źródło]: [1-2 zdania]
-[max 5 pozycji — z newsletterów + RSS łącznie]
+🤖 [Source]: [1-2 sentences of the key insight]
+📧 [Source]: [1-2 sentences]
+[max 5 items — newsletters + RSS combined]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ PLAN DNIA
+✅ TODAY'S PLAN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [pack-specific briefing items]
 
-⏭️ Quick win: [1 małe działanie do zrobienia TERAZ]
+⏭️ Quick win: [1 small action to do NOW]
 ```
 
 ### Section rules:
 - **Weather** → in header bar (temperature + emoji). If unavailable → omit from header.
-- **Calendar** → show if events exist. Flag back-to-back meetings: "⚠️ 3 spotkania pod rząd". Tomorrow preview: max 2 events.
-- **Emails** → max 5, prioritized: action-required > unread > FYI. If email requires reply → `⚡ odpowiedź wymagana`. If 0 → "Skrzynka czysta."
-- **News** → merge newsletters (Gmail) + RSS into one "NEWSY" section. Deduplicate by topic. Max 2 sentences per item. Max 5 items total. If both sources have same story → pick the better summary. If 0 → skip section.
+- **Calendar** → show if events exist. Flag back-to-back meetings: "⚠️ 3 meetings back-to-back". Tomorrow preview: max 2 events.
+- **Emails** → max 5, prioritized: action-required > unread > FYI. If email requires reply → `⚡ reply required`. If 0 → "Inbox clear."
+- **News** → merge newsletters (Gmail) + RSS into one "NEWS" section. Deduplicate by topic. Max 2 sentences per item. Max 5 items total. If both sources have same story → pick the better summary. If 0 → skip section.
 - **Plan** → energy-matched tasks. Quick win always last.
 
 ## Low Battery Day (energy 1-3)
@@ -315,46 +259,7 @@ On next day: "Yesterday was a Low Battery Day. That's by design. Today: [normal 
 
 ## First Morning (day after setup)
 
-If this is the user's first /morning (check: no entries in state/weekly-log.md or `first_morning_shown` = false/missing in native auto-memory):
-
-**Reference seeded data from /setup.** Read state/tasks.md, state/goals.md, state/habits.md to show what's already there.
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ☀️  FIRST MORNING, [name]!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  You already have:
-  ✅ [X] tasks ready to go
-  ✅ 1 goal set: [primary_goal short]
-  ✅ [Y] habits to track
-  [✅ Budget framework — if finances seeded]
-
-  Today's focus:
-  → [First seeded task by name]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🗓️  YOUR FIRST WEEK WITH bOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Day 1 (today): Do your first task:
-                  "[seeded task #1 title]"
-  Day 2-3: Try /evening before bed
-  Day 4: Talk to @[relevant agent]
-         about [primary_goal]
-  Day 5: Run /task
-  Day 7: Run /evolve
-
-  Each step takes 5 min. After a week,
-  your agents know you well enough to
-  be genuinely useful.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-Then continue with the normal morning briefing using seeded data. Set `first_morning_shown: true` in native auto-memory so this only shows once.
-
-**First Morning motivational hook:**
-"You're not starting from zero — your system is already working for you. [X] tasks, 1 goal, [Y] profile fields filled. Let's make Day 1 count."
+If this is the user's first /morning (no entries in `state/daily-log.md` yet): open warmer — show what /setup already seeded (tasks, goal, habits, from the files), pick the first seeded task as today's focus, and mention that /evening exists for closing the day. No multi-day curriculum, no lecture. Then run the normal briefing.
 
 ## Session Ending (Peak-End Rule)
 Always close /morning with a confidence statement based on DATA:
@@ -416,7 +321,7 @@ For EVERY external data source, follow this chain:
 2. **Native MCP** (Gmail, Google Calendar) → fallback if bos-compound unavailable
 3. **Skip silently** → if no tool available, omit the section entirely
 
-Never display: "brak danych", "MCP unavailable", "nie połączono". If you can't get data → the section doesn't exist.
+Never display: "no data", "MCP unavailable", "not connected". If you can't get data → the section doesn't exist.
 
 ## MCP Usage Across bOS (Global Pattern)
 
@@ -438,4 +343,3 @@ This pattern applies to ALL skills, not just /morning:
 - If you have native auto-memory data about the user's patterns, use it
 - If user has low energy pattern at this time → lighter suggestions
 - End with confidence, not a question
-- **Model: sonnet** — morning needs tool orchestration + synthesis, haiku can't handle parallel MCP coordination well

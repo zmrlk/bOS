@@ -1,48 +1,50 @@
 # bOS — a folder OS
 
-A folder of markdown, skills, and hooks. Open it in **Claude Code**, **Codex**, or **Grok**. Same files on all three.
+A personal operating system that is just a folder: markdown files, skills, and hooks. Open it in **Claude Code**, **Codex**, or **Grok** — same files, same behavior on all three.
 
-> **v0.12.1** — honesty freeze from 0.12, plus jsonl bus + one helper, and roster `tier: core|optional`.
->
-> Clone: `git clone https://github.com/zmrlk/bOS.git`
+Your tasks, finances, habits, goals, and decisions live in plain-text state files. The model reads them, updates them, and talks to you like an operator — no server, no database, no daemon.
 
-This is **not** a 24/7 daemon, not a kernel, not Karol's private ICC fleet, and not VARD.
+> **v0.12.1** — `git clone https://github.com/zmrlk/bOS.git`
 
-## Honest picture (count from disk)
+## What it is (and what it is not)
 
-Verify anytime:
+bOS is deliberately honest about which parts are enforced by code and which are best-effort prompting. Verify anytime against the disk:
 
 ```bash
 bash scripts/bos-roster.sh
 ```
 
-| REAL (code) | BEST-EFFORT (prompt) | Does not exist |
-|-------------|----------------------|----------------|
-| 6 hooks wired in `.claude/settings.json` | Ambient capture (energy/expense mentioned → log) | 24/7 daemon, Pulse, Broker, SQLite kernel |
-| 24 Lite skills, `tier: core` (17) or `optional` (7), SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — never spawned | `/vault` in chat, `/schedule` in Lite |
-| 10 agent files | Grok ping: you must **Read** `state/ping.md` (hook stdout is ignored) | Auto morning interrogation, weekly nag |
-| Bus: `bash scripts/context-bus-append.sh` → `state/context-bus.jsonl` | | Mid-generation inject |
-| AskUserQuestion (Claude) | | `git push` inside `/ship` (denied; ask separately) |
+| REAL (enforced by code) | BEST-EFFORT (prompting) | Not included |
+|-------------------------|-------------------------|--------------|
+| 6 hooks wired in `.claude/settings.json` | Ambient capture (energy/expense mentioned → logged) | Background daemon or 24/7 automation |
+| 24 skills, `tier: core` (17) or `optional` (7), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite backend |
+| 10 agent files | Grok ping: you must **Read** `state/ping.md` (hook stdout is ignored) | Unprompted morning check-ins or weekly nags |
+| Message bus: `bash scripts/context-bus-append.sh` → `state/context-bus.jsonl` | | Mid-generation message injection |
+| Clickable questions via AskUserQuestion (Claude) | | `git push` inside `/ship` (always a separate, explicit ask) |
 
-Live skill list: [config/roster.md](config/roster.md) (generated; do not hand-edit). Missing `tier:` = drift.
+Live skill list: [config/roster.md](config/roster.md) (generated; do not hand-edit).
 
-`/home` is a **Summary snapshot** from files, not a product dashboard. `/morning` and `/evening` run **only if you ask**. Greetings are not energy and do not start `/morning`.
+`/home` is a snapshot built from your state files, not a dashboard product. `/morning` and `/evening` run **only when you ask** — a greeting never triggers a ritual.
 
 ## Quick start
 
-1. Install [Claude Code](https://claude.ai/code), or Codex CLI, or Grok.
-2. `git clone https://github.com/zmrlk/bOS.git` and open that folder.
-3. Say "hi". If `profile.md` is empty → `/setup`.
+1. Install [Claude Code](https://claude.ai/code), Codex CLI, or Grok CLI.
+2. `git clone https://github.com/zmrlk/bOS.git` and open the folder in your CLI.
+3. Say "hi". If `profile.md` is empty, the system runs `/setup` — a 3-minute onboarding.
 
-**Claude:** SessionStart is REAL. **Codex:** `.codex/hooks.json` points at the same scripts — if your Codex build does not inject hook stdout, Read `AGENTS.md` (BEST-EFFORT). **Grok:** hook stdout is ignored — Read `AGENTS.md`, `state/handoff.md`, and `state/ping.md` every turn.
+Per-CLI notes:
 
-Write to a running session: one message in `state/ping.md`. Consumed on the **next turn**, not mid-generation.
+- **Claude Code:** hooks are fully wired — SessionStart injects your state summary automatically.
+- **Codex:** `.codex/hooks.json` points at the same scripts. If your build does not inject hook stdout, Read `AGENTS.md` at session start.
+- **Grok:** hook stdout is ignored — Read `AGENTS.md`, `state/handoff.md`, and `state/ping.md` every turn.
+
+To message a running session from outside: write one line into `state/ping.md`. It is consumed on the next turn (never mid-generation).
 
 ## Team
 
-Ten files. Conversational titles (ceo, coo, sales, …) are **personas of @boss**, never spawned.
+Ten agent files, one orchestrator. Conversational titles (ceo, coo, sales, …) are **personas of @boss**, not separate agents.
 
-| Area | Files |
+| Area | Agents |
 |------|--------|
 | Core | @boss |
 | Business | @cto @cmo @advocate |
@@ -51,24 +53,29 @@ Ten files. Conversational titles (ceo, coo, sales, …) are **personas of @boss*
 | Health | @trainer @diet |
 | Learning | @reader |
 
-## Bus
+## Message bus
 
-The only writer:
+Cross-session signals go through one helper (the only writer):
 
 ```bash
 bash scripts/context-bus-append.sh <from> <to> <type> <priority> "<content>" [ttl_days]
 ```
 
-Never `echo >>` jsonl. `protect-state` blocks hand-edit. TTL is a **read filter** in SessionStart, not a rewrite kernel. `state/context-bus.md` is a stub. The live jsonl is gitignored (your signals do not ship).
+Never append to the jsonl by hand — the `protect-state` hook blocks it. TTL is a read filter applied at session start, not a background process. The live `state/context-bus.jsonl` is gitignored: your signals never ship with the repo.
 
-## Optional (not Lite)
+## Optional extras
 
-Calendar/email via `/connect`. macOS ntfy: `examples/hooks/ntfy/` (`install-layer3.sh` hard-fails without a topic). `examples/supabase`, `examples/templates/n8n`, `examples/skills/vault`, `examples/skills/schedule` are samples. Clone works without them.
+Everything under `examples/` is a sample, not a dependency — a fresh clone works without any of it:
 
-Secrets: create `.secrets/` yourself (`chmod 700`, files `600`). Never paste keys into chat.
+- `examples/hooks/ntfy/` — push notifications on macOS (`install-layer3.sh` refuses to run without your own topic)
+- `examples/supabase/` — schema for an optional cloud mirror
+- `examples/templates/n8n/` — inbox/cron workflow templates
+- `examples/skills/vault`, `examples/skills/schedule` — skills that need extra setup before they are safe to enable
+
+Calendar/email integrations connect via `/connect` (MCP). Secrets live in a local `.secrets/` directory you create yourself (`chmod 700`, files `600`) — never paste keys into chat.
 
 ## Limits
 
-One model wearing roles (~60–80% routing). Data quality = what you say. See [PRIVACY.md](PRIVACY.md). Contract: [AGENTS.md](AGENTS.md). Claude overlay: [CLAUDE.md](CLAUDE.md).
+One model wearing roles routes correctly ~60–80% of the time, not 100%. Data quality equals what you tell it. Privacy model: [PRIVACY.md](PRIVACY.md). Shared cross-CLI contract: [AGENTS.md](AGENTS.md). Claude-specific overlay: [CLAUDE.md](CLAUDE.md).
 
 License: [MIT](LICENSE).

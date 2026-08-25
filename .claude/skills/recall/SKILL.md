@@ -9,7 +9,7 @@ tier: core
 # /recall — Cross-Session Memory Search
 
 **Shortcuts:** `/recall`, `rc`
-**NLP triggers:** "remember when", "last time we", "we talked about", "what did we decide", "przypomnij", "co ustaliliśmy", "did I already", "have we"
+**NLP triggers:** "remember when", "last time we", "we talked about", "what did we decide", "did I already", "have we"
 
 Search everything bOS remembers across sessions. Powered by @boss.
 
@@ -24,13 +24,11 @@ Search ALL sources in parallel. Each source has different strengths:
 | Source | Path | What it captures | Best for |
 |--------|------|-----------------|----------|
 | **Session digests** | `state/.backup/session-digests/` | Topic, decisions, open threads per session | "What did we decide about X?" |
-| **Memory files** | `~/.claude/projects/<project>/memory/` | Persistent facts, patterns, feedback | "What do you know about X?" |
+| **Agent memory** | `~/.claude/projects/<project>/memory/` | Persistent facts, patterns, feedback; MEMORY.md index (Claude Code hosts) | "What do you know about X?" |
 | **Pre-compact snapshots** | `state/.backup/pre-compact-*.md` | State at moment of context compaction | Recovering mid-session context |
 | **Context bus** | `state/context-bus.jsonl` | Inter-agent signals, decisions | "When did agent X say Y?" |
 | **Session log** | `state/session-log.md` | Timestamps of sessions | "When was our last session?" |
 | **State files** | `state/*.md` | Tasks, finances, habits, goals, etc. | "What task did we add for X?" |
-| **Native auto-memory** | `~/.claude/projects/<project>/memory/` | Agent-specific observations (cto/, boss/, etc.) | Agent behavioral patterns |
-| **Project memory** | `~/.claude/projects/<project>/memory/` | Project-scoped persistent memory | Cross-session facts, MEMORY.md index |
 
 ---
 
@@ -38,7 +36,7 @@ Search ALL sources in parallel. Each source has different strengths:
 
 ### Step 1: Understand the query
 Parse what the user is looking for:
-- **Topic search** ("remember that thing about Lightpanda") → keyword search across all sources
+- **Topic search** ("remember that thing about that headless browser") → keyword search across all sources
 - **Decision search** ("what did we decide about pricing") → focus on digests + context-bus
 - **Time search** ("last week's session") → focus on digests by date
 - **State search** ("did I already log that expense") → focus on state files
@@ -53,7 +51,7 @@ Read: MEMORY.md for index of memory files
 
 Use multiple Grep calls in parallel across different source directories. Search for:
 1. Exact keywords from the user's query
-2. Synonyms / related terms (e.g., "Lightpanda" → also search "browser", "headless", "panda")
+2. Synonyms / related terms (e.g., "that headless browser" → also search the product name, "browser", "headless")
 3. Date patterns if time-based query
 
 ### Step 3: Synthesize results
@@ -73,7 +71,7 @@ Context: [synthesized answer to user's question]
 
 ### Rules
 - Always show WHERE the information was found (source + date) so user can verify
-- If nothing found → say so clearly: "Nie znalazłem tego w żadnym ze źródeł. Może to było w sesji która nie miała digestu (przed v0.9.1)?"
+- If nothing found → say so clearly: "I couldn't find this in any source. It may have been in a session that left no digest."
 - If partial match → show what you found + ask for clarification
 - If multiple sessions mention the topic → show chronological progression
 - Never fabricate recalled information — only report what's actually in the files
@@ -81,5 +79,5 @@ Context: [synthesized answer to user's question]
 
 ### Step 4: Offer follow-up
 After recall, offer:
-- "Chcesz żebym zapisał to do memory żeby nie stracić?"
-- "Chcesz kontynuować tę robotę?"
+- "Want me to save this to memory so it doesn't get lost?"
+- "Want to continue that work?"

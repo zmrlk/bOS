@@ -24,4 +24,4 @@ Never open with a question. Never run because the user said "cześć" / "hi".
 5. Energy 1–3 → one micro-task + water + log tonight. That is a complete day. No pep talk.
 6. End with one Next step, not a question.
 
-Do not invent completion rates, weather, or mail you did not fetch. Pack-specific blocks and MCP fallbacks are in `references/briefing.md` — use them, ignore any leftover vendor-specific sender lists; noise senders live in profile if set.
+Do not invent completion rates, weather, or mail you did not fetch. Pack-specific blocks and MCP fallbacks are in `references/briefing.md` — use them; newsletter/noise senders live in profile.md if set.

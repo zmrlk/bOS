@@ -29,7 +29,7 @@
           "parameters": [
             {
               "name": "model",
-              "value": "claude-sonnet-4-6"
+              "value": "claude-sonnet-5"
             },
             {
               "name": "max_tokens",
@@ -56,7 +56,7 @@
     {
       "parameters": {
         "operation": "sendMessage",
-        "chatId": "REPLACE_ME",
+        "chatId": "REPLACE_CHAT_ID",
         "text": "={{ $json.content[0].text }}"
       },
       "id": "send-telegram",
@@ -86,10 +86,10 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "timezone": "Europe/Warsaw"
+    "timezone": "UTC"
   },
   "_meta": {
-    "description": "bOS v0.6.1 — Sends morning briefing at 8:00 via Telegram. Uses Claude API to generate the briefing. Set ANTHROPIC_API_KEY as environment variable in n8n.",
+    "description": "bOS — Sends morning briefing at 8:00 via Telegram. Uses Claude API to generate the briefing. Set ANTHROPIC_API_KEY as environment variable in n8n.",
     "setup_steps": [
       "1. Set ANTHROPIC_API_KEY in n8n environment variables",
       "2. Add Telegram Bot credentials",

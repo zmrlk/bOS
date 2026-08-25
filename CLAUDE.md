@@ -8,7 +8,7 @@ Hooks in `.claude/settings.json`: SessionStart `session-start.sh`, UserPromptSub
 
 `<bos-time-context>` from `time-aware.sh` carries clock + `LATE-HOUR-GATE` only. Map `mode:` to MINIMAL/DETAILED. It never asks the user anything.
 
-AskUserQuestion for every question to the user. Fallback: `Wybierz: 1) … 2) …`.
+AskUserQuestion for every question to the user. Fallback: a numbered list `1) … 2) …` in the user's language.
 
 Spawn specialists with `Agent(subagent_type: "…")`. Personas are not files.
 
@@ -16,4 +16,4 @@ If `profile.md` Name / Active packs / Primary goal are empty → `/setup` before
 
 ## Do not resurrect
 
-No MICRO-MORNING, energy interrogation, weekly-review offers, `/mobile-sync`, Supabase-mandatory, `/vault` in chat, `git push` inside `/ship`, hand-edit of `state/context-bus.jsonl` (helper only).
+No unprompted morning check-ins, no energy interrogation, no weekly-review offers, no mandatory cloud sync, no `/vault` in chat, no `git push` inside `/ship`, no hand-edit of `state/context-bus.jsonl` (helper only).

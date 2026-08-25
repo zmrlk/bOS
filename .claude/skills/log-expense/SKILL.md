@@ -44,8 +44,8 @@ Categories: food, transport, tools, entertainment, health, education, housing, b
 If native auto-memory has `monthly_budget_thresholds` for this category:
 1. Calculate: this month's total for category (from finances.md Active section)
 2. Compare against budget:
-   - **>80%**: "⚠️ [Category]: [X]% budżetu ([spent]/[budget] [currency]). Uważaj."
-   - **>100%**: "🚨 [Category]: przekroczony budżet! [spent]/[budget] [currency] (+[overage])."
+   - **>80%**: "⚠️ [Category]: [X]% of budget ([spent]/[budget] [currency]). Watch it."
+   - **>100%**: "🚨 [Category]: over budget! [spent]/[budget] [currency] (+[overage])."
    - Post context-bus signal: @finance → @boss + @coach (constraint)
 3. If no budget set for category → skip silently
 

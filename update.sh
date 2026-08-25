@@ -84,14 +84,17 @@ echo "    state/*.md (tasks, finances, habits...)"
 echo "    .secrets/"
 echo ""
 echo -e "  ${YELLOW}UPDATE (system files):${NC}"
-echo "    CLAUDE.md"
-echo "    .claude/agents/"
-echo "    .claude/skills/"
+echo "    CLAUDE.md, AGENTS.md"
+echo "    .claude/agents/  .claude/skills/  .claude/hooks/"
 echo "    .claude/settings.json"
+echo "    .codex/  .grok/  scripts/  config/"
 echo "    VERSION, README.md, PRIVACY.md"
 echo "    profile-template.md"
 echo "    state/SCHEMAS.md"
-echo "    supabase/"
+echo "    examples/"
+echo ""
+echo "  Note: customized skills/agents/hooks are overwritten"
+echo "  (a copy goes to the backup folder first)."
 echo ""
 
 read -p "  Continue? [Y/n] " confirm
@@ -111,17 +114,36 @@ if [ -f "$EXISTING_BOS/profile.md" ]; then
     cp "$EXISTING_BOS/profile.md" "$BACKUP_DIR/profile.md"
 fi
 cp "$EXISTING_BOS/CLAUDE.md" "$BACKUP_DIR/CLAUDE.md"
+if [ -f "$EXISTING_BOS/AGENTS.md" ]; then
+    cp "$EXISTING_BOS/AGENTS.md" "$BACKUP_DIR/AGENTS.md"
+fi
 if [ -f "$EXISTING_BOS/VERSION" ]; then
     cp "$EXISTING_BOS/VERSION" "$BACKUP_DIR/VERSION"
+fi
+if [ -f "$EXISTING_BOS/.claude/settings.json" ]; then
+    mkdir -p "$BACKUP_DIR/.claude"
+    cp "$EXISTING_BOS/.claude/settings.json" "$BACKUP_DIR/.claude/settings.json"
+fi
+if [ -d "$EXISTING_BOS/.claude/skills" ]; then
+    mkdir -p "$BACKUP_DIR/.claude"
+    cp -r "$EXISTING_BOS/.claude/skills" "$BACKUP_DIR/.claude/skills"
+fi
+if [ -d "$EXISTING_BOS/.claude/hooks" ]; then
+    mkdir -p "$BACKUP_DIR/.claude"
+    cp -r "$EXISTING_BOS/.claude/hooks" "$BACKUP_DIR/.claude/hooks"
 fi
 
 echo -e "  ${GREEN}✓${NC} Backup created: state/.backup/pre-update-${OLD_VERSION}-..."
 
 # ── Copy system files ─────────────────────────
 
-# CLAUDE.md
+# CLAUDE.md + AGENTS.md (shared contract)
 cp "$NEW_BOS/CLAUDE.md" "$EXISTING_BOS/CLAUDE.md"
 echo -e "  ${GREEN}✓${NC} CLAUDE.md"
+if [ -f "$NEW_BOS/AGENTS.md" ]; then
+    cp "$NEW_BOS/AGENTS.md" "$EXISTING_BOS/AGENTS.md"
+    echo -e "  ${GREEN}✓${NC} AGENTS.md"
+fi
 
 # VERSION
 cp "$NEW_BOS/VERSION" "$EXISTING_BOS/VERSION"
@@ -141,11 +163,36 @@ if [ -d "$NEW_BOS/.claude/skills" ]; then
     echo -e "  ${GREEN}✓${NC} .claude/skills/"
 fi
 
+# Hooks (the scripts settings.json points at)
+if [ -d "$NEW_BOS/.claude/hooks" ]; then
+    mkdir -p "$EXISTING_BOS/.claude/hooks"
+    cp -r "$NEW_BOS/.claude/hooks/"* "$EXISTING_BOS/.claude/hooks/"
+    chmod +x "$EXISTING_BOS/.claude/hooks/"*.sh 2>/dev/null || true
+    echo -e "  ${GREEN}✓${NC} .claude/hooks/"
+fi
+
 # Settings
 if [ -f "$NEW_BOS/.claude/settings.json" ]; then
     cp "$NEW_BOS/.claude/settings.json" "$EXISTING_BOS/.claude/settings.json"
     echo -e "  ${GREEN}✓${NC} .claude/settings.json"
 fi
+
+# Helper scripts (bus append, roster)
+if [ -d "$NEW_BOS/scripts" ]; then
+    mkdir -p "$EXISTING_BOS/scripts"
+    cp -r "$NEW_BOS/scripts/"* "$EXISTING_BOS/scripts/"
+    chmod +x "$EXISTING_BOS/scripts/"*.sh 2>/dev/null || true
+    echo -e "  ${GREEN}✓${NC} scripts/"
+fi
+
+# Cross-CLI configs
+for d in .codex .grok config; do
+    if [ -d "$NEW_BOS/$d" ]; then
+        mkdir -p "$EXISTING_BOS/$d"
+        cp -r "$NEW_BOS/$d/"* "$EXISTING_BOS/$d/"
+        echo -e "  ${GREEN}✓${NC} $d/"
+    fi
+done
 
 # README, PRIVACY
 for f in README.md PRIVACY.md; do
@@ -167,18 +214,11 @@ if [ -f "$NEW_BOS/state/SCHEMAS.md" ]; then
     echo -e "  ${GREEN}✓${NC} state/SCHEMAS.md"
 fi
 
-# Supabase schemas
-if [ -d "$NEW_BOS/supabase" ]; then
-    mkdir -p "$EXISTING_BOS/supabase"
-    cp -r "$NEW_BOS/supabase/"* "$EXISTING_BOS/supabase/"
-    echo -e "  ${GREEN}✓${NC} supabase/"
-fi
-
-# Templates
-if [ -d "$NEW_BOS/templates" ]; then
-    mkdir -p "$EXISTING_BOS/templates"
-    cp -r "$NEW_BOS/templates/"* "$EXISTING_BOS/templates/"
-    echo -e "  ${GREEN}✓${NC} templates/"
+# Examples (supabase schemas, n8n templates, ntfy hooks, sample skills)
+if [ -d "$NEW_BOS/examples" ]; then
+    mkdir -p "$EXISTING_BOS/examples"
+    cp -r "$NEW_BOS/examples/"* "$EXISTING_BOS/examples/"
+    echo -e "  ${GREEN}✓${NC} examples/"
 fi
 
 # update.sh itself

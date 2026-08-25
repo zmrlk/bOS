@@ -218,7 +218,7 @@ Active section: lines XX-YY
 ### Rules:
 - One section per week (## Week of YYYY-MM-DD)
 - /plan-week creates the section with week_goal and planned tasks
-- /review-week fills in done, rate, wins, lessons, next week
+- fill in done, rate, wins, lessons, next week when you review (e.g. via /reflect)
 - /standup can append notes mid-week
 - Archive: Weeks older than 2 months → state/archive/weekly-log-YYYY-MM.md
 
@@ -331,7 +331,7 @@ Active section: lines XX-YY
 ### Rules:
 - @coach is coordinator (primary writer)
 - Other agents POST goal updates to context-bus → @coach writes
-- Progress updated weekly (during /review-week or /plan-week)
+- Progress updated weekly (whenever you review your week)
 - Goals with no progress for 3+ months → flag for review
 - Completed goals move to Completed section
 
@@ -356,7 +356,7 @@ Active section: lines XX-YY
 - Newest decision on top
 - Major decisions also saved to agent memory (summary)
 - Never delete decisions — mark as reversed/superseded with reason
-- **Review date** is required for all GO and CONDITIONAL decisions. @ceo tracks pending reviews in memory: `pending_reviews: [{title, review_date}]`. /morning checks for reviews due today. /review-week shows upcoming reviews in next 7 days.
+- **Review date** is required for all GO and CONDITIONAL decisions. @ceo tracks pending reviews in memory: `pending_reviews: [{title, review_date}]`. /morning (when you run it) checks for reviews due today.
 
 ---
 
@@ -390,7 +390,7 @@ One JSON object per line. **Write only** via `bash scripts/context-bus-append.sh
 | type | insight \| decision \| constraint \| data \| calibration \| session-status \| plan \| system-migration \| incident |
 | priority | critical \| normal \| info |
 | from | `@agent` \| `session:name` \| cron-name |
-| content | max 2000 chars; calibration MUST contain `BYŁO:` `JEST:` `ŹRÓDŁO:` |
+| content | max 2000 chars; calibration MUST contain `WAS:` `NOW:` `SOURCE:` |
 
 ### Rules
 - Append-only. No ACK kernel. No rewrite of expired lines.
@@ -417,15 +417,15 @@ Small file (read in full). Owner: @coach.
 
 | Date | Q# | Question | Answer |
 |------|-----|----------|--------|
-| 2026-03-02 | 14 | Co dziś poszło lepiej niż się spodziewałeś? | Udało mi się skończyć prezentację w godzinę |
-| 2026-03-01 | 7 | Za co jesteś dziś wdzięczny? | Za dobrą rozmowę z Anią |
+| 2026-03-02 | 14 | What went better today than you expected? | Finished the presentation in an hour |
+| 2026-03-01 | 7 | What are you grateful for today? | A good conversation with a friend |
 ```
 
 ### Rules:
 - Single table, newest entry on top
 - @coach is primary writer (via /reflect skill)
 - One entry per day (if user runs /reflect twice → update, don't duplicate)
-- After 30+ entries → @coach triggers pattern analysis during /review-week
+- After 30+ entries → ask @coach for a pattern analysis
 - Never delete entries — this is a personal journal
 
 ---
@@ -544,65 +544,14 @@ Small file (read in full). Owner: @mentor.
 ### Rules:
 - @mentor is primary writer (via /network skill)
 - Sorted by follow-up date (most overdue first)
-- Natural language input supported: "Spotkałem się z Anią" → parse + log
+- Natural language input supported: "I met Anna today" → parse + log
 - /morning surfaces overdue inner-circle follow-ups as nudges
 
 ---
 
-## inbox.md
-
-Growing file (Summary/Active/Archive format). Owner: @boss.
-
-### Summary Template (first 25 lines)
-```
-# Inbox
-
-## Summary
-<!-- AUTO-UPDATED by @boss at session end -->
-Active section: lines XX-YY
-| Metric | Value |
-|--------|-------|
-| Unread | X |
-| Total active | X |
-| Channels | telegram, email |
-| Last message | YYYY-MM-DD HH:MM from [sender] via [channel] |
-
----
-```
-
-### Schema
-
-| Column | Type | Required | Description |
-|--------|------|----------|-------------|
-| ID | number | yes | Auto-increment message ID |
-| Channel | text | yes | Source: telegram / email / slack / discord / whatsapp |
-| Sender | text | yes | Sender name or ID |
-| Subject/Preview | text | yes | Email subject or message preview (60 chars) |
-| Status | text | yes | unread / read / routed / replied / archived |
-| Routed to | @agent | no | Which agent handles this message |
-| Date | YYYY-MM-DD HH:MM | yes | When message was received |
-
-### Format example:
-```
-## Active
-
-| ID | Channel | Sender | Subject/Preview | Status | Routed to | Date |
-|----|---------|--------|-----------------|--------|-----------|------|
-| 5 | telegram | Jan K. | Hej, masz chwilę na call? | unread | — | 2026-03-02 14:30 |
-| 4 | email | newsletter@ai.com | Weekly AI digest | read | — | 2026-03-02 08:00 |
-| 3 | slack | Anna M. | Czy masz aktualizację projektu? | routed | @coo | 2026-03-01 16:45 |
-```
-
-### Rules:
-- Single table, newest message on top
-- @boss is primary writer (via /inbox skill and session-start auto-check)
-- Status transitions: unread → read → routed/replied/archived
-- Archive: Messages older than 30 days AND status = replied/archived → state/archive/inbox-YYYY-MM.md
-- In Pro mode, inbox.md is a fallback view — primary data in Supabase `messages` table
-
----
-
 ## schedules.md
+
+> **Not Lite.** This file exists only if you copy `examples/skills/schedule/` yourself. A fresh clone neither creates nor reads it.
 
 Small file (read in full). Owner: @boss.
 
@@ -635,39 +584,9 @@ Small file (read in full). Owner: @boss.
 
 ---
 
-## marketplace.md
-
-Small file (read in full). Owner: @boss.
-
-| Column | Type | Required | Description |
-|--------|------|----------|-------------|
-| Skill ID | text | yes | Registry identifier |
-| Command | text | yes | Skill command (e.g., /pomodoro) |
-| Version | semver | yes | Installed version |
-| Installed | YYYY-MM-DD | yes | Installation date |
-| Source | text | yes | official / community |
-| Last updated | YYYY-MM-DD | no | Last update date |
-
-### Format example:
-```
-# Marketplace — Installed Skills
-
-| Skill ID | Command | Version | Installed | Source | Last updated |
-|----------|---------|---------|-----------|--------|--------------|
-| pomodoro | /pomodoro | 1.0.0 | 2026-03-02 | official | 2026-03-02 |
-```
-
-### Rules:
-- @boss is primary writer (via /marketplace skill)
-- Only tracks MARKETPLACE-installed skills (not built-in bOS skills)
-- Used by /evolve to check for updates
-- Used by /marketplace update to compare versions
-
----
-
 ## telemetry.md
 
-Small file (read in full). Owner: @boss. Auto-updated by session hooks and /review-week.
+Small file (read in full). Owner: @boss. Auto-updated by session hooks.
 
 ### Structure:
 
@@ -735,8 +654,7 @@ Routing accuracy: [X]%
 - Agent/skill metrics updated by @boss at session end (lazy batch)
 - Routing log: append-only, last 20 entries (older → archive)
 - Misroute patterns: computed by /evolve Phase 2C
-- Monthly trends: computed by /review-week on last Friday of month
-- /review-week surfaces top insights from telemetry
+- Ask for a telemetry summary when you want insights
 
 ---
 
@@ -805,47 +723,3 @@ Every proposal must show all 6 gates: PURPOSE, BUDGET, CAPACITY, HEALTH, VALUES,
 - Applied proposals: move from Pending to Applied with date and impact notes
 
 ---
-
-## notes.md
-
-Small file (read in full). Owner: @boss (via /note skill).
-
-### Structure:
-
-```markdown
-# Notes
-
-## Summary
-| Total | Reminders | Ideas | Todos |
-|-------|-----------|-------|-------|
-| N     | N         | N     | N     |
-
-## Active
-
-### YYYY-MM-DD [icon] [content]
-Type: reminder|idea|todo|note
-Due: YYYY-MM-DD (reminders only)
-
----
-
-## Archive
-```
-
-### Note Types:
-
-| Type | Icon | Has Due date | Description |
-|------|------|-------------|-------------|
-| reminder | :calendar: | Yes | Time-bound reminder |
-| idea | :bulb: | No | Captured idea |
-| todo | :white_check_mark: | No | Quick action item |
-| note | :pushpin: | No | General note (default) |
-
-### Rules:
-- @boss is sole writer (via /note skill)
-- Zero questions on capture — `n [text]` = instant save
-- Date parsing: "do 15 marca", "jutro", "w piątek" → extract to Due field
-- Reminders surfaced by /morning (due today/tomorrow) and @boss session-start proactive checks
-- Completed/deleted notes move to Archive section
-- /home shows note count + nearest reminder
-- /evening asks "Chcesz coś zanotować?" before close
-- Don't duplicate — if very similar note exists, update instead of creating new

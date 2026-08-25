@@ -7,6 +7,8 @@ command: /schedule
 
 # /schedule — Cron Schedules
 
+> **Example — NOT installed.** bOS Lite has no `/schedule`. If you want scheduled runs, copy this folder to `.claude/skills/schedule/` and wire the n8n/cron side yourself. As an example it has no `tier:`.
+
 Automate your bOS rituals. Set it, forget it, get results delivered.
 
 ---

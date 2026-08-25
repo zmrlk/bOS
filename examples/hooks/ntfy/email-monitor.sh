@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # ── Config ──────────────────────────────────────────────────
-BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+BOS_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"  # repo root (script lives in examples/hooks/ntfy/)
 LOG_DIR="$HOME/.claude/logs"
 LOG_FILE="$LOG_DIR/email-monitor-$(date '+%Y%m%d').log"
 STATE_FILE="$BOS_DIR/state/.email-monitor-last-check"
@@ -39,8 +39,8 @@ else
 fi
 
 # ── Environment ────────────────────────────────────────────
-export LANG="pl_PL.UTF-8"
-export LC_ALL="pl_PL.UTF-8"
+export LANG="${EMAIL_MONITOR_LOCALE:-en_US.UTF-8}"
+export LC_ALL="${EMAIL_MONITOR_LOCALE:-en_US.UTF-8}"
 [[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
 
 export NVM_DIR="$HOME/.nvm"
@@ -104,8 +104,8 @@ Output exactly: NO_IMPORTANT
 STEP 5 — If 1+ important emails:
 Call send_notification with:
 - topic: $NTFY_TOPIC
-- title: '📬 bOS: [count] nowych maili'
-- message: For each important email (max 5): '[sender short] — [subject]' on separate lines. Max 300 chars total. Polish. Plain text, no markdown.
+- title: '📬 bOS: [count] new emails'
+- message: For each important email (max 5): '[sender short] — [subject]' on separate lines. Max 300 chars total, in the user's language. Plain text, no markdown.
 - priority: default (or high if any email mentions payment/urgent/deadline)
 - tags: [\"email\",\"inbox\"]
 

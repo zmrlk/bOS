@@ -10,7 +10,7 @@ tier: core
 
 Show a clean, one-screen reference of everything available.
 
-**Adapt to tech_comfort:** "not technical" → simple language, group by action ("Chcesz zaplanować dzień?"). "I use apps" → list commands with brief descriptions. "I code" → compact table with command names.
+**Adapt to tech_comfort:** "not technical" → simple language, group by action ("Want to plan your day?"). "I use apps" → list commands with brief descriptions. "I code" → compact table with command names.
 
 ---
 
@@ -42,9 +42,9 @@ Show a clean, one-screen reference of everything available.
   /ship             — review, commit (push is a separate ask)
 
   💰  TRACKING
-  /log-expense      — log spending
+  /expense          — log spending
   /habit            — streaks, habits, quit tracker
-  /log-workout      — log exercise
+  /workout          — log exercise
   /reflect          — one-question micro-journal
 
   🔎  MEMORY & INBOX
@@ -81,7 +81,7 @@ Show a clean, one-screen reference of everything available.
 2. Only show command groups relevant to active packs:
    - DAILY RHYTHM → always shown
    - WORK → always shown; hide /ship and /follow-up without a Business pack
-   - TRACKING → show /log-expense always, /log-workout only if Health pack
+   - TRACKING → show /expense always, /workout only if Health pack
    - MEMORY & INBOX → always shown
    - SYSTEM → always shown
 3. Language matches user's language from profile.md

@@ -9,7 +9,7 @@ tier: core
 # /ship — Vibecoding Fast Lane
 
 ## Meta
-- **Trigger:** `/ship`, "ship it", "zrób commit", "push to git", "commituj", "wypchnij"
+- **Trigger:** `/ship`, "ship it", "commit it", "push to git"
 - **Agent:** @cto
 - **Model:** haiku (quick) → sonnet if issues found
 - **Context needed:** git status, changed files
@@ -34,7 +34,7 @@ With one command that does it intelligently.
 ### Step 1: Scan Changes
 Run `git status` + `git diff --stat` to see what changed.
 
-If no changes → "Nic do shipowania. Workspace czysty."
+If no changes → "Nothing to ship. Workspace clean."
 
 ### Step 2: Quick Review
 For each changed file:
@@ -51,18 +51,18 @@ For each changed file:
 
 **If blockers found:**
 ```
-🚫 BLOKERY (napraw przed shipem):
+🚫 BLOCKERS (fix before shipping):
 - [file:line] — [issue]
 
-Naprawić teraz? (tak / pomiń / anuluj)
+Fix now? (yes / skip / cancel)
 ```
 
 **If warnings only:**
 ```
-⚠️ OSTRZEŻENIA (nie blokują):
+⚠️ WARNINGS (non-blocking):
 - [warning]
 
-Kontynuować? (tak / anuluj)
+Continue? (yes / cancel)
 ```
 
 **If clean:**
@@ -75,9 +75,9 @@ Generate smart commit message from diff summary:
 - Max 72 chars
 - Polish OK if codebase is Polish
 
-Show message + ask: "OK" / "Zmień" / "Anuluj"
+Show message + ask: "OK" / "Change" / "Cancel"
 
-If "Zmień" → user types custom message (1 open text field).
+If "Change" → user types custom message (1 open text field).
 
 ### Step 5: Commit (default)
 ```bash

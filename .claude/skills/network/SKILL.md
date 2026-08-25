@@ -19,7 +19,7 @@ Relationships need maintenance. This helps you track who matters and when to rea
 - `/network who` — who should I reach out to?
 - `/network add` — add new person to network
 
-Natural language: "Spotkałem się z Anią" → parse + log automatically.
+Natural language: "I met with Ania" → parse + log automatically.
 
 ---
 
@@ -57,50 +57,50 @@ If network.md doesn't exist → create with schema headers from SCHEMAS.md.
 
 1. Fuzzy match name against network.md
 2. If match found → update Last contact = today, add context to Notes
-3. If no match → "Nie mam [Name] w sieci. Dodać? /network add"
+3. If no match → "I don't have [Name] in the network. Add them? /network add"
 4. Recalculate Follow-up date based on tier
-5. Confirm: "✅ Zalogowano kontakt z [Name]. Następny follow-up: [date]."
+5. Confirm: "✅ Logged contact with [Name]. Next follow-up: [date]."
 
 **Natural language parsing:**
-- "Spotkałem się z Anią" → log Ania, context: spotkanie
-- "Dzwoniłem do Marka" → log Marek, context: telefon
-- "Mail od Jana" → log Jan, context: email
+- "I met with Ania" → log Ania, context: meeting
+- "I called Marek" → log Marek, context: phone call
+- "Email from Jan" → log Jan, context: email
 
 ### Subcommand: `/network who`
 
 Sort contacts by staleness (most overdue first). Show top 3 with conversation starters:
 
 ```
-  📞  KOGO DAWNO NIE WIDZIAŁEŚ?
+  📞  WHO HAVEN'T YOU SEEN IN A WHILE?
 
-  1. [Name] — [tier] — [X] dni temu
+  1. [Name] — [tier] — [X] days ago
      💬 "[conversation starter based on Notes]"
 
-  2. [Name] — [tier] — [Y] dni temu
+  2. [Name] — [tier] — [Y] days ago
      💬 "[conversation starter]"
 
-  3. [Name] — [tier] — [Z] dni temu
+  3. [Name] — [tier] — [Z] days ago
      💬 "[conversation starter]"
 ```
 
 ### Subcommand: `/network add`
 
-1. Ask for typed input: "Kogo dodajesz? (imię)"
+1. Ask for typed input: "Who are you adding? (name)"
 2. Use `AskUserQuestion`:
    - header: "Tier"
    - options:
-     - "🔵 Inner circle (5)" (description: "Najbliżsi — kontakt co 2 tygodnie")
-     - "🟢 Active (50)" (description: "Aktywna sieć — kontakt co 1-2 miesiące")
-     - "⚪ Extended (500)" (description: "Szeroka sieć — kontakt co 3-6 miesięcy")
-3. Ask for context (typed): "Skąd go/ją znasz? (krótko)"
+     - "🔵 Inner circle (5)" (description: "Closest people — contact every 2 weeks")
+     - "🟢 Active (50)" (description: "Active network — contact every 1-2 months")
+     - "⚪ Extended (500)" (description: "Wide network — contact every 3-6 months")
+3. Ask for context (typed): "How do you know them? (briefly)"
 4. Add to network.md with today's date and calculated follow-up
-5. Confirm: "✅ Dodano [Name] do [tier]. Follow-up: [date]."
+5. Confirm: "✅ Added [Name] to [tier]. Follow-up: [date]."
 
 ## Context-Bus Signals
 
 | Condition | Signal |
 |-----------|--------|
-| Inner circle overdue (7+ days past follow-up) | @coach proactive nudge in /morning: "Dawno nie rozmawiałeś z [Name]. Napisz dziś?" |
+| Inner circle overdue (7+ days past follow-up) | @coach proactive nudge in /morning: "Haven't talked to [Name] in a while. Message them today?" |
 
 ## State Files
 - **Read:** profile.md, network.md (full)

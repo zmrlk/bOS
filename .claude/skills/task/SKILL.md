@@ -1,6 +1,6 @@
 ---
 name: Task
-description: "Add, list, complete, or manage tasks. Works with @boss (work tasks) and @boss (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
+description: "Add, list, complete, or manage tasks. Works with @boss (work tasks) and @coach (life tasks). Use to view today's tasks, add new ones, or mark tasks complete. Daily task management."
 user_invocable: true
 command: /task
 tier: core
@@ -24,36 +24,36 @@ If user provides a task without subcommand → treat as `/task add`.
 1. Read `state/tasks.md`
 2. Show today's section:
 ```
-📋 Dziś ([day], [date]):
+📋 Today ([day], [date]):
 
 [status] #1 [Task] — [energy] [context]
 [status] #2 [Task] — [energy] [context]
 
-Gotowe: [X]/[Y] ([%])
+Done: [X]/[Y] ([%])
 ```
-3. If no tasks for today → "Pusto na dziś. Dodać coś?"
+3. If no tasks for today → "Nothing for today. Add something?"
 
 ### Add task
 1. If description provided → use it. If not → ask.
 2. Auto-detect context from content:
    - Work/project/client/meeting → work → owner: @boss
-   - Personal/home/errands/life → personal → owner: @boss
+   - Personal/home/errands/life → personal → owner: @coach
    - Unclear → default to personal
 3. Auto-detect energy from task type:
    - Creative/strategic/building → H
    - Writing/emails/admin → M
    - Review/planning/errands → L
 4. Use `AskUserQuestion` for when:
-   - header: "Kiedy"
-   - options: "Dziś" / "Jutro" / "Ten tydzień" / "Backlog"
+   - header: "When"
+   - options: "Today" / "Tomorrow" / "This week" / "Backlog"
 5. Add to appropriate section in `state/tasks.md`
-6. Confirm: "[status emoji] Dodane na [day]."
+6. Confirm: "[status emoji] Added for [day]."
 
 ### Complete task
 1. Find task by # in `state/tasks.md`
 2. Change status to 🟢
 3. Update completion rate
-4. If all today's tasks done → celebrate: "Wszystko na dziś zrobione! 🎉"
+4. If all today's tasks done → celebrate: "Everything done for today! 🎉"
 5. If goal connected → update goal progress
 
 ### Skip task
@@ -63,7 +63,7 @@ Gotowe: [X]/[Y] ([%])
 ### Move task
 1. Remove from current day
 2. Add to target day
-3. Confirm: "Przeniesione na [day]."
+3. Confirm: "Moved to [day]."
 
 ### Carry-over logic
 When /task runs at the start of a day:
@@ -72,14 +72,14 @@ When /task runs at the start of a day:
 3. Identify tasks with Status = ☐ (not done, not skipped)
 4. If today's section doesn't exist → create it
 5. Copy ☐ tasks from most recent section to today's section
-6. Show: "Przenoszę [X] niezrobionych zadań z [date]:"
+6. Show: "Carrying over [X] unfinished tasks from [date]:"
    List carried tasks briefly
-7. Ask: "Które chcesz zachować na dziś?" (AskUserQuestion, multiSelect)
-   - "Wszystkie" → keep all
+7. Ask: "Which ones do you want to keep for today?" (AskUserQuestion, multiSelect)
+   - "All" → keep all
    - Individual tasks listed → keep selected, mark others as ⏭️ (skipped)
 
 Date logic: Use current date from system. Compare with section headers (## YYYY-MM-DD format).
-If task carried 3+ times → flag: "Ten task się ciągnie. Chcesz go rozbić na mniejsze części, delegować, albo usunąć?"
+If task carried 3+ times → flag: "This task keeps dragging. Want to break it into smaller pieces, delegate it, or delete it?"
 
 ## Adapt to user_type
 - Employee → "work" context = company tasks. "personal" = life tasks.
@@ -91,15 +91,15 @@ If task carried 3+ times → flag: "Ten task się ciągnie. Chcesz go rozbić na
 Read `profile.md` → `adhd_indicators`, `work_style` before displaying or adding tasks.
 
 ### ADHD adaptation (adhd_indicators = yes/suspected)
-- **Show tasks:** Max 3 visible tasks, even if more exist. Show: "Masz jeszcze [X] zadań, ale skup się na tych 3."
-- **Add task:** Frame as dopamine hook: "⚡ Nowe wyzwanie dodane!" Add time estimate (15-25 min chunks).
-- **Complete task:** Loud celebration: "🔥 Boom! [X/Y] done! Następne wyzwanie?" Show streak if applicable.
+- **Show tasks:** Max 3 visible tasks, even if more exist. Show: "You have [X] more tasks, but focus on these 3."
+- **Add task:** Frame as dopamine hook: "⚡ New challenge added!" Add time estimate (15-25 min chunks).
+- **Complete task:** Loud celebration: "🔥 Boom! [X/Y] done! Next challenge?" Show streak if applicable.
 - **Carry-over:** If task carried 2+ times → break it down immediately, don't just flag at 3.
 
 ### Work style adaptation
-- **Sprinter** → Group tasks into sprint blocks: "🏃 Sprint blok (60 min): #1, #2, #3". After sprint: "Odpoczynek czy następny sprint?"
-- **Scattered** → Show ONLY 1 task: "Jedno zadanie. Tylko to." Hide the rest completely. After completion, reveal next one.
-- **Procrastinator** → Show deadlines prominently: "#1 [Task] — ⏰ zostało 3h". Add countdown for today's tasks.
+- **Sprinter** → Group tasks into sprint blocks: "🏃 Sprint block (60 min): #1, #2, #3". After sprint: "Rest or next sprint?"
+- **Scattered** → Show ONLY 1 task: "One task. Just this." Hide the rest completely. After completion, reveal next one.
+- **Procrastinator** → Show deadlines prominently: "#1 [Task] — ⏰ 3h left". Add countdown for today's tasks.
 - **Steady** → Standard display (no changes needed).
 
 ## Context-Bus Signals
@@ -115,4 +115,4 @@ After state changes, helper only — never edit jsonl:
 
 ## Agents
 - @boss owns work tasks
-- @boss owns personal/life tasks
+- @coach owns personal/life tasks

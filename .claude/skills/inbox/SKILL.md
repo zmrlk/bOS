@@ -43,7 +43,7 @@ Fill senders during `/setup`. Defaults: noreply newsletters, social, promotions.
 ### Priority Senders (ALWAYS surface, regardless of filters)
 
 - Names the user marked as priority in profile.md
-- FreelancePlatform (payments)
+- Payment/marketplace platforms you use (payments)
 - Anthropic, Stripe (billing)
 - Any real person (not automated/noreply)
 
@@ -62,7 +62,7 @@ ToolSearch("select:mcp__claude_ai_Gmail__gmail_search_messages,mcp__claude_ai_Gm
 
 **Outlook — 2 parallel searches:**
 1. Recent non-noise: `afterDateTime: last 24h, limit: 20` → then filter out noise senders in post-processing
-2. If doing full triage: separate search for `sender: powiadomienia@[system-alerts@company.com], afterDateTime: last 24h` → count only, for summary
+2. If doing full triage: separate search for your system-alert sender (e.g. `sender: alerts@your-system.com`), afterDateTime: last 24h → count only, for summary
 
 ### Step 2: Filter and categorize
 
@@ -83,14 +83,14 @@ ToolSearch("select:mcp__claude_ai_Gmail__gmail_search_messages,mcp__claude_ai_Gm
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   📬 INBOX TRIAGE — [date]
-  Gmail: [X] nowych | Outlook: [Y] nowych
+  Gmail: [X] new | Outlook: [Y] new
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🔴 ACTION ([N]):
   1. 📧 [sender] — [subject] (1 line summary)
-     → Sugestia: [reply/task/meeting]
+     → Suggestion: [reply/task/meeting]
   2. 📨 [sender] — [subject]
-     → Sugestia: [action]
+     → Suggestion: [action]
 
 💰 PAYMENT ([N]):
   3. [sender] — [subject] → [amount if visible]
@@ -99,7 +99,7 @@ ToolSearch("select:mcp__claude_ai_Gmail__gmail_search_messages,mcp__claude_ai_Gm
   4. [sender] — [subject] (1 line)
 
 🟡 DELEGATE ([N]):
-  5. [sender] — [subject] → kto: [person]
+  5. [sender] — [subject] → who: [person]
 
 ⚪ ARCHIVE: [count] emails skipped
 
@@ -112,41 +112,41 @@ Use 📧 for Gmail emails, 📨 for Outlook emails — so [user] knows which inb
 For each ACTION email, use AskUserQuestion:
 
 "[icon] [sender]: [subject summary]"
-Options: [Wyślij draft odpowiedzi] [Dodaj jako task] [Pomiń] [Pokaż pełny mail]
+Options: [Send draft reply] [Add as task] [Skip] [Show full email]
 
-If "Wyślij draft":
-- Generate draft reply in [user]'s style (direct, concise, Polish unless email was English)
+If "Send draft reply":
+- Generate draft reply in [user]'s style (direct, concise, in the language the email was written in)
 - Gmail: use `gmail_create_draft` to save draft
 - Outlook: show draft text (no draft API available yet)
-- Confirm: "📝 Draft zapisany — sprawdź w Gmail/Outlook"
+- Confirm: "📝 Draft saved — check it in Gmail/Outlook"
 
-If "Dodaj jako task":
+If "Add as task":
 - Extract task → append to state/tasks.md
-- Confirm: "✅ Task dodany: [task name]"
+- Confirm: "✅ Task added: [task name]"
 
 ### Step 5: Extract tasks automatically
 
 From ALL emails (not just ACTION), detect task-like content:
-- Deadlines mentioned ("do piątku", "termin 25.03")
-- Requests ("proszę o", "potrzebujemy")
-- Meeting proposals ("spotkanie", "call")
-- Payment due ("faktura", "termin płatności")
+- Deadlines mentioned ("by Friday", "deadline March 25")
+- Requests ("please send", "we need")
+- Meeting proposals ("meeting", "call")
+- Payment due ("invoice", "payment due")
 
 ```
-📋 Wyciągnięte taski:
-  → [task] (z maila od [sender])
-  → [task] (z maila od [sender])
-Dodać do tasks.md? [Tak, wszystkie] [Wybiorę] [Nie]
+📋 Extracted tasks:
+  → [task] (from email from [sender])
+  → [task] (from email from [sender])
+Add to tasks.md? [Yes, all] [Let me pick] [No]
 ```
 
 ### Step 6: Quick Actions
 AskUserQuestion at the end:
-- "Co dalej?" → [Odpowiedz na pierwszy ACTION] [Sprawdź [system-alerts] detale] [Gotowe]
+- "What next?" → [Reply to the first ACTION] [Check system-alert details] [Done]
 
 ## Rules:
 - NEVER send emails without explicit user approval — only create DRAFTS
-- Draft language = Polish unless email was in English
-- Draft tone = [user]'s style: bezpośredni, konkretny, bez bullshitu
+- Draft language = the language the email was written in
+- Draft tone = the user's style from profile.md: direct, concrete, no fluff
 - If email is from a profile priority sender → flag as priority
 - If email mentions money/log-expense → flag as PAYMENT category
 - Max 15 emails total per triage (paginate if more)
@@ -164,12 +164,8 @@ When called from /morning:
 
 When called from /evening:
 - Show unprocessed ACTION emails from today
-- "Zostały [N] maile do ogarnięcia. Na jutro?" [Tak] [Ogarniam teraz]
+- "[N] emails left to deal with. Push to tomorrow?" [Yes] [I'll handle them now]
 
-## Cron Integration (email-monitor.sh)
+## Optional: background monitor (not installed by default)
 
-A background cron runs every 15 minutes checking both accounts.
-- Filters same noise senders
-- Sends ntfy push ONLY for important new emails
-- State tracked in `state/.email-monitor-last-check`
-- Cooldown: max 1 push per 30 minutes
+`examples/hooks/ntfy/email-monitor.sh` is a sample launchd cron you can install yourself. If you wire it, it checks both accounts every 15 minutes, filters the same noise senders, sends ntfy push only for important new mail (max 1 push per 30 minutes), and tracks state in `state/.email-monitor-last-check`. A fresh clone does NOT run it.

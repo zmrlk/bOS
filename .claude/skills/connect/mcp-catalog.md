@@ -1,8 +1,7 @@
 # MCP Catalog — Vetted Connectors for bOS
 
-> Last updated: 2026-03-03. Update during each /bos-dev research cycle.
-> Source: Anthropic MCP Registry, GitHub, community reviews, mcp.so, glama.ai, pulsemcp.com, smithery.ai
-> Ecosystem: ~18,000+ MCP servers (Glama: 18,052 | PulseMCP: 8,600+ | Smithery: 7,300+)
+> A curated starting list — counts and URLs go stale fast; verify against the registries before installing.
+> Sources: Anthropic MCP Registry, GitHub, community reviews, mcp.so, glama.ai, pulsemcp.com, smithery.ai
 
 ---
 
@@ -272,7 +271,7 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 | **ADHD** | Clockwise, Spotify, ntfy*, Apple Reminders | Focus defense + notifications |
 | **Health-focused** | Open Wearables, Garmin, Spotify | Fitness tracking + motivation |
 
-*ntfy = built into bos-compound-mcp, no separate install needed
+*ntfy = plain HTTP (`curl` to ntfy.sh) — no MCP server needed; see `examples/hooks/ntfy/`
 
 ---
 

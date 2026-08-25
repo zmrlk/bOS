@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# profile-scan.sh — completeness scanner for bOS /setup (v2.1 po symulacji e2e 2026-08-04)
-# Zamiast ankiety: policz co JUŻ wiemy, wykryj co się da, zwróć TYLKO luki niewykrywalne.
+# profile-scan.sh — completeness scanner for bOS /setup
+# Instead of a questionnaire: count what we already know, detect what we can, return ONLY the undetectable gaps.
 # Usage: profile-scan.sh [BOS_DIR]   (default: repo root two levels up from this script)
 # Output: plain-text report for the model. Exit 0 always (degrade gracefully).
 
@@ -10,7 +10,7 @@ BOS_DIR="${1:-$(cd "$SCRIPT_DIR/../../../.." && pwd)}"
 PROFILE="$BOS_DIR/profile.md"
 TODAY_EPOCH=$(date +%s)
 
-# ── Leverage map: pola, o które WOLNO zapytać przy luce (10 = pytaj pierwsze) ──
+# ── Leverage map: fields we're ALLOWED to ask about when there's a gap (10 = ask first) ──
 LEVERAGE="Name|10
 Primary goal|9
 Active packs|9
@@ -21,30 +21,30 @@ User type|5
 Language|4
 Location|3"
 
-# ── 1. AUTO-DETECTED (nigdy o to nie pytaj — potwierdź w prezentacji) ──
+# ── 1. AUTO-DETECTED (never ask about these — confirm in the presentation) ──
 echo "== AUTO-DETECTED (use these, do NOT ask; confirm in one presentation card) =="
 DETECTED_FIELDS=""
 TZ_SYS=$(readlink /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||') ; [ -n "${TZ_SYS:-}" ] && echo "timezone: $TZ_SYS" && DETECTED_FIELDS="$DETECTED_FIELDS Timezone"
 LOCALE_SYS=$(defaults read -g AppleLocale 2>/dev/null || echo "${LANG:-}")
 [ -n "$LOCALE_SYS" ] && echo "locale: $LOCALE_SYS" && DETECTED_FIELDS="$DETECTED_FIELDS Location"
 LANG1=$(defaults read -g AppleLanguages 2>/dev/null | sed -n 's/[^"]*"\([a-z][a-z]\)[-"].*/\1/p' | head -1)
-[ -n "${LANG1:-}" ] && echo "language_guess: $LANG1 (tie-break: język PIERWSZEJ WIADOMOŚCI usera wygrywa z locale)" && DETECTED_FIELDS="$DETECTED_FIELDS Language"
+[ -n "${LANG1:-}" ] && echo "language_guess: $LANG1 (tie-break: the language of the user's FIRST MESSAGE wins over locale)" && DETECTED_FIELDS="$DETECTED_FIELDS Language"
 case "$LOCALE_SYS" in *PL*) echo "currency_guess: PLN";; *US*) echo "currency_guess: USD";; *GB*) echo "currency_guess: GBP";; *DE*|*FR*|*ES*|*IT*|*NL*) echo "currency_guess: EUR";; esac
 GIT_NAME=$(git config --global user.name 2>/dev/null)
 if [ -n "${GIT_NAME:-}" ]; then
   if [ ${#GIT_NAME} -le 3 ] || ! echo "$GIT_NAME" | grep -qi '[aeiouy]'; then
-    echo "name_guess: $GIT_NAME (WEAK — wygląda na inicjały; pytaj o imię wprost, nie marnuj klika na potwierdzenie)"
+    echo "name_guess: $GIT_NAME (WEAK — looks like initials; ask for the name directly, don't waste a click on confirmation)"
   else
-    echo "name_guess: $GIT_NAME (confirm 1 klikiem, nie pytaj otwarcie)"
+    echo "name_guess: $GIT_NAME (confirm with 1 click, don't ask open-ended)"
     DETECTED_FIELDS="$DETECTED_FIELDS Name"
   fi
 fi
 command -v git >/dev/null && echo "has_git: yes"
-[ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (zaproponuj import — WYMAGA OSOBNEJ ZGODY, to inny zakres prywatności niż skan appek)"
-[ -d "$HOME/bos-wiki" ] && echo "existing_bos_wiki: yes (import za osobną zgodą)"
+[ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (suggest import — REQUIRES SEPARATE CONSENT, a different privacy scope than the app scan)"
+[ -d "$HOME/bos-wiki" ] && echo "existing_bos_wiki: yes (import requires separate consent)"
 ls /Applications 2>/dev/null | head -60 | tr '\n' ',' | sed 's/,$//' | awk '{print "apps_sample: " $0}'
 
-# ── 2. SYSTEM INVENTORY (surowe liczby; welcome cytuje TE liczby, nie inne) ──
+# ── 2. SYSTEM INVENTORY (raw counts; the welcome quotes THESE numbers, no others) ──
 echo ""
 echo "== SYSTEM INVENTORY (raw counts — welcome must not exceed these) =="
 N_SKILLS=$(find "$BOS_DIR/.claude/skills" -maxdepth 2 -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
@@ -53,11 +53,11 @@ N_AGENTS=$(find "$BOS_DIR/.claude/agents" -maxdepth 1 -name "*.md" 2>/dev/null |
 N_HOOKS=$(grep -o 'bash \.claude/hooks/[a-z-]*\.sh' "$BOS_DIR/.claude/settings.json" 2>/dev/null | wc -l | tr -d ' ')
 echo "skills: $N_SKILLS | agents: $N_AGENTS | hooks_wired: $N_HOOKS"
 
-# ── 3. PROFILE COMPLETENESS (tryb liczony po sekcji Core — reszta narasta z użycia) ──
+# ── 3. PROFILE COMPLETENESS (mode computed from the Core section — the rest grows with usage) ──
 echo ""
 echo "== PROFILE =="
 emit_gaps() {
-  # $1 = raw gaps "Field|lev\n..."; filtruje pola pokryte auto-detekcją, cap 5
+  # $1 = raw gaps "Field|lev\n..."; filters out fields covered by auto-detection, cap 5
   local RAW="$1"
   local OUT=""
   while IFS='|' read -r F L; do
@@ -95,10 +95,10 @@ done < "$PROFILE"
 
 CORE_TOTAL=$((CORE_FILLED+CORE_EMPTY)); CORE_PCT=0; [ "$CORE_TOTAL" -gt 0 ] && CORE_PCT=$((CORE_FILLED*100/CORE_TOTAL))
 ALL_TOTAL=$((ALL_FILLED+ALL_EMPTY))
-echo "core_filled: $CORE_FILLED / $CORE_TOTAL (${CORE_PCT}%) — MODE DECYDUJE CORE"
-echo "all_fields: $ALL_FILLED / $ALL_TOTAL (reszta narasta z użycia, NIE pytaj o nią)"
+echo "core_filled: $CORE_FILLED / $CORE_TOTAL (${CORE_PCT}%) — CORE DECIDES THE MODE"
+echo "all_fields: $ALL_FILLED / $ALL_TOTAL (the rest grows with usage, do NOT ask about it)"
 
-# Staleness: linia freshness → nazwa sekcji (najbliższy nagłówek ## powyżej)
+# Staleness: freshness line → section name (nearest ## heading above)
 echo "stale_sections:"
 grep -n 'freshness: 20' "$PROFILE" 2>/dev/null | while IFS= read -r fl; do
   LN=$(echo "$fl" | cut -d: -f1)
@@ -107,12 +107,12 @@ grep -n 'freshness: 20' "$PROFILE" 2>/dev/null | while IFS= read -r fl; do
   AGE=$(( (TODAY_EPOCH - D_EPOCH) / 86400 ))
   if [ "$AGE" -gt 30 ]; then
     SEC=$(head -n "$LN" "$PROFILE" | grep '^## ' | tail -1 | sed 's/^## //')
-    echo "  - ${SEC:-?}: ${AGE}d old (review — 'nadal aktualne?', nie pytaj od zera)"
+    echo "  - ${SEC:-?}: ${AGE}d old (review — 'still accurate?', don't ask from scratch)"
   fi
 done
 
 if [ "$CORE_PCT" -ge 80 ]; then
-  echo "mode: REVIEW (Core >=80% — read values back, 'still accurate?' na stęchłe sekcje JEDNYM multiSelect, NEVER re-interview)"
+  echo "mode: REVIEW (Core >=80% — read values back, 'still accurate?' for stale sections in ONE multiSelect, NEVER re-interview)"
 elif [ "$CORE_PCT" -ge 30 ]; then
   echo "mode: PARTIAL (fill gaps only)"
 else

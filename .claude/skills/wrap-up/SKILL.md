@@ -66,7 +66,7 @@ Write to `state/handoff.md` (overwrite previous — only latest matters):
 ### Step 4: Confirm to user
 
 ```
-✅ Handoff saved. Następna sesja zacznie od:
+✅ Handoff saved. Next session starts from:
 → {suggested first action}
 {1-line summary of what's in progress}
 ```
@@ -76,4 +76,4 @@ Write to `state/handoff.md` (overwrite previous — only latest matters):
 - Focus on WHAT'S NOT IN STATE FILES — don't repeat tasks.md content
 - Overwrite previous handoff — only latest matters
 - If /evening runs in same session → /wrap-up adds handoff on top, doesn't replace /evening
-- Language: match user's language (Polish for [user])
+- Language: match the user's language
