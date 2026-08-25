@@ -3,6 +3,7 @@ name: Expense
 description: "Log a personal or business expense. Quick entry for tracking spending. Use whenever user mentions spending money, paying, or buying something."
 user_invocable: true
 command: /expense
+tier: core
 ---
 
 # Log Expense
@@ -62,11 +63,12 @@ Read `state/finances.md` for: buffer current, this month's total.
 - If adhd_indicators = yes → keep response very short, no lecture.
 
 ### Context-Bus Signals
-After logging, post to `state/context-bus.jsonl`:
-- **Large expense (>10% monthly):** `@finance → @boss, Type: data, Priority: normal, TTL: 7 days, Content: "Large expense: [amount] [currency] — [category]. Monthly total now: [X]", Status: pending`
-- **Impulse flagged:** `@finance → @coach, Type: insight, Priority: info, TTL: 7 days, Content: "Impulse expense flagged: [amount] [currency] — [description]", Status: pending`
-- **Monthly spending exceeds budget:** `@finance → @boss + @finance, Type: constraint, Priority: critical, TTL: 14 days, Content: "Monthly spending [amount] exceeds budget [budget]. Buffer impact.", Status: pending`
+After logging, helper only:
+`bash scripts/context-bus-append.sh <from> <to> <type> <priority> "<content>" [ttl_days]`
+- Large expense (>10% monthly): `@finance` `ALL` `data` `normal` `"Large expense: [amount] — [category]. Monthly now: [X]"` `7`
+- Impulse flagged: `@finance` `@coach` `insight` `info` `"Impulse expense flagged: [amount] — [description]"` `7`
+- Over budget: `@finance` `ALL` `constraint` `critical` `"Monthly spending [amount] exceeds budget [budget]"` `14`
 
 ## State Files
 - **Read:** state/finances.md, profile.md (money_style, monthly_expenses, adhd_indicators, currency)
-- **Write:** state/finances.md, state/context-bus.jsonl
+- **Write:** state/finances.md. Bus = helper → `state/context-bus.jsonl`

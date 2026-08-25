@@ -1,5 +1,5 @@
 {
-  "enableAllProjectMcpServers": true,
+  "enableAllProjectMcpServers": false,
   "hooks": {
     "SessionStart": [
       {
@@ -23,7 +23,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "Write|Edit|MultiEdit|Bash",
         "hooks": [
           {
             "type": "command",
@@ -100,6 +100,9 @@
       "Bash(npx *)",
       "Bash(which *)",
       "Bash(uname *)",
+      "Bash(bash scripts/bos-roster.sh*)",
+      "Bash(bash scripts/context-bus-append.sh*)",
+      "Bash(scripts/context-bus-append.sh*)",
       "Bash(test *)",
       "Bash([ *)",
       "mcp__*"
@@ -112,7 +115,8 @@
       "Bash(wget *)",
       "Bash(python*)",
       "Bash(node -e *)",
-      "Bash(pbcopy*)"
+      "Bash(pbcopy*)",
+      "Bash(git push*)"
     ]
   }
 }

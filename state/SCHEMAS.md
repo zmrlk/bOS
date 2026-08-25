@@ -5,7 +5,7 @@
 
 ## Growing File Structure (Smart Context Loading)
 
-Growing state files (tasks.md, daily-log.md, finances.md, context-bus.md, weekly-log.md) use a 3-zone format:
+Growing state files (tasks.md, daily-log.md, finances.md, weekly-log.md) use a 3-zone format. The bus is JSONL, not this format.
 
 ```markdown
 # [TITLE]
@@ -376,53 +376,27 @@ Active section: lines XX-YY
 
 ---
 
-## context-bus.md
+## context-bus.jsonl
 
-### Summary Template (first 25 lines)
+One JSON object per line. **Write only** via `bash scripts/context-bus-append.sh`. `state/context-bus.md` is a stub.
+
+### Fields
 ```
-# Context Bus
-
-## Summary
-<!-- AUTO-UPDATED by @boss at session end -->
-| Metric | Value |
-|--------|-------|
-| Pending critical | X |
-| Pending normal | X |
-| Pending info | X |
-| Oldest pending | YYYY-MM-DD |
-
----
+{"ts":"ISO-8601Z","from":"@agent","to":"ALL","type":"insight","priority":"normal","ttl":"ISO-8601Z","status":"pending","content":"..."}
 ```
 
-### Format:
-```
-## [YYYY-MM-DD] @source → @target(s)
-Type: insight | decision | constraint | data | calibration
-Priority: critical | normal | info
-TTL: [expiry date, default: 14 days]
-Content: [the finding]
-Status: pending | acknowledged | acted-on | expired
-```
+| Field | Values |
+|-------|--------|
+| type | insight \| decision \| constraint \| data \| calibration \| session-status \| plan \| system-migration \| incident |
+| priority | critical \| normal \| info |
+| from | `@agent` \| `session:name` \| cron-name |
+| content | max 2000 chars; calibration MUST contain `BYŁO:` `JEST:` `ŹRÓDŁO:` |
 
-### Signal types:
-- `insight` — observation, pattern, correlation
-- `decision` — decision made that affects other agents
-- `constraint` — hard limit discovered (budget, time, health)
-- `data` — raw data update (task done, expense logged, streak milestone)
-- `calibration` — updated understanding of the user that other agents should know about
-
-### Status lifecycle:
-- `pending` → signal posted, not yet seen by target agent
-- `acknowledged` → target agent has seen the signal
-- `acted-on` → target agent has incorporated the signal into their behavior/response
-- `expired` → past TTL, awaiting archival
-
-### Rules:
-- All agents can append (never edit others' entries)
-- @boss sweeps on session start: surface critical+pending, mark expired
-- @boss processes `calibration` signals: updates profile.md or reposts as targeted signals
-- After acting on a signal, update Status to `acted-on`
-- Monthly: archive expired and acted-on entries to state/archive/context-bus-YYYY-MM.md
+### Rules
+- Append-only. No ACK kernel. No rewrite of expired lines.
+- SessionStart **filters** unexpired `priority=critical` (last 5) into context.
+- Never `echo >>` the jsonl file. Helper validates and rejects.
+- Empty file (or missing) is valid.
 
 ---
 

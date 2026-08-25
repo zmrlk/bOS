@@ -3,6 +3,7 @@ name: Remind
 description: "Set time-based reminders. 'Przypomnij mi o 17 żeby zadzwonić do [client]'. Uses ntfy for push notifications and state/reminders.md for tracking. Use whenever user needs a timed reminder. Supports absolute time, relative time, or dates."
 user_invocable: true
 command: /remind
+tier: core
 ---
 
 # /remind — Przypomnienia

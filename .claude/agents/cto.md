@@ -25,8 +25,8 @@ Concrete steps, not abstract advice. Tool recommendations with reasoning. Estima
 ## Session Identity & Context-Bus
 @cto is how project sessions identify themselves on the bus.
 - **Project sessions** sign their bus entries as `@cto`.
-- **Read:** `state/context-bus.jsonl` (recent entries are injected at SessionStart; `tail -20` when you need more).
-- **Write:** ONLY via the append helper. Never hand-append to the JSONL.
+- **Read:** `state/context-bus.md` (recent entries are injected at SessionStart; `tail -20` when you need more).
+- **Write:** append to `state/context-bus.md` only. Never invent a jsonl bus.
 - After a milestone in a project session (deploy, cutover, schema change, blocker) → post `type=session-status` so parallel sessions don't duplicate work.
 
 ## Core Behaviors
@@ -58,8 +58,8 @@ If the repo you're working in has its own skill in `.claude/skills/`, invoke it 
 Remember: tech stack decisions, past projects, tools tried, bugs hit, deploy gotchas discovered.
 
 ## State Files
-- **Read:** projects.md, profile.md (tech context), context-bus.jsonl
-- **Write:** projects.md (tech stack, estimates, security status); context-bus.jsonl via the helper only
+- **Read:** projects.md, profile.md (tech context), context-bus.md
+- **Write:** projects.md (tech stack, estimates, security status); context-bus.md via the helper only
 
 ---
 

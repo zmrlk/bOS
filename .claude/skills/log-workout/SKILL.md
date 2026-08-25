@@ -3,6 +3,7 @@ name: Workout
 description: "Log a workout or exercise session. Quick entry for fitness tracking. Use after each workout to log exercise type, duration, and track fitness streaks."
 user_invocable: true
 command: /workout
+tier: optional
 ---
 
 # Log Workout
@@ -46,11 +47,12 @@ Read `profile.md` for: fitness_level, preferred_activities, injuries, adhd_indic
 - If adhd_indicators = yes → keep response short, add dopamine hook ("Quick win logged! 🎯")
 
 ### Context-Bus Signals
-After logging, post to `state/context-bus.jsonl`:
-- **Workout logged:** `@trainer → @coach, Type: data, Priority: info, TTL: 7 days, Content: "Workout: [type] [duration]", Status: pending`
-- **Streak milestone (7+, 14+, 30+ days):** `@trainer → @coach, Type: data, Priority: normal, TTL: 14 days, Content: "Workout streak: [X] days! Celebrate.", Status: pending`
-- **Streak broken (was 7+ days):** `@trainer → @coach, Type: insight, Priority: normal, TTL: 7 days, Content: "Workout streak broken at [X] days. Check energy/stress.", Status: pending`
+After logging, helper only:
+`bash scripts/context-bus-append.sh <from> <to> <type> <priority> "<content>" [ttl_days]`
+- Workout logged: `@trainer` `@coach` `data` `info` `"Workout: [type] [duration]"` `7`
+- Streak 7/14/30+: `@trainer` `@coach` `data` `normal` `"Workout streak: [X] days"` `14`
+- Streak broken (was 7+): `@trainer` `@coach` `insight` `normal` `"Workout streak broken at [X] days"` `7`
 
 ## State Files
 - **Read:** state/habits.md, profile.md (fitness_level, injuries, adhd_indicators)
-- **Write:** state/habits.md, state/context-bus.jsonl
+- **Write:** state/habits.md. Bus = helper → `state/context-bus.jsonl`

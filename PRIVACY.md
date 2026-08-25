@@ -1,6 +1,8 @@
 # bOS Privacy
 
-This is a plain-language explanation of what bOS knows about you, where it lives, and what you can do with it. No legal jargon — just the facts.
+This is a plain-language explanation of what **Lite bOS (this repo, v0.12.1)** knows about you. No legal jargon.
+
+Lite is a **local folder**. It does not run a 24/7 daemon. Optional samples live under `examples/` and are off unless you copy them in. There is no `/vault` skill and no `/delete-my-data` skill in Lite — delete files yourself, or use your OS.
 
 ---
 
@@ -36,12 +38,12 @@ Daily activity tracked in local markdown files:
 | `state/projects.md` | Active projects and hours (if Business pack active) |
 | `state/journal.md` | Micro-journal entries from /reflect (questions + your answers) |
 | `state/network.md` | Relationship contacts — names, context, follow-up dates |
-| `state/context-bus.jsonl` | Cross-agent context signals |
+| `state/context-bus.jsonl` | Cross-agent context signals (append via helper only) |
 | `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
 | `state/time-log.md` | Time tracking entries — project, duration, description |
 | `state/inbox.md` | Messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) — sender, subject, status |
-| `state/schedules.md` | Automated skill schedules — which skills run when, delivery channel |
-| `state/marketplace.md` | Installed marketplace skills — skill name, version, install date |
+| `state/schedules.md` | Only if you copy `examples/skills/schedule/` — not Lite |
+| `state/marketplace.md` | Not used by Lite (no skill registry) |
 | `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
 
 ### Auto-memory (`~/.claude/projects/<project>/memory/`)
@@ -53,13 +55,13 @@ This is stored in `~/.claude/projects/<project>/memory/` — separate from bOS i
 Small dotfiles written by lifecycle hooks and skills during a session — for example `state/.last-message` (a timestamp) or `state/.working.md` (a crash buffer). They hold only what the hook needs to avoid repeating itself, they stay on your machine, and they are never synced to Supabase. All of them are gitignored, so they never travel with the distribution.
 
 ### Cross-agent signals (`state/context-bus.jsonl`)
-Agents share relevant information with each other to coordinate better. For example, when your stress is high, the wellness perspective signals @finance to watch for impulse spending. When your budget is tight, @finance signals all agents to avoid recommending paid tools. These signals contain only the relevant data point — not your full profile or history.
+Agents share relevant information with each other to coordinate better. For example, when your stress is high, the wellness perspective signals @finance to watch for impulse spending. When your budget is tight, @finance signals all agents to avoid recommending paid tools. These signals contain only the relevant data point — not your full profile or history. Write only through `bash scripts/context-bus-append.sh`. The markdown stub `state/context-bus.md` is not the live bus.
 
 ### Webhook configuration (`state/.webhooks.md`)
-If you use `/webhooks` to connect bOS to external tools (n8n, Zapier, Make), the webhook URLs and event mappings are stored in this file. bOS never logs full webhook URLs in cross-agent signals (they may contain tokens). Webhook execution is fire-and-forget — bOS sends a JSON payload when events occur but does not store responses.
+Lite has no `/webhooks` skill. If you add your own `state/.webhooks.md`, URLs may contain tokens — never copy them to the bus or chat.
 
-### Secrets vault (`.secrets/vault.json`)
-API keys and credentials you store via `/vault`. Stored locally only, protected so only your account can read them. Never sent anywhere.
+### Secrets (`.secrets/`)
+Create this folder yourself (`chmod 700`, files `600`). Never paste keys into chat. There is no `/vault` skill in Lite.
 
 ### Push notification config (`.secrets/ntfy.env`)
 If you use push notifications via ntfy.sh, your topic name and server URL are stored in `.secrets/ntfy.env`. This file is local-only and never synced to Supabase or any external service.
@@ -73,7 +75,7 @@ bOS also checks file modification dates to determine which tools and projects ar
 
 ## Subscription & benefit detection
 
-When you run `/scan-context` or `/evolve` (with your consent), bOS may search for subscription-related information:
+When you run `/evolve` **and you consent to a file-name scan**, bOS may look for subscription-related **names** (not file contents):
 
 ### What it looks for
 - **Email patterns** (if Gmail/email connected): Searches for emails from known subscription providers by sender domain. It does NOT read email content — only checks if emails from specific senders exist.
@@ -96,13 +98,11 @@ When you run `/scan-context` or `/evolve` (with your consent), bOS may search fo
 
 ## Where it lives
 
-**Lite Mode (default):** Everything stays on your computer. `profile.md`, state files, `.secrets/` — all local. Nothing leaves your machine.
+**Lite (this repo):** Everything stays on your computer. `profile.md`, state files, `.secrets/` — all local. Nothing leaves your machine unless you send it (chat to Anthropic, or an optional ntfy topic you configured).
 
-**Pro Mode (Supabase connected):** Your task data, financial logs, habits, and agent memory get stored in a Supabase database. This is a cloud database — you set it up yourself with your own account. bOS uses your own database, not a shared one.
+**Supabase / “Pro”:** sample schemas live in `examples/supabase/`. Lite does **not** dual-write to the cloud. If you copy those samples and connect a database yourself, that is your setup — not shipped behavior.
 
-**Hybrid Sync (v0.6.1+):** When Supabase is connected, bOS uses a dual-write protocol — data is always written locally first, then pushed to Supabase. If you're offline, everything works normally. Changes sync automatically when you reconnect. Conflict resolution: small differences are auto-merged, larger conflicts ask you to decide. Sync metadata (timestamps, not content) is tracked in `sync_log` and `sync_state` Supabase tables.
-
-In both modes, your secrets vault stays local. It never syncs to Supabase.
+Secrets in `.secrets/` stay local. They are not synced anywhere by Lite.
 
 ---
 
@@ -110,7 +110,7 @@ In both modes, your secrets vault stays local. It never syncs to Supabase.
 
 **Lite Mode:** Only you. The files are on your computer. If someone has access to your computer, they have access to these files. The `.secrets/` folder is protected so only your account can read them.
 
-**Pro Mode:** You + your Supabase account. Supabase enforces Row Level Security — your data is tied to your authenticated user, and no one else can read it through the API.
+**Your own cloud (optional):** only if you copy `examples/supabase/` and connect it. Not Lite.
 
 **Claude / Anthropic:** Claude processes your messages to give responses. When Claude Code reads a local file (like your profile or state files), the relevant content is sent to Anthropic's API as part of the conversation context. [Anthropic's privacy policy](https://www.anthropic.com/privacy) governs how this data is handled. Your files are not stored separately on Anthropic's servers — they are processed as part of your conversation, subject to Anthropic's data retention policy.
 
@@ -120,30 +120,24 @@ In both modes, your secrets vault stays local. It never syncs to Supabase.
 
 Data stays until you delete it. There's no automatic expiration.
 
-- Profile, state files, secrets vault: until you run `/delete-my-data` or delete the files manually
+- Profile, state files, `.secrets/`: until you delete the files yourself (Lite has no `/delete-my-data` skill)
 - Agent memory: until you clear it (`~/.claude/projects/<project>/memory/` — delete the folder)
-- Supabase data (Pro mode): until you delete it from your Supabase dashboard, or until you drop the tables
+- Anything you put in your own Supabase (not Lite): until you delete it there
 
 ---
 
 ## Exporting your data
 
-Run `/export` to create a full backup of everything bOS knows about you:
-- Your profile
-- All state files
-- Secrets (field names only, values masked)
-- Agent memory summary
-
-This creates a single `bos-export-YYYY-MM-DD.md` file you can keep as a backup or use to migrate to another setup.
+Lite has **no** `/export` skill. Copy `profile.md` and `state/*.md` yourself (or ask the agent to pack a zip). Do not copy `.secrets/` into chat.
 
 ---
 
 ## Deleting your data
 
-Run `/delete-my-data` to wipe everything:
+To wipe everything, delete `profile.md`, `state/*.md`, and `.secrets/` yourself (ask the agent to list paths first):
 - Deletes `profile.md`
 - Resets state files to blank templates
-- Clears `.secrets/vault.json`
+- Clears `.secrets/` if present
 - Does NOT delete agent memory automatically (that's in `~/.claude/projects/<project>/memory/` — you can delete that folder yourself)
 - Does NOT delete Supabase data automatically — you can drop tables from the Supabase dashboard
 
@@ -158,7 +152,7 @@ bOS only scans file and folder **names**. It never opens or reads file contents.
 Specifically:
 - It looks at names in Desktop, Documents, Downloads, Applications
 - It does NOT read your documents, spreadsheets, PDFs, images, or any other file
-- Scanning happens only with your explicit consent during setup or when you run `/scan`
+- Scanning happens only with your explicit consent during `/setup`
 - You can say no — bOS works fine without scanning
 - File modification dates are checked to prioritize recent/active files
 
@@ -204,9 +198,9 @@ Your phone → claude.ai/Claude app → Anthropic API → your local Claude Code
 
 ---
 
-### Option B: Telegram Bot (advanced)
+### Option B: Telegram (not Lite)
 
-If you connect Telegram via `/connect-mobile`, here's how your data flows:
+There is **no** `/connect-mobile` skill in this repo. Sample n8n flows live under `examples/templates/n8n/`. If you wire Telegram yourself, data may flow like this:
 
 ### Data path
 
@@ -240,19 +234,13 @@ Your phone → Telegram servers → n8n (your account) → Supabase (your databa
 Your Supabase data and local bOS data remain intact after disconnecting Telegram.
 
 ### Recommendation
-Telegram is a convenience layer — don't share sensitive information (passwords, financial account numbers) through the bot. Use the computer interface for sensitive conversations and the `/vault` for storing secrets.
+Telegram is a convenience layer — don't share sensitive information (passwords, financial account numbers) through the bot. Use the computer interface for sensitive conversations; store secrets in `.secrets/` with an editor, never in chat.
 
 ---
 
 ## Webhooks and external integrations
 
-If you configure webhooks via `/webhooks`, bOS sends event data (like "task completed" or "budget exceeded") to URLs you specify. This means data leaves your machine and goes to whatever service you connected (n8n, Zapier, Make, or a custom endpoint).
-
-**What gets sent:** Event type, timestamp, and relevant data (task name, expense amount, habit streak, etc.). Test payloads are clearly marked with `"test": true`.
-
-**What does NOT get sent:** Your full profile, passwords, health details, journal entries, or any data beyond the specific event.
-
-**You control everything:** You choose which events to hook, where they go, and you can remove them anytime with `/webhooks remove`.
+Lite has **no** `/webhooks` skill. If you add your own hooks, data you send leaves the machine. Keep payloads small; never put secrets in them.
 
 ---
 
@@ -290,14 +278,7 @@ bOS passively captures data mentioned in natural conversation — for example, i
 
 ## Data gap detection
 
-At session start, bOS checks for stale state files and may gently ask about missing data:
-
-- **Daily energy log:** If no entry for >1 day, bOS may ask "How's your energy?" at a natural pause
-- **Expenses:** If no expenses logged this month (after day 5), bOS may remind about expense tracking
-- **Tasks:** If task summary is >3 days old, bOS refreshes it silently
-- **Weekly review:** On Friday-Sunday, if no review this week, bOS may suggest `/review-week`
-
-**Rules:** Maximum 1 data gap question per session. If you ignore it, bOS does not repeat. Detection runs locally via shell scripts — no external services involved.
+Session start injects locators and facts. It does **not** ask about energy or offer `/review-week`. `/morning` and `/evening` run only if you ask.
 
 ---
 
@@ -308,8 +289,7 @@ bOS uses lifecycle hooks (SessionStart, PreCompact, Stop) that run automatically
 - Read the current date and time from your local system clock
 - Count pending tasks and overdue items from local state files
 - Check your financial buffer status from `state/finances.md`
-- Scan `state/context-bus.jsonl` for critical pending signals
-- Detect data gaps (stale daily-log, missing expenses, outdated task summary, missing weekly review) and inject `DATA_GAP` signals
+- Scan `state/context-bus.jsonl` for unexpired critical signals (TTL is a read filter)
 
 **No external service is involved.** Hooks are plain shell scripts that run locally. They do not send data anywhere — they only read local files and inject a summary into your session context. The same privacy rules apply as for interactive bOS use: everything stays on your machine.
 
@@ -317,13 +297,7 @@ bOS uses lifecycle hooks (SessionStart, PreCompact, Stop) that run automatically
 
 ## Headless execution (`claude -p`)
 
-bOS can run scheduled skills using `claude -p` (headless/non-interactive mode). This is how `/schedule` runs morning briefings, reminders, or recurring tasks automatically.
-
-**Privacy model:** Identical to interactive use. The same files are read, the same local-only data is used, and nothing additional is sent to external services. Claude Code processes locally; if a skill sends output (Telegram, email), only the same data that would appear in an interactive session is sent.
-
-**What runs:** Only skills you explicitly scheduled via `/schedule`. You can see all active schedules in `state/schedules.md`.
-
-**How to stop:** Run `/schedule remove [skill]` or delete the relevant entry in `state/schedules.md`.
+`/schedule` is **not Lite**. Sample skill: `examples/skills/schedule/`. If you copy it in and run `claude -p` yourself, privacy is the same as an interactive session. Lite does not arm that cron.
 
 ---
 
@@ -341,15 +315,9 @@ If you use `/reflect`, bOS stores your micro-journal entries (a question and you
 
 ## Unified Inbox data
 
-If you use `/inbox`, bOS collects messages from connected channels (Telegram, Email, Slack, Discord, WhatsApp) via n8n workflows. Messages are stored in `state/inbox.md` (Lite mode) or the `messages` Supabase table (Pro mode). Message data includes: sender name, channel, subject/preview, and timestamps. Full message bodies are stored only in Pro mode. Messages can be archived or deleted via `/inbox archive`.
+`/inbox` in Lite is Gmail/Outlook **MCP if you connected them** — not a multi-channel n8n inbox. It does not write full mail bodies to `state/`.
 
-## Scheduled skill data
-
-If you use `/schedule`, bOS stores your automation schedules in `state/schedules.md` (Lite mode) or the `schedules` Supabase table (Pro mode). This includes: which skills run, when (cron expression), and where they deliver (in-app, Telegram, email). No personal data is stored in schedules — only configuration.
-
-## Marketplace data
-
-If you use `/marketplace`, bOS tracks which skills you've installed in `state/marketplace.md`. This includes: skill name, version, and install date. No personal data is shared with the skill registry — bOS fetches the catalog from GitHub (public repo) without sending any user information.
+`/schedule` and `/marketplace` are **not Lite**. Samples: `examples/skills/schedule/`. There is no skill registry.
 
 ---
 
@@ -377,40 +345,23 @@ bOS monitors your conversation for work that matches open tasks in `state/tasks.
 
 ---
 
-## Email monitoring (v0.10.0)
+## Email (optional, not wired)
 
-If you connect Gmail and/or Outlook (Microsoft 365) via Claude.ai connectors, bOS can:
-- Search your email for important messages
-- Filter noise (system alerts, newsletters, promotions)
-- Send push notifications via ntfy when important emails arrive
+`/inbox` can search Gmail/Outlook **if you connected those MCP servers**. Lite does **not** ship a live 15-minute email cron. Sample launchd files live in `examples/hooks/ntfy/` and stay off until you install them (they hard-fail without an ntfy topic).
 
-**What gets read:** Email metadata (sender, subject, date) and snippets. Full email body only when you explicitly open a message.
-
-**Cron behavior:** An optional launchd cron runs every 15 minutes using `claude -p` to check for new important emails. It uses the same Claude.ai OAuth — no API keys stored locally.
-
-**What gets stored:** Nothing. Email content is NOT saved to state files. Only the notification summary is sent via ntfy.
-
-**Who has access:** Claude (via Anthropic's API) processes the email search query and results. Anthropic's privacy policy applies.
-
-**How to disable:** Unload the launchd agent: `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.bos.email-monitor.plist`
+Email bodies are not written to `state/`.
 
 ---
 
-## Skill auto-tracking (v0.10.0)
+## Skill-run logs
 
-bOS logs every skill execution to `state/skill-runs.jsonl`. Each entry contains:
-- Timestamp
-- Skill name
-- Success/failure status
-- Score (0-1)
-
-**No conversation content is stored.** Only the fact that a skill ran and whether it succeeded. This data is used by `/check` to monitor system health.
+Lite `/check` reports from **disk** (roster, files, hooks). It does not require `state/skill-runs.jsonl`. If that file appears, it is local telemetry — no conversation text.
 
 ---
 
-## Plugin integration (v0.10.0)
+## Plugins
 
-bOS supports Anthropic official plugins (installed via `claude plugin install`). These plugins may introduce their own tools and data handling. Plugin-specific privacy is governed by the plugin author's policies. bOS built-in state files are not modified by plugins — they use their own storage.
+Claude Code plugins you install yourself have their own policies. They are not part of this Lite folder.
 
 ---
 
@@ -419,7 +370,7 @@ bOS supports Anthropic official plugins (installed via `claude plugin install`).
 bOS is an open system — you can read every file it creates. If you're ever unsure what's stored, just look in:
 - `profile.md` — your profile
 - `state/` — your activity data
-- `.secrets/vault.json` — your secrets (open the file to inspect it)
+- `.secrets/` — your secrets (open files in an editor; never paste into chat)
 - `~/.claude/projects/<project>/memory/` — agent memory
 
 Everything is readable text. Nothing is hidden.

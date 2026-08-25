@@ -20,7 +20,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/zsh</string>
-    <string>REPLACE_WITH_HOME/.claude/hooks/morning-push.sh</string>
+    <string>REPLACE_WITH_HOME/examples/hooks/ntfy/morning-push.sh</string>
   </array>
 
   <!-- ── Schedule: multi-slot (first awake wins) ─────────── -->

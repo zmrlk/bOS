@@ -3,6 +3,7 @@ name: Recall
 description: "Search across all past bOS sessions — session digests, memory files, pre-compact snapshots, state files, and context-bus history. Use this skill whenever the user says /recall, 'remember when', 'last time we', 'we talked about', 'what did we decide', 'find that conversation', or references something from a previous session. Also trigger when user seems confused about past context or asks 'did I already...' or 'have we...'. This is the go-to skill for recovering any information from past sessions."
 user_invocable: true
 command: /recall
+tier: core
 ---
 
 # /recall — Cross-Session Memory Search

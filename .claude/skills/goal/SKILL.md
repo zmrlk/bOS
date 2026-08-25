@@ -3,6 +3,7 @@ name: Goal
 description: "Set, update, review, or complete goals. Works with @coach (life goals) and @boss (business goals)."
 user_invocable: true
 command: /goal
+tier: core
 ---
 
 # /goal — Goal Manager
@@ -48,11 +49,11 @@ If user provides a goal without subcommand → treat as `/goal set`.
 1. Read `state/goals.md`, find goal by #
 2. Update Progress column with note
 3. If progress suggests completion → ask: "Wygląda na to, że cel osiągnięty. Zamknąć?"
-4. Post to context-bus: `@goal-owner → all: Goal #[X] updated — [progress]`
+4. Bus: `bash scripts/context-bus-append.sh "@coach" "ALL" "data" "info" "Goal #[X] updated — [progress]" 7`
 
 ### Complete goal
 1. Move from Active Goals to Completed Goals with date and duration
-2. Post to context-bus: `@coach → all: 🎉 Goal completed — [goal description]`
+2. Bus: `bash scripts/context-bus-append.sh "@coach" "ALL" "data" "normal" "Goal completed — [goal description]" 14`
 3. Celebrate: "Powiedziałeś, że to zrobisz. Zrobiłeś. To jest ogromne."
 4. Ask: "Chcesz ustawić następny cel?" (AskUserQuestion)
 

@@ -3,6 +3,7 @@ name: Help
 description: "Show all available commands, agents, and shortcuts. The go-to reference when users don't know what to do."
 user_invocable: true
 command: /help
+tier: core
 ---
 
 # /help — What can I do?
@@ -38,7 +39,7 @@ Show a clean, one-screen reference of everything available.
   /decide           — structured decision with a verdict
   /wrap-up          — close a session with a handoff note
   /follow-up        — follow-up script for a contact
-  /ship             — review, commit, push
+  /ship             — review, commit (push is a separate ask)
 
   💰  TRACKING
   /log-expense      — log spending
@@ -56,16 +57,16 @@ Show a clean, one-screen reference of everything available.
   /setup            — onboarding / profile refresh
   /check            — system health check
   /evolve           — audit and improve bOS itself
-  /vault            — manage secrets/API keys
   /connect          — manage MCP connections
-  /schedule         — run skills on a schedule
   /build-agent      — create a custom agent
   /help             — this screen
 
+  Live list + core|optional: config/roster.md (`bash scripts/bos-roster.sh`)
+
   💬  JUST TALK
   You don't need commands. Just type naturally:
-  "good morning" · "plan my day" · "50 for lunch"
-  "how much did I spend" · "I need a workout"
+  "plan my day" · "50 for lunch" · "how much did I spend"
+  (A greeting like "hi" is not /morning and is not energy.)
 
   ⚙️  SETTINGS
   "turn off proactive mode" — agents stop suggesting

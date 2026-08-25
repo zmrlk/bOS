@@ -13,30 +13,7 @@ TODAY=$(date '+%Y-%m-%d')
 # ─── Clean crash buffer on clean exit (ISI-10) ───
 rm -f "$BOS_DIR/state/.working.md"
 
-# Expire context-bus entries past their TTL
-# BUG FIX: was comparing CREATION date vs 14-day cutoff — now compares TTL date vs TODAY
-if [ -f "$BOS_DIR/state/context-bus.md" ]; then
-  # Write awk script to temp file (avoids macOS awk escaping issues with !=)
-  AWK_EXPIRE=$(mktemp)
-  cat > "$AWK_EXPIRE" << 'AWKEOF'
-/^TTL:/ { gsub(/TTL: */, ""); ttl=$0 }
-/Status: pending/ {
-  if (ttl > "" && ttl < today) print NR
-  ttl=""
-}
-AWKEOF
-
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    while IFS= read -r line_num; do
-      sed -i '' "${line_num}s/Status: pending/Status: expired/" "$BOS_DIR/state/context-bus.md" 2>/dev/null
-    done < <(awk -v today="$TODAY" -f "$AWK_EXPIRE" "$BOS_DIR/state/context-bus.md" 2>/dev/null)
-  else
-    while IFS= read -r line_num; do
-      sed -i "${line_num}s/Status: pending/Status: expired/" "$BOS_DIR/state/context-bus.md" 2>/dev/null
-    done < <(awk -v today="$TODAY" -f "$AWK_EXPIRE" "$BOS_DIR/state/context-bus.md" 2>/dev/null)
-  fi
-  rm -f "$AWK_EXPIRE" 2>/dev/null
-fi
+# Bus TTL is a SessionStart read-filter. Do not rewrite jsonl here.
 
 # Update telemetry session count (cross-platform)
 if [ -f "$BOS_DIR/state/telemetry.md" ]; then
@@ -101,30 +78,10 @@ if [ ! -f "$ENGAGE_FILE" ]; then
   echo "|------|-----------|---------|" >> "$ENGAGE_FILE"
 fi
 
-# Check if micro-morning was shown today (uses marker file, not session-log grep)
-# DEDUP: only log once per day per directive (not per session-close)
 ENGAGE_TODAY_FILE="$BOS_DIR/state/.engage-logged-today"
 ENGAGE_LOGGED_TODAY=""
 [ -f "$ENGAGE_TODAY_FILE" ] && ENGAGE_LOGGED_TODAY=$(cat "$ENGAGE_TODAY_FILE" 2>/dev/null)
-
-MICRO_MORNING_FILE="$BOS_DIR/state/.micro-morning-done"
-if [ -f "$MICRO_MORNING_FILE" ] && [ "$(cat "$MICRO_MORNING_FILE" 2>/dev/null)" = "$TODAY" ]; then
-  # Only log once per day
-  if ! echo "$ENGAGE_LOGGED_TODAY" | grep -q "micro-morning"; then
-    if [ -f "$BOS_DIR/state/.micro-morning-skips" ]; then
-      SKIP_COUNT=$(head -1 "$BOS_DIR/state/.micro-morning-skips" 2>/dev/null || echo "0")
-      if [ "$SKIP_COUNT" -gt 0 ] 2>/dev/null; then
-        echo "| $TIMESTAMP | micro-morning | skipped ($SKIP_COUNT) |" >> "$ENGAGE_FILE"
-      else
-        echo "| $TIMESTAMP | micro-morning | shown |" >> "$ENGAGE_FILE"
-      fi
-    else
-      echo "| $TIMESTAMP | micro-morning | shown |" >> "$ENGAGE_FILE"
-    fi
-    echo "${ENGAGE_LOGGED_TODAY}micro-morning," > "$ENGAGE_TODAY_FILE"
-    ENGAGE_LOGGED_TODAY=$(cat "$ENGAGE_TODAY_FILE" 2>/dev/null)
-  fi
-fi
+# micro-morning tracking removed in v0.12 — rituals are opt-in only
 
 # Check if evening energy was logged today (dedup: once per day)
 if [ "$HOUR" -ge 18 ] && [ "$HOUR" -lt 22 ]; then
@@ -200,8 +157,7 @@ if [ ! -f "$DIGEST_FILE" ]; then
       [ -z "$TOPIC" ] && TOPIC=$(grep -E -m1 '^- ' "$LATEST_SNAPSHOT" 2>/dev/null | head -1 | sed 's/^- //')
       [ -z "$TOPIC" ] && TOPIC=$(grep -E -m1 '.{10,}' "$LATEST_SNAPSHOT" 2>/dev/null | head -1)
     fi
-    # Fallback: check context-bus for today's entries
-    [ -z "$TOPIC" ] && TOPIC=$(grep -E -A1 "## $TODAY" "$BOS_DIR/state/context-bus.md" 2>/dev/null | grep -v "^##" | head -1)
+    [ -z "$TOPIC" ] && TOPIC=$(grep "$TODAY" "$BOS_DIR/state/context-bus.jsonl" 2>/dev/null | tail -1 | sed -n 's/.*"content":"\([^"]*\)".*/\1/p')
     [ -z "$TOPIC" ] && TOPIC="(no topic extracted)"
     echo "## Topic: $(echo "$TOPIC" | cut -c1-120)"
     echo ""
@@ -212,9 +168,8 @@ if [ ! -f "$DIGEST_FILE" ]; then
     fi
     echo ""
     echo "## Recent State Changes"
-    # Show recent context-bus entries from today
-    if [ -f "$BOS_DIR/state/context-bus.md" ]; then
-      grep -E -A3 "## $TODAY|## $(date '+%Y-%m')" "$BOS_DIR/state/context-bus.md" 2>/dev/null | head -20
+    if [ -f "$BOS_DIR/state/context-bus.jsonl" ]; then
+      grep "$TODAY" "$BOS_DIR/state/context-bus.jsonl" 2>/dev/null | tail -5
     fi
     echo ""
     echo "## Tasks Modified Today"

@@ -3,6 +3,7 @@ name: Build Agent
 description: "Create a custom agent from scratch. User describes the role, bOS builds the agent file and adds it to the roster. Use when user wants to create a new specialized agent for a specific domain or role."
 user_invocable: true
 command: /build-agent
+tier: optional
 ---
 
 # Custom Agent Builder
