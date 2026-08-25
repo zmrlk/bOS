@@ -33,14 +33,9 @@
 | **Agent taglines** | default (say "customize team" to change) |
 | **Profile generated** | |
 | **Last updated** | |
-| **Mobile connected** | no |
-| **Mobile platform** | (remote-control / telegram / lite / both / none) |
 | **Social profiles scanned** | (none / twitter, linkedin, instagram...) |
 | **Setup extras pending** | no |
-| **Inbox channels** | (none / telegram, email, slack, discord, whatsapp) |
-| **Inbox auto-route** | off (on = auto-route messages to agents by keywords) |
 | **DND hours** | (none / e.g. 22:00-07:00) |
-| **Scheduled skills** | (none / list of active schedules) |
 | **Output mode** | auto (auto / minimal / detailed / visual) |
 | **bOS version** | 0.12.1 |
 
@@ -224,15 +219,14 @@
 |--------|-----------|------------|
 | Name, location, language, currency, timezone | /setup | user request |
 | user_type, tech_comfort | /setup | user request |
-| primary_goal | /setup | @coach, @ceo |
+| primary_goal | /setup | @coach, @boss |
 | communication_style | /setup | user request |
-| mobile_connected, mobile_platform | not Lite (no `/connect-mobile`) | leave empty |
-| social_profiles_scanned | /setup (5A Round 3) | user request |
-| permissions_mode | /setup (2f) | user request |
-| active_packs, active_agents | /setup (2d) | @boss |
-| system_mode, connected_mcps, bos_version | /setup (5B, 5D) | @boss |
+| social_profiles_scanned | /setup | user request |
+| permissions_mode | /setup | user request |
+| active_packs, active_agents | /setup | @boss |
+| system_mode, connected_mcps, bos_version | /setup | @boss |
 | proactive_mode | /setup | user request |
-| setup_extras_pending | /setup (Step 9) | @boss (/morning) |
+| setup_extras_pending | /setup | @boss (/morning) |
 | energy_pattern, work_style, peak_hours | @coo | @coo |
 | fitness_level, workout_frequency, injuries, weight, height, body_type, time_per_session | @trainer | @trainer |
 | sleep_quality, stress_level, caffeine_intake, alcohol_use, hydration | @wellness | @wellness |

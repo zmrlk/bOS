@@ -1,5 +1,5 @@
 ---
-name: Expense
+name: log-expense
 description: "Log a personal or business expense. Quick entry for tracking spending. Use whenever user mentions spending money, paying, or buying something."
 user_invocable: true
 command: /expense

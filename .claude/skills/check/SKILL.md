@@ -1,5 +1,5 @@
 ---
-name: Check
+name: check
 description: "Read-only health check of profile, state, hooks, and roster. Use when the user says /check, health check, or czy działa."
 user_invocable: true
 command: /check

@@ -1,5 +1,5 @@
 ---
-name: Remind
+name: remind
 description: "Set time-based reminders ('remind me at 5pm to call the client'). Uses ntfy for push notifications and state/reminders.md for tracking. Use whenever user needs a timed reminder. Supports absolute time, relative time, or dates."
 user_invocable: true
 command: /remind

@@ -263,12 +263,12 @@ Active section: lines XX-YY
 Active section: lines XX-YY
 | Metric | Value |
 |--------|-------|
-| Buffer | XX% (X PLN / Y PLN target) |
-| This month spent | X PLN |
-| Budget remaining | X PLN |
+| Buffer | XX% (X / Y target, in your currency) |
+| This month spent | X |
+| Budget remaining | X |
 | Top category | [category] |
 | Impulse ratio | X% (X/Y expenses) |
-| Last expense | YYYY-MM-DD, X PLN, [category] |
+| Last expense | YYYY-MM-DD, X, [category] |
 
 ---
 ```
@@ -289,16 +289,16 @@ Active section: lines XX-YY
 
 | Field | Value |
 |-------|-------|
-| Target | 3 months (X PLN) |
-| Current | X PLN |
+| Target | 3 months (X) |
+| Current | X |
 | Progress | XX% |
-| Monthly savings | X PLN |
+| Monthly savings | X |
 
 ## Expense Log
 
 | Date | Amount | Category | Description | Impulse? |
 |------|--------|----------|-------------|----------|
-| 2026-03-01 | 150 PLN | Food | Grocery shopping | no |
+| 2026-03-01 | 150 | Food | Grocery shopping | no |
 ```
 
 ### Rules:
@@ -441,7 +441,7 @@ Small file (read in full). Owner: @cfo.
 | Client | text | yes | Client/company name |
 | Project | text | no | Related project |
 | Amount | number | yes | Invoice amount |
-| Currency | text | yes | Currency code (PLN, USD, EUR) |
+| Currency | text | yes | Currency code (USD, EUR, PLN, …) |
 | Status | text | yes | draft / sent / paid / overdue |
 | Due date | YYYY-MM-DD | yes | Payment due date |
 | Paid date | YYYY-MM-DD | no | Date payment received |
@@ -452,8 +452,8 @@ Small file (read in full). Owner: @cfo.
 
 | Invoice # | Date | Client | Project | Amount | Currency | Status | Due date | Paid date |
 |-----------|------|--------|---------|--------|----------|--------|----------|-----------|
-| INV-001 | 2026-03-01 | Acme Corp | Website | 5000 | PLN | sent | 2026-03-15 | — |
-| INV-002 | 2026-03-05 | StartupXYZ | Audit | 2000 | PLN | draft | 2026-03-19 | — |
+| INV-001 | 2026-03-01 | Acme Corp | Website | 5000 | USD | sent | 2026-03-15 | — |
+| INV-002 | 2026-03-05 | StartupXYZ | Audit | 2000 | USD | draft | 2026-03-19 | — |
 ```
 
 ### Rules:

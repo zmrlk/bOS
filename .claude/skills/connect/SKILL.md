@@ -1,5 +1,5 @@
 ---
-name: Connect
+name: connect
 description: "Manage MCP connections — list, add, test, remove. Use when the user wants to connect a tool or says /connect."
 user_invocable: true
 command: /connect

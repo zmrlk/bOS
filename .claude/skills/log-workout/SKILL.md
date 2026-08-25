@@ -1,5 +1,5 @@
 ---
-name: Workout
+name: log-workout
 description: "Log a workout or exercise session. Quick entry for fitness tracking. Use after each workout to log exercise type, duration, and track fitness streaks."
 user_invocable: true
 command: /workout

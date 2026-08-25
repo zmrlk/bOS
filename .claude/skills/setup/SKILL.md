@@ -1,5 +1,5 @@
 ---
-name: Setup
+name: setup
 description: "Detection-first onboarding. Use when profile.md is missing or empty, or the user says /setup."
 user_invocable: true
 command: /setup

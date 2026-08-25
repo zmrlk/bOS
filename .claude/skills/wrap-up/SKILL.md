@@ -1,5 +1,5 @@
 ---
-name: Wrap Up
+name: wrap-up
 description: "Structured session close with handoff notes for next session continuity. Eliminates re-discovery time. Use when user says wrap-up, zamykam, koniec sesji, or before significant breaks between sessions."
 user_invocable: true
 command: /wrap-up

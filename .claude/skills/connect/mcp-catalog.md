@@ -83,7 +83,7 @@ These are verified by Anthropic and available via HTTP transport. Score: 10/10.
 | Name | What it does | Install command |
 |------|-------------|-----------------|
 | **Stripe** | Payments, invoices, subscriptions | `claude mcp add --transport http stripe https://mcp.stripe.com` |
-| **HubSpot** | CRM, contacts, deals, marketing | `claude mcp add --transport http hubspot https://mcp.hubspot.com/mcp` |
+| **HubSpot** | CRM, contacts, deals, marketing | `claude mcp add --transport http hubspot https://mcp.hubspot.com` |
 
 ### Data & Analytics
 
@@ -95,8 +95,8 @@ These are verified by Anthropic and available via HTTP transport. Score: 10/10.
 
 | Name | What it does | Install command |
 |------|-------------|-----------------|
-| **Zapier** | Automate workflows across 7000+ apps | `claude mcp add --transport http zapier [your-zapier-mcp-url]` |
-| **n8n** | Self-hosted workflow automation | `claude mcp add --transport http n8n [your-n8n-instance-url]/mcp` |
+| **Zapier** | Automate workflows across 7000+ apps | `claude mcp add --transport http zapier <your-zapier-mcp-url>` |
+| **n8n** | Self-hosted workflow automation | `claude mcp add --transport http n8n <your-n8n-instance-url>/mcp` |
 
 ### Knowledge & Research
 
@@ -104,7 +104,6 @@ These are verified by Anthropic and available via HTTP transport. Score: 10/10.
 |------|-------------|-----------------|
 | **Context7** | Up-to-date library docs for coding | `claude mcp add --transport http context7 https://mcp.context7.com/mcp` |
 | **Hugging Face** | ML models, datasets, Gradio apps | `claude mcp add --transport http hugging-face https://huggingface.co/mcp` |
-| **PubMed** | Biomedical literature search | `claude mcp add --transport http pubmed https://mcp.pubmed.ncbi.nlm.nih.gov/mcp` |
 
 ### Meetings & Notes
 
@@ -133,7 +132,7 @@ These are open-source, actively maintained, and community-verified.
 |--------|----------------|------------|-------|
 | **Softeria ms-365** (recommended) | `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server` | Personal + Work accounts | 9/10 |
 | **Softeria ms-365 (org mode)** | `claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --org-mode` | Work/School only | 9/10 |
-| **XenoXilus outlook-mcp** | `claude mcp add outlook -- npx -y @xenoxilus/outlook-mcp` | Outlook + SharePoint | 8/10 |
+| **XenoXilus outlook-mcp** | Clone `https://github.com/XenoXilus/outlook-mcp` + pack as DXT (no npm package) | Outlook + SharePoint | 8/10 |
 | **Official M365 connector** | Marketplace (Team/Enterprise only) | Requires Global Admin | 10/10 |
 
 **Softeria ms-365 features:** Email (read, send, draft, move, delete), Calendar (events, create, update), OneDrive (files, search), Contacts, Tasks, OneNote, Excel.
@@ -154,26 +153,25 @@ claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --preset all
 
 | Name | Install command | What it does | Score |
 |------|----------------|-------------|-------|
-| **Google Calendar** | Marketplace toggle or `claude mcp add gcal -- npx -y @anthropic/google-calendar-mcp` | Events, scheduling | 10/10 |
-| **Google Drive** | `claude mcp add gdrive -- npx -y @anthropic/google-drive-mcp` | Files, search, sharing | 9/10 |
-| **Google Maps** | `claude mcp add gmaps -- npx -y @modelcontextprotocol/server-google-maps` | Location, directions, places | 9/10 |
+| **Google Calendar** | Marketplace toggle or `claude mcp add gcal -- npx -y @cocal/google-calendar-mcp` | Events, scheduling | 10/10 |
+| **Google Drive** | `claude mcp add gdrive -- npx -y @isaacphi/mcp-gdrive` | Files, search, sharing | 9/10 |
+| **Google Maps** | `claude mcp add gmaps -- npx -y @modelcontextprotocol/server-google-maps` | Location, directions, places (archived upstream, unmaintained) | 9/10 |
 
 ### Database
 
 | Name | Install command | What it does | Score |
 |------|----------------|-------------|-------|
-| **PostgreSQL** | `claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres "postgresql://user:pass@host/db"` | SQL queries, schema | 9/10 |
-| **SQLite** | `claude mcp add sqlite -- npx -y @modelcontextprotocol/server-sqlite [path.db]` | Local database | 9/10 |
+| **PostgreSQL** | `claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres "postgresql://user:pass@host/db"` | SQL queries, schema (archived upstream, unmaintained) | 9/10 |
+| **SQLite** | `claude mcp add sqlite -- uvx mcp-server-sqlite --db-path <path.db>` | Local database (archived upstream, unmaintained) | 9/10 |
 | **MySQL** | `claude mcp add mysql -- npx -y @benborla29/mcp-server-mysql` | MySQL queries | 8/10 |
 
 ### Development
 
 | Name | Install command | What it does | Score |
 |------|----------------|-------------|-------|
-| **GitHub (stdio)** | `claude mcp add github -- npx -y @modelcontextprotocol/server-github` | Repos, PRs, issues (needs GITHUB_TOKEN) | 10/10 |
-| **GitLab** | `claude mcp add gitlab -- npx -y @modelcontextprotocol/server-gitlab` | GitLab API | 9/10 |
+| **GitHub (stdio)** | `claude mcp add github -- npx -y @modelcontextprotocol/server-github` | Repos, PRs, issues (needs GITHUB_TOKEN; deprecated upstream — prefer the HTTP server above) | 10/10 |
+| **GitLab** | `claude mcp add gitlab -- npx -y @modelcontextprotocol/server-gitlab` | GitLab API (archived upstream, unmaintained) | 9/10 |
 | **Playwright** | `claude mcp add playwright -- npx -y @playwright/mcp@latest` | Browser automation, testing | 10/10 |
-| **Docker** | `claude mcp add docker -- npx -y @modelcontextprotocol/server-docker` | Container management | 8/10 |
 
 ### System & Files
 
@@ -188,8 +186,8 @@ claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --preset all
 
 | Name | Install command | What it does | Score |
 |------|----------------|-------------|-------|
-| **Brave Search** | `claude mcp add brave -- npx -y @anthropic/brave-search-mcp --env BRAVE_API_KEY=YOUR_KEY` | Web + local search | 9/10 |
-| **Fetch** | `claude mcp add fetch -- npx -y @modelcontextprotocol/server-fetch` | Fetch web content | 9/10 |
+| **Brave Search** | `claude mcp add brave --env BRAVE_API_KEY=YOUR_KEY -- npx -y @brave/brave-search-mcp-server` | Web + local search | 9/10 |
+| **Fetch** | `claude mcp add fetch -- uvx mcp-server-fetch` | Fetch web content | 9/10 |
 
 ### AI & Knowledge
 
@@ -222,19 +220,12 @@ claude mcp add ms365 -- npx -y @softeria/ms-365-mcp-server --org-mode
 **For Enterprise (Team/Enterprise Claude plan + Global Admin):**
 Toggle in Marketplace → requires admin approval.
 
-### WP Poczta / Yahoo / Other IMAP
-```bash
-claude mcp add email -- npx -y mcp-mail-manager
-```
-Requires IMAP credentials (server, port, username, password).
-
 ### Quick decision tree:
 ```
 Email provider?
 ├── Gmail → Marketplace toggle (1 click)
 ├── Outlook/Hotmail → softeria ms-365 (npx)
-├── Company Outlook → softeria ms-365 --org-mode (npx)
-└── Other (WP, Yahoo, custom) → mcp-mail-manager (IMAP)
+└── Company Outlook → softeria ms-365 --org-mode (npx)
 ```
 
 ---
@@ -243,7 +234,7 @@ Email provider?
 
 ### Google Calendar
 **Easiest:** Marketplace toggle in claude.ai/settings/connectors.
-**CLI:** `claude mcp add gcal -- npx -y @anthropic/google-calendar-mcp`
+**CLI:** `claude mcp add gcal -- npx -y @cocal/google-calendar-mcp`
 
 ### Outlook Calendar
 Included in ms-365-mcp-server:
@@ -261,14 +252,14 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 | User profile | Recommended MCPs | Why |
 |-------------|-----------------|-----|
 | **Business owner** | GitHub, Notion/Linear, Stripe, Slack, WhatsApp, ntfy* | Core business + messaging |
-| **Freelancer** | GitHub, Notion, Stripe, Gmail/ms365, WhatsApp, Clockwise | Client mgmt + focus time |
+| **Freelancer** | GitHub, Notion, Stripe, Gmail/ms365, WhatsApp | Client mgmt + focus time |
 | **Developer** | GitHub, Playwright, Sentry, Supabase, Context7, Tavily | Dev workflow + research |
 | **Designer** | Figma, Canva, Miro, YouTube | Creative tools + inspiration |
-| **Manager** | Slack, Asana/Linear, Notion, Google Calendar, Clockwise | Team coord + scheduling |
+| **Manager** | Slack, Asana/Linear, Notion, Google Calendar | Team coord + scheduling |
 | **Student** | Notion, Google Drive, Context7, YouTube, Spotify | Learning + focus music |
 | **Sales** | HubSpot, Slack, Gmail/ms365, WhatsApp, Postiz | Pipeline + social selling |
 | **Marketing** | Canva, HubSpot, Slack, Postiz, GA4, DeepL | Content + analytics |
-| **ADHD** | Clockwise, Spotify, ntfy*, Apple Reminders | Focus defense + notifications |
+| **ADHD** | Spotify, ntfy*, Apple Reminders | Focus defense + notifications |
 | **Health-focused** | Open Wearables, Garmin, Spotify | Fitness tracking + motivation |
 
 *ntfy = plain HTTP (`curl` to ntfy.sh) — no MCP server needed; see `examples/hooks/ntfy/`
@@ -279,8 +270,8 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **WhatsApp** (Go) | `claude mcp add whatsapp -- npx -y whatsapp-mcp` | Personal WhatsApp — messages, contacts, search. SQLite local. | 9/10 | HIGH |
-| **WhatsApp** (TS) | `claude mcp add whatsapp -- npx -y whatsapp-mcp-ts` | TypeScript alt — Baileys library | 8/10 | HIGH |
+| **WhatsApp** (Go) | Clone `https://github.com/lharries/whatsapp-mcp` (Go bridge + uv — no npm package) | Personal WhatsApp — messages, contacts, search. SQLite local. | 9/10 | HIGH |
+| **WhatsApp** (TS) | `claude mcp add whatsapp -- npx -y whatsapp-mcp-ts` (verify before installing) | TypeScript alt — Baileys library | 8/10 | HIGH |
 | **Telegram** | `claude mcp add telegram -- npx -y telegram-mcp` | Send/receive Telegram, manage chats | 6/10 | LOW |
 | **Discord** | Community implementations | Channel messaging, server management | 5/10 | LOW |
 
@@ -290,11 +281,8 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **Clockwise** | `claude mcp add --transport http clockwise https://www.getclockwise.com/mcp` | Smart scheduling, focus time defense, capacity analysis | 8/10 | HIGH |
 | **FocusMo** (ADHD) | FocusMo Pro + MCP integration | Focus data, streaks, app usage for ADHD coaching | 9/10 | MED (paid) |
 | **Apple Reminders** | `claude mcp add reminders -- npx -y apple-reminders-mcp` | Manage Reminders natively, sync to iPhone | 8/10 | MED |
-
-**Clockwise:** Free tier exists. ADHD-critical: auto-defends 4-6h focus blocks/week.
 
 ## Media & Content (NEW)
 
@@ -312,7 +300,7 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
 | **DeepL** | `claude mcp add deepl -- npx -y deepl-mcp-server` | Professional multilingual translation, document translation | 8/10 | MED |
-| **Lara Translate** | `claude mcp add lara -- npx -y lara-mcp` | Context-aware translation with memory | 6/10 | LOW |
+| **Lara Translate** | `claude mcp add lara -- npx -y @translated/lara-mcp` | Context-aware translation with memory | 6/10 | LOW |
 
 **DeepL:** Free tier: 500k chars/month. Great for proposals + @cmo content in multiple languages.
 
@@ -320,7 +308,7 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **Open Wearables** | `claude mcp add wearables -- npx -y @openwearables/mcp-server` | Unified wearable data: Strava, Garmin, Apple Health, Polar, Whoop | 8/10 | LOW |
+| **Open Wearables** | Self-hosted (FastMCP, no npm package) — see `docs.openwearables.io/mcp-server` | Unified wearable data: Strava, Garmin, Apple Health, Polar, Whoop | 8/10 | LOW |
 | **Garmin Connect** | `claude mcp add garmin -- npx -y garmin-connect-mcp` | Garmin workout data, health metrics | 7/10 | LOW |
 | **Spike Health** | Spike API account + MCP | Wearable + fitness aggregation | 7/10 | LOW |
 
@@ -332,8 +320,8 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 |------|----------------|-------------|-------|----------|
 | **Tavily** | `claude mcp add tavily -- npx -y tavily-mcp` | AI-optimized search + extract + research | 9/10 | HIGH (needs key) |
 | **Firecrawl** | `claude mcp add firecrawl -- npx -y firecrawl-mcp` | Web scraping, crawling, structured extraction | 9/10 | HIGH (needs key) |
-| **Exa AI** | `claude mcp add exa -- npx -y exa-mcp` | Semantic search, find similar | 8/10 | MED (needs key) |
-| **Brave Search** | `claude mcp add brave -- npx -y @anthropic/brave-search-mcp --env BRAVE_API_KEY=KEY` | Web + local search | 9/10 | MED (needs key) |
+| **Exa AI** | `claude mcp add exa -- npx -y exa-mcp-server` | Semantic search, find similar | 8/10 | MED (needs key) |
+| **Brave Search** | `claude mcp add brave --env BRAVE_API_KEY=KEY -- npx -y @brave/brave-search-mcp-server` | Web + local search | 9/10 | MED (needs key) |
 
 **Note:** All require API keys.
 
@@ -350,15 +338,15 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **Google Analytics GA4** | `claude mcp add ga4 -- npx -y google-analytics-mcp` | 200+ dimensions, traffic, conversions | 8/10 | MED |
+| **Google Analytics GA4** | `claude mcp add ga4 -- pipx run analytics-mcp` | 200+ dimensions, traffic, conversions | 8/10 | MED |
 | **DataForSEO** | DataForSEO API key + MCP | SERP, keywords, backlinks | 7/10 | LOW (paid) |
 
 ## MCP Gateways (Mega-tools)
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **Composio** | `claude mcp add --transport http composio https://mcp.composio.dev/` | ONE gateway to 300+ apps, managed OAuth | 9/10 | FUTURE |
-| **Zapier MCP** | `claude mcp add --transport http zapier [your-zapier-url]` | ONE connection to 8,000+ apps | 8/10 | FUTURE |
+| **Composio (Rube)** | `claude mcp add --transport http rube https://rube.app/mcp` (verify before installing — mcp.composio.dev is deprecated) | ONE gateway to 500+ apps, managed OAuth | 9/10 | FUTURE |
+| **Zapier MCP** | `claude mcp add --transport http zapier <your-zapier-mcp-url>` | ONE connection to 8,000+ apps | 8/10 | FUTURE |
 
 **Privacy note:** Data flows through gateway provider. For sensitive data, prefer individual local MCPs. Good for non-sensitive ops when MCP count gets unwieldy.
 
@@ -366,7 +354,7 @@ No reliable MCP yet. Workaround: use Desktop Commander to read .ics files.
 
 | Name | Install command | What it does | Score | Priority |
 |------|----------------|-------------|-------|----------|
-| **Home Assistant** | `claude mcp add ha -- [HA instance]/mcp` | Smart home control, automations | 7/10 | bOS 2.0 |
+| **Home Assistant** | `claude mcp add --transport sse ha <your-ha-url>/mcp_server/sse` | Smart home control, automations (MCP Server integration must be enabled in HA) | 7/10 | bOS 2.0 |
 
 ---
 

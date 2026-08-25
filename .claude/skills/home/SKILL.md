@@ -1,5 +1,5 @@
 ---
-name: Home
+name: home
 description: "One-screen snapshot from state Summaries. Use when the user says /home, dashboard, or status."
 user_invocable: true
 command: /home

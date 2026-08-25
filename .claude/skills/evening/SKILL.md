@@ -1,5 +1,5 @@
 ---
-name: Evening
+name: evening
 description: "On-request evening shutdown — log energy if missing, one win, tomorrow's #1. Use when the user says /evening, end of day, or zamykam dzień. Never auto-nudge."
 user_invocable: true
 command: /evening

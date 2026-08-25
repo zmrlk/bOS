@@ -1,5 +1,5 @@
 ---
-name: Inbox
+name: inbox
 description: "AI email triage — reads Gmail + Outlook, categorizes (action/FYI/delegate/archive), filters noise, drafts replies, extracts tasks. Reduces decision fatigue. Use when user says 'maile', 'inbox', 'sprawdź pocztę', 'email triage', or during morning routine."
 user_invocable: true
 command: /inbox
