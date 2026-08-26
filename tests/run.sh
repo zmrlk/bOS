@@ -34,6 +34,9 @@ guard "interp-settings"   '{"tool_name":"Bash","command":"python3 -c x > .claude
 guard "sed-settings-esc"  '{"tool_name":"Bash","command":"sed -i \"\" s/a/b/ .claude/settings.json"}' 2
 guard "echo-bus"          '{"tool_name":"Bash","command":"echo x >> state/context-bus.jsonl"}' 2
 guard "interp-bus"        '{"tool_name":"Bash","command":"node write.js state/context-bus.jsonl"}' 2
+guard "helper-chain"      '{"tool_name":"Bash","command":"bash scripts/context-bus-append.sh a b insight info hi; echo x >> state/context-bus.jsonl"}' 2
+guard "mv-archive"        '{"tool_name":"Bash","command":"mv state/archive/old.md /tmp/"}' 2
+guard "redirect-archive"  '{"tool_name":"Bash","command":"echo x > state/archive/old.md"}' 2
 guard "write-settings"    '{"tool_name":"Write","file_path":".claude/settings.json"}' 2
 guard "write-archive"     '{"tool_name":"Write","file_path":"state/archive/old.md"}' 2
 guard "edit-bus"          '{"tool_name":"Edit","file_path":"state/context-bus.jsonl"}' 2
@@ -56,6 +59,22 @@ if bus "@boss" "ALL" "calibration" "critical" "no keys here"; then bad "bus reje
 if bus "@boss" "ALL" "calibration" "critical" "FACT: a | WAS: b | NOW: c | SOURCE: test"; then ok "bus accepts full calibration"; else bad "bus accepts full calibration"; fi
 LONG=$(printf 'a%.0s' $(seq 1 2100))
 if bus "@boss" "ALL" "insight" "info" "$LONG"; then bad "bus rejects >2000 chars"; else ok "bus rejects >2000 chars"; fi
+if bus "@boss" 'x","injected":"y' "insight" "info" "x"; then bad "bus rejects bad to"; else ok "bus rejects bad to"; fi
+TAB_CONTENT=$(printf 'col1\tcol2 "quoted" back\\slash')
+if bus "@boss" "ALL" "insight" "info" "$TAB_CONTENT"; then ok "bus accepts tab/quote content"; else bad "bus accepts tab/quote content"; fi
+if command -v python3 >/dev/null 2>&1; then
+  if python3 - "$SANDBOX/state/context-bus.jsonl" <<'PYCHK'
+import json,sys
+ok=True
+for i,line in enumerate(open(sys.argv[1]),1):
+    line=line.strip()
+    if not line: continue
+    try: json.loads(line)
+    except Exception as e: print(f"line {i}: {e}"); ok=False
+sys.exit(0 if ok else 1)
+PYCHK
+  then ok "bus file is valid JSONL (every line parses)"; else bad "bus file is valid JSONL (every line parses)"; fi
+fi
 
 echo "== 4. Hooks survive empty and malformed stdin =="
 for h in "$SANDBOX"/.claude/hooks/*.sh; do
@@ -79,7 +98,19 @@ printf -- '---\nname: zz-drift-fixture\ndescription: "fixture"\n---\n# x\n' > "$
 if ( cd "$SANDBOX" && bash scripts/bos-roster.sh >/dev/null 2>&1 ); then bad "roster flags missing tier"; else ok "roster flags missing tier"; fi
 rm -rf "$SANDBOX/.claude/skills/zz-drift-fixture"
 
-echo "== 7. Clean-clone: hooks never mutate shipped files =="
+echo "== 7. Data boundary (P0): user state never tracked =="
+for f in state/finances.md state/journal.md state/tasks.md state/network.md; do
+  if ( cd "$REPO" && git check-ignore -q "$f" ); then ok "gitignored $f"; else bad "gitignored $f"; fi
+done
+TRACKED_STATE=$( cd "$REPO" && git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ' )
+if [ "$TRACKED_STATE" = "0" ]; then ok "only SCHEMAS/stub/.gitkeep tracked in state/"; else bad "only SCHEMAS/stub/.gitkeep tracked in state/" "($TRACKED_STATE extra)"; fi
+TPL_COUNT=$(ls "$REPO/templates/state"/*.md 2>/dev/null | wc -l | tr -d ' ')
+if [ "$TPL_COUNT" -ge 15 ]; then ok "templates/state ships $TPL_COUNT templates"; else bad "templates/state ships templates" "(got $TPL_COUNT)"; fi
+rm -f "$SANDBOX/state/tasks.md"
+bash "$SANDBOX/.claude/hooks/session-start.sh" >/dev/null 2>&1
+if [ -f "$SANDBOX/state/tasks.md" ]; then ok "session-start bootstraps missing state from template"; else bad "session-start bootstraps missing state from template"; fi
+
+echo "== 8. Clean-clone: hooks never mutate shipped files =="
 # Record checksums of everything that shipped, run every hook, then verify
 # that any file which changed or appeared is gitignored in the real repo.
 BEFORE="$SANDBOX/.before-sums"

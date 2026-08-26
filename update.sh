@@ -16,13 +16,20 @@ NC='\033[0m'
 # ── Detect paths ──────────────────────────────
 
 NEW_BOS="$(cd "$(dirname "$0")" && pwd)"
-EXISTING_BOS="$1"
+DRY_RUN=0
+EXISTING_BOS=""
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=1 ;;
+        *) [ -z "$EXISTING_BOS" ] && EXISTING_BOS="$arg" ;;
+    esac
+done
 
 if [ -z "$EXISTING_BOS" ]; then
     echo ""
     echo -e "${BOLD}bOS Update${NC}"
     echo ""
-    echo "Usage:  bash update.sh /path/to/your/existing/bOS"
+    echo "Usage:  bash update.sh /path/to/your/existing/bOS [--dry-run]"
     echo ""
     echo "Example:"
     echo "  bash ~/Downloads/bOS/update.sh ~/Desktop/bOS"
@@ -90,15 +97,21 @@ echo "    .claude/settings.json"
 echo "    .agents/  .codex/  .grok/  scripts/  config/"
 echo "    VERSION, README.md, PRIVACY.md"
 echo "    profile-template.md"
-echo "    state/SCHEMAS.md"
+echo "    state/SCHEMAS.md, templates/state/"
 echo "    examples/"
 echo ""
 echo "  Note: customized skills/agents/hooks are overwritten"
 echo "  (a copy goes to the backup folder first)."
 echo ""
 
-read -p "  Continue? [Y/n] " confirm
-if [[ "$confirm" =~ ^[Nn] ]]; then
+if [ "$DRY_RUN" -eq 1 ]; then
+    echo -e "  ${YELLOW}DRY RUN${NC} — nothing was copied, nothing was changed."
+    echo "  Run again without --dry-run to apply."
+    exit 0
+fi
+
+read -p "  Continue? [y/N] " confirm
+if [[ ! "$confirm" =~ ^[Yy] ]]; then
     echo "  Cancelled."
     exit 0
 fi
@@ -131,6 +144,10 @@ fi
 if [ -d "$EXISTING_BOS/.claude/hooks" ]; then
     mkdir -p "$BACKUP_DIR/.claude"
     cp -r "$EXISTING_BOS/.claude/hooks" "$BACKUP_DIR/.claude/hooks"
+fi
+if [ -d "$EXISTING_BOS/.claude/agents" ]; then
+    mkdir -p "$BACKUP_DIR/.claude"
+    cp -r "$EXISTING_BOS/.claude/agents" "$BACKUP_DIR/.claude/agents"
 fi
 
 echo -e "  ${GREEN}✓${NC} Backup created: state/.backup/pre-update-${OLD_VERSION}-..."
@@ -244,6 +261,13 @@ fi
 if [ -f "$NEW_BOS/state/SCHEMAS.md" ]; then
     cp "$NEW_BOS/state/SCHEMAS.md" "$EXISTING_BOS/state/SCHEMAS.md"
     echo -e "  ${GREEN}✓${NC} state/SCHEMAS.md"
+fi
+
+# Blank state templates (user's live state/ is NEVER touched)
+if [ -d "$NEW_BOS/templates/state" ]; then
+    mkdir -p "$EXISTING_BOS/templates/state"
+    cp -r "$NEW_BOS/templates/state/"* "$EXISTING_BOS/templates/state/"
+    echo -e "  ${GREEN}✓${NC} templates/state/"
 fi
 
 # Examples (supabase schemas, n8n templates, ntfy hooks, sample skills)

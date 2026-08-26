@@ -35,6 +35,9 @@ esac
 if ! printf '%s' "$FROM" | grep -qE '^(@[a-z][a-z-]*|session:[A-Za-z0-9._-]+|[a-z][a-z0-9-]*)$'; then
   echo "BUS-REJECT: from '$FROM' not (@agent | session:name | cron-name)" >&2; exit 1
 fi
+if ! printf '%s' "$TO" | grep -qE '^(ALL|@[a-z][a-z-]*|session:[A-Za-z0-9._-]+|[a-z][a-z0-9-]*)$'; then
+  echo "BUS-REJECT: to '$TO' not (ALL | @agent | session:name | cron-name)" >&2; exit 1
+fi
 if [ "${#CONTENT}" -gt 2000 ]; then
   echo "BUS-REJECT: content ${#CONTENT} chars (max 2000) — signal, not a document" >&2; exit 1
 fi
@@ -52,7 +55,13 @@ fi
 
 TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 TTL_TS=$(date -u -v+${TTL_DAYS}d '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u -d "+${TTL_DAYS} days" '+%Y-%m-%dT%H:%M:%SZ')
-ESCAPED_CONTENT=$(printf '%s' "$CONTENT" | tr '\n' ' ' | sed 's/\\/\\\\/g; s/"/\\"/g')
+# JSON-safe content: newline→space, CR dropped, other control chars stripped,
+# then backslash and quote escaped, then literal TAB → \t (last, so the
+# backslash it introduces is not double-escaped).
+ESCAPED_CONTENT=$(printf '%s' "$CONTENT" \
+  | tr '\n' ' ' | tr -d '\r' | tr -d '\000-\010\013\014\016-\037' \
+  | sed 's/\\/\\\\/g; s/"/\\"/g' \
+  | sed "s/$(printf '\t')/\\\\t/g")
 
 mkdir -p "$(dirname "$BUS_FILE")"
 echo "{\"ts\":\"$TS\",\"from\":\"$FROM\",\"to\":\"$TO\",\"type\":\"$TYPE\",\"priority\":\"$PRIORITY\",\"ttl\":\"$TTL_TS\",\"status\":\"pending\",\"content\":\"$ESCAPED_CONTENT\"}" >> "$BUS_FILE"

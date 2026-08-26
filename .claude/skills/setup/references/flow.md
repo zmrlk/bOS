@@ -4,9 +4,9 @@
 
 Goal: a filled `profile.md` and first value in under 3 minutes of the user's attention. Detection over interrogation.
 
-## Step 0 — silent scan (before any question)
+## Step 0 — scan (non-personal detection first)
 
-If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh`. It prints what is already detectable (locale, timezone, folder names, existing state) and `gaps_by_leverage` — the ordered list of gaps worth asking about. No script → detect what you can from the conversation and file names; never open file contents without consent.
+If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh`. The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun with `--with-names`. Never open file contents at all during setup.
 
 ## Step 1 — present, don't ask
 

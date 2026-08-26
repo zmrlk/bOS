@@ -26,9 +26,10 @@ if [ -f "$LAST_MSG_FILE" ]; then
   LAST_MSG_TS=$(cat "$LAST_MSG_FILE" 2>/dev/null)
   LAST_MSG_DATE=$(echo "$LAST_MSG_TS" | cut -d' ' -f1)
   LAST_MSG_HOUR=$(echo "$LAST_MSG_TS" | cut -d' ' -f2 | cut -d: -f1)
-  if [ -n "$LAST_MSG_DATE" ] && date -j -f "%Y-%m-%d %H:%M" "$LAST_MSG_TS" "+%s" >/dev/null 2>&1; then
-    LAST_MSG_SEC=$(date -j -f "%Y-%m-%d %H:%M" "$LAST_MSG_TS" "+%s")
-    HOURS_SINCE_LAST=$(( (NOW_SEC - LAST_MSG_SEC) / 3600 ))
+  if [ -n "$LAST_MSG_DATE" ]; then
+    # macOS date -j, GNU date -d fallback
+    LAST_MSG_SEC=$(date -j -f "%Y-%m-%d %H:%M" "$LAST_MSG_TS" "+%s" 2>/dev/null || date -d "$LAST_MSG_TS" "+%s" 2>/dev/null)
+    [ -n "$LAST_MSG_SEC" ] && HOURS_SINCE_LAST=$(( (NOW_SEC - LAST_MSG_SEC) / 3600 ))
   fi
 fi
 
@@ -105,8 +106,11 @@ fi
 # ─── Data gap (informational only — never a question) ───
 if [ -f "$BOS_DIR/state/daily-log.md" ]; then
   LAST_LOG_DATE=$(grep '^| 20' "$BOS_DIR/state/daily-log.md" 2>/dev/null | head -1 | grep -o '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' | head -1)
-  if [ -n "$LAST_LOG_DATE" ] && date -j -f "%Y-%m-%d" "$LAST_LOG_DATE" "+%s" >/dev/null 2>&1; then
-    LAST_SEC=$(date -j -f "%Y-%m-%d" "$LAST_LOG_DATE" "+%s")
+  LAST_SEC=""
+  if [ -n "$LAST_LOG_DATE" ]; then
+    LAST_SEC=$(date -j -f "%Y-%m-%d" "$LAST_LOG_DATE" "+%s" 2>/dev/null || date -d "$LAST_LOG_DATE" "+%s" 2>/dev/null)
+  fi
+  if [ -n "$LAST_SEC" ]; then
     LOG_GAP=$(( (NOW_SEC - LAST_SEC) / 86400 ))
     [ "$LOG_GAP" -ge 5 ] && echo "note: daily-log has a ${LOG_GAP}-day gap (context only — do NOT ask the user about it)"
   fi
