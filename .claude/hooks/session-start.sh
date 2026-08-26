@@ -6,6 +6,16 @@ BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 # shellcheck source=ping-inject.sh
 . "$BOS_DIR/.claude/hooks/ping-inject.sh"
 
+# Bootstrap: user state is untracked (P0 data boundary) — materialize any
+# missing state file from its blank template on first run. Never overwrite.
+if [ -d "$BOS_DIR/templates/state" ]; then
+  for tpl in "$BOS_DIR/templates/state"/*.md; do
+    [ -f "$tpl" ] || continue
+    dest="$BOS_DIR/state/$(basename "$tpl")"
+    [ -f "$dest" ] || cp "$tpl" "$dest" 2>/dev/null
+  done
+fi
+
 echo "## bOS start"
 echo "Date: $(date '+%Y-%m-%d %H:%M %Z (%A)')"
 echo "Contract: AGENTS.md. Locators: state/tasks.md | state/finances.md | state/handoff.md | state/ping.md | state/rules.md | state/context-bus.jsonl"

@@ -1,6 +1,6 @@
 # bOS Privacy
 
-This is a plain-language explanation of what **Lite bOS (this repo, v0.12.1)** knows about you. No legal jargon.
+This is a plain-language explanation of what **Lite bOS (this repo)** knows about you. No legal jargon.
 
 Lite is a **local folder**. It does not run a 24/7 daemon. Optional samples live under `examples/` and are off unless you copy them in. There is no `/vault` skill and no `/delete-my-data` skill in Lite — delete files yourself, or use your OS.
 
