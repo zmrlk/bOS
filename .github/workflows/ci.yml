@@ -19,6 +19,45 @@ jobs:
       - name: Roster matches disk
         run: bash scripts/bos-roster.sh
 
+  # Updater end-to-end: old install (VERSION spoofed) -> update -> self-test
+  # must pass, VERSION must advance, user's profile.md must survive.
+  test-updater:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags: the old install must be a REAL past release
+      - name: Updater e2e from the previous release (real tree, not a copy)
+        run: |
+          set -e
+          NEW="$PWD"
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^$(cat VERSION)$" | head -1)
+          echo "Previous release: ${PREV_TAG:-none}"
+          OLD="$(mktemp -d)"
+          if [ -n "$PREV_TAG" ]; then
+            git archive "$PREV_TAG" | (cd "$OLD" && tar xf -)
+          else
+            tar cf - --exclude .git . | (cd "$OLD" && tar xf -); echo "0.0.1" > "$OLD/VERSION"
+          fi
+          # A real install is a git checkout — that is what exposes the
+          # data-boundary migration (old releases tracked state/*.md).
+          ( cd "$OLD" && git init -q . && git add -A \
+            && git -c user.email=ci@ci -c user.name=ci commit -qm "old release" )
+          echo "my custom profile" > "$OLD/profile.md"
+          printf 'y\ny\ny\n' | bash "$NEW/update.sh" "$OLD"
+          # 1. version advanced, 2. user content survived
+          [ "$(cat "$OLD/VERSION")" = "$(cat "$NEW/VERSION")" ] || { echo "VERSION not updated"; exit 1; }
+          [ "$(cat "$OLD/profile.md")" = "my custom profile" ] || { echo "profile.md content was touched"; exit 1; }
+          # 3. the load-bearing file actually shipped
+          grep -q 'state/\*\.md' "$OLD/.gitignore" || { echo ".gitignore not migrated"; exit 1; }
+          # 4. personal state untracked but still on disk
+          LEFT=$( cd "$OLD" && git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ' )
+          [ "$LEFT" = "0" ] || { echo "personal state still tracked after update ($LEFT files)"; exit 1; }
+          [ -f "$OLD/state/finances.md" ] || { echo "state file deleted from disk — data loss"; exit 1; }
+          # 5. backup captured agents
+          ls "$OLD"/state/.backup/pre-update-*/.claude/agents >/dev/null || { echo "agents backup missing"; exit 1; }
+          echo "updater e2e OK (real $PREV_TAG -> $(cat "$NEW/VERSION"), boundary migrated)"
+
   # Experimental: Git Bash on Windows. Symlinks and BSD/GNU tool gaps are
   # known unknowns — failures here don't block a release yet.
   test-windows:

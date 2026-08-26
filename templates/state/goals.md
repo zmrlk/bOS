@@ -1,27 +1,15 @@
-# GOALS
+# Goals
 
-> Updated by @coach (life goals) and @boss (business goals). Reviewed monthly.
-
----
+> @coach is coordinator (primary writer); other agents post goal updates via context-bus. Progress reviewed weekly.
 
 ## Active Goals
 
-| # | Goal | Owner | Category | Target date | Status | Progress |
-|---|------|-------|----------|-------------|--------|----------|
-| | | @coach / @boss | life / business / health / learning | | not started / in progress / done | |
+| Goal | Owner | Started | Target date | Progress | Status |
+|------|-------|---------|-------------|----------|--------|
 
----
-
-## Milestones
-
-| Goal # | Milestone | Target date | Status |
-|--------|-----------|-------------|--------|
-| | | | pending / done |
-
----
+(no goals yet — normal for a fresh start)
 
 ## Completed Goals
 
-| Goal | Category | Completed | Duration | Notes |
-|------|----------|-----------|----------|-------|
-| | | | | |
+| Goal | Owner | Completed | Duration |
+|------|-------|-----------|----------|

@@ -1,22 +1,24 @@
-# DECISION LOG
+# Decision Log
 
-> Key decisions with reasoning. Written by @boss after every go/no-go, strategy change, or team synthesis.
+> Key decisions with reasoning. Written by @boss (primary writer). Newest decision on top. Never delete — mark as reversed/superseded with reason.
 
 ---
 
 ## Format
 
 ```
-### [DATE] — [TITLE]
-**Context:** [Why this came up]
-**Decision:** [GO / NO-GO / CHANGE / etc.]
-**Reasoning:** [1-3 sentences]
-**Score:** [X/15] (if project evaluation)
-**Agent:** [@boss / @team]
+## [YYYY-MM-DD] — [Decision title]
+
+**Decision:** [What was decided]
+**Options considered:** [List of alternatives]
+**Reasoning:** [Why this option]
+**Owner:** @[agent who made the recommendation]
+**Status:** active / reversed / superseded
+**Review date:** YYYY-MM-DD [required for GO/CONDITIONAL decisions]
 ```
 
 ---
 
 ## Decisions
 
-*(Newest first)*
+(no decisions yet — normal for a fresh start)

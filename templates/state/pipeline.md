@@ -1,41 +1,13 @@
-# SALES PIPELINE
+# Sales Pipeline
 
-> Updated weekly by @cmo. Track leads from first contact to closed.
+> Updated by @cmo (primary writer). Track leads from first contact to closed. Business pack only.
 
----
+<!-- Single table sorted by status priority (hot > warm > cold). -->
+<!-- Status: cold / warm / hot / proposal / won / lost -->
+<!-- Follow-up framework: Day 0 (initial), Day 3 (follow up), Day 7, Day 14 -->
+<!-- Won/lost entries older than 1 month → state/archive/pipeline-YYYY-MM.md -->
 
-## Active Leads
+| Client | Status | Value | Next step | Deadline | Last contact | Notes |
+|--------|--------|-------|-----------|----------|--------------|-------|
 
-| # | Company/Person | Status | Value | Next Step | Deadline | Notes |
-|---|---------------|--------|-------|-----------|----------|-------|
-| | | 🔵 NEW | | | | |
-
----
-
-## Status Legend
-
-```
-🔵 NEW        — Lead identified, no contact yet
-🟡 CONTACTED  — First email/DM sent
-🟠 TALKING    — Discovery call scheduled or completed
-🔴 PROPOSED   — Quote sent, awaiting decision
-🟢 CLIENT     — Deposit received / work in progress
-⬜ COLD       — Not now, reactivate in 3 months
-❌ LOST       — Doesn't fit / no response after full sequence
-```
-
----
-
-## Cold Storage (reactivate later)
-
-| Company/Person | Last Contact | Reactivate | Notes |
-|---------------|-------------|-----------|-------|
-| | | | |
-
----
-
-## Closed (Won)
-
-| Company/Person | Project | Value | Date Closed |
-|---------------|---------|-------|-------------|
-| | | | |
+(no leads yet — normal for a fresh start)
