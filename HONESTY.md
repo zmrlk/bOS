@@ -11,7 +11,8 @@ bash tests/run.sh            # guard payloads, bus schema, clean-clone check
 
 | REAL (enforced by code) | BEST-EFFORT (prompting) | Does not exist |
 |-------------------------|-------------------------|----------------|
-| 6 hooks wired in `.claude/settings.json` | Ambient capture (energy/expense mentioned → logged) | Background daemon or 24/7 automation |
+| User state is untracked: `state/*.md` is gitignored, blank templates ship in `templates/state/`, session-start materializes them | Ambient capture (energy/expense mentioned → logged) | Background daemon or 24/7 automation |
+| 6 hooks wired in `.claude/settings.json` | Crisis-data ephemerality and send/spend consent on non-Claude hosts (prompt contract) | Automatic cloud backup of your data |
 | 24 skills, `tier: core` (16) or `optional` (8), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite backend |
 | 10 agent files | Routing accuracy ~60-80%, not 100% | Unprompted morning check-ins or weekly nags |
 | Message bus: single writer script with schema validation | Grok integration (see per-CLI matrix below) | Mid-generation message injection |
@@ -35,5 +36,7 @@ Two more things worth knowing:
 | **Claude Code** | Full enforcement: all 6 hooks fire (state injection, guard, logging, digests), AskUserQuestion works. This is the reference host. |
 | **Codex** | Context injection: `.codex/hooks.json` wires session-start and time-aware. No PreToolUse guard, no session-end. If your build doesn't inject hook stdout, Read `AGENTS.md` manually. |
 | **Grok** | Prompt-only: hook stdout is ignored entirely. The contract asks the model to Read `AGENTS.md`, `state/handoff.md`, and `state/ping.md` every turn. It works when the model complies — that is best-effort by definition. |
+
+`/ship` stages files by explicit name only (`git add .` is forbidden in the skill) and checks the staged diff for `state/`, `profile.md`, `.secrets/` before committing.
 
 `/home` is a snapshot built from your state files, not a dashboard product. `/morning` and `/evening` run **only when you ask** — a greeting never triggers a ritual. Live skill list: [config/roster.md](config/roster.md) (generated; do not hand-edit).

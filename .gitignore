@@ -30,15 +30,13 @@ state/handoff.md
 state/context-bus.jsonl
 .claude/logs/
 
-# Runtime files written by hooks and skills (user data, never ship)
-state/session-log.md
-state/telemetry.md
-state/reminders.md
-state/skill-runs.jsonl
-state/tool-log.jsonl
-state/tool-log.md
-state/inbox.md
-state/schedules.md
+# ALL user state is untracked (P0 data boundary, audit 2026-08-26).
+# Blank templates ship in templates/state/; session-start bootstraps them.
+# Only the schema doc and the bus stub remain tracked.
+state/*.md
+state/*.jsonl
+!state/SCHEMAS.md
+!state/context-bus.md
 
 # ─────────────────────────────────────────────
 # EXPORTS & BACKUPS — User-generated
