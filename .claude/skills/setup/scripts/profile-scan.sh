@@ -42,7 +42,13 @@ fi
 command -v git >/dev/null && echo "has_git: yes"
 [ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (suggest import — REQUIRES SEPARATE CONSENT, a different privacy scope than the app scan)"
 [ -d "$HOME/bos-wiki" ] && echo "existing_bos_wiki: yes (import requires separate consent)"
-ls /Applications 2>/dev/null | head -60 | tr '\n' ',' | sed 's/,$//' | awk '{print "apps_sample: " $0}'
+# App NAMES are personal-ish: listed only with --with-names, i.e. AFTER the
+# user consented to the names scan in /setup (PRIVACY.md: consent-gated).
+if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+  ls /Applications 2>/dev/null | head -60 | tr '\n' ',' | sed 's/,$//' | awk '{print "apps_sample: " $0}'
+else
+  echo "apps_sample: (skipped — rerun with --with-names after user consent)"
+fi
 
 # ── 2. SYSTEM INVENTORY (raw counts; the welcome quotes THESE numbers, no others) ──
 echo ""

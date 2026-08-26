@@ -81,7 +81,7 @@ If "Change" → user types custom message (1 open text field).
 
 ### Step 5: Commit (default)
 ```bash
-git add .
+git add <only the files you reviewed in Step 2 — named explicitly, never `.`>
 git commit -m "[message]"
 ```
 
@@ -117,4 +117,6 @@ If multiple repos detected → ask which one (AskUserQuestion, show changed file
 2. **Never git add -f** — if file is gitignored, it's gitignored for a reason
 3. **Never rebase/force-push** — /ship is safe-only. For risky ops → direct git
 4. **Secrets check** — scan diff for patterns: `API_KEY`, `SECRET`, `PASSWORD`, `token=` → hard BLOCK
-5. **Buffer awareness** — if context-bus has `alert:overloaded` → mention capacity before shipping new features
+5. **Explicit staging only** — name every file you stage; `git add .` / `-A` are forbidden in this skill
+6. **Staged-diff privacy gate** — before commit, run `git diff --cached --name-only`; any path under `state/` or `profile.md` or `.secrets/` → UNSTAGE it and tell the user (personal data never ships, even if someone broke the gitignore)
+7. **Buffer awareness** — if context-bus has `alert:overloaded` → mention capacity before shipping new features

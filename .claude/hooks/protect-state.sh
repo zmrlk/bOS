@@ -25,8 +25,8 @@ case "$TOOL" in
     ;;
   Bash)
     # Archive/backup: block every destructive verb we can name, not just rm.
-    if echo "$COMMAND" | grep -qE '(rm\s+|find\s+.*-delete|unlink\s+|truncate\s+|shred\s+|dd\s+.*of=)[^;|&]*state/(archive|\.backup)|state/(archive|\.backup)[^;|&]*(-delete)'; then
-      echo "BLOCKED: Cannot delete or truncate files in state/archive/ or state/.backup/"
+    if echo "$COMMAND" | grep -qE '(rm\s+|find\s+.*-delete|unlink\s+|truncate\s+|shred\s+|dd\s+.*of=|mv\s+)[^;|&]*state/(archive|\.backup)|state/(archive|\.backup)[^;|&]*(-delete)|(>|>>|tee\s)[^;|&]*state/(archive|\.backup)'; then
+      echo "BLOCKED: Cannot delete, move, truncate or overwrite files in state/archive/ or state/.backup/"
       exit 2
     fi
     # settings.json: the Write/Edit guard below is useless if Bash can write it.
@@ -38,10 +38,8 @@ case "$TOOL" in
         fi
       fi
     fi
-    # Bus: one helper. Allow the helper; block redirects/tee/sed AND interpreters onto the files.
-    if echo "$COMMAND" | grep -q 'context-bus-append.sh'; then
-      exit 0
-    fi
+    # Bus: one helper. NO early-exit on the helper's name — a chained command
+    # ("helper.sh …; echo x >> bus") must still hit the write patterns below.
     if echo "$COMMAND" | grep -qE 'context-bus\.(jsonl|md)'; then
       if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*context-bus\.(jsonl|md)|(tee|truncate)[[:space:]].*context-bus\.(jsonl|md)|sed[[:space:]]+-i.*context-bus\.(jsonl|md)|(python[0-9.]*|node|perl|ruby)[[:space:]].*context-bus\.(jsonl|md)'; then
         echo "BLOCKED: write the bus only via bash scripts/context-bus-append.sh"

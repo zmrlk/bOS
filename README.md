@@ -32,12 +32,13 @@ It is just a folder: markdown files, skills, and hooks. Open it in **Claude Code
 
 Everything above is a file you can open: the plan reads `state/tasks.md`, the expense lands in `state/finances.md`, the quit-tracker lives in `state/habits.md`.
 
-## Guardrails are code, not vibes
+## Guardrails — what is code, what is contract
 
-- A PreToolUse hook **blocks** hand-edits of the message bus, writes to archives, and in-session `settings.json` edits — fed hostile payloads in CI on every push.
-- Destructive actions (`git push`, delete, send, spend) always require a separate, explicit yes.
-- Crisis conversations are **never persisted** — no notes, no logs, external hotlines instead (Rule 12).
-- Every claim is auditable from disk: `bash scripts/bos-roster.sh` + `bash tests/run.sh`. The full REAL / BEST-EFFORT / does-not-exist breakdown lives in [HONESTY.md](HONESTY.md).
+- **Code (hook):** a PreToolUse guard blocks hand-edits of the message bus, destructive ops on archives, and in-session `settings.json` edits — fed hostile payloads in CI on every push. It's a speed bump against the model's mistakes, not a security boundary ([HONESTY.md](HONESTY.md) says exactly where the line is).
+- **Code (boundary):** your data lives in untracked `state/` files — git never sees them, so a commit or push cannot ship them.
+- **Code (permissions, Claude Code):** `git push`, `rm`, `sudo`, `curl` are deny-listed in chat; destructive actions require a separate, explicit yes.
+- **Contract (prompt, all hosts):** crisis conversations are never persisted — no notes, no logs, external hotlines instead (Rule 12). Send/spend consent on non-Claude hosts is also contract, not hook.
+- Every claim is auditable from disk: `bash scripts/bos-roster.sh` + `bash tests/run.sh`. Full breakdown: [HONESTY.md](HONESTY.md).
 
 ## Quick start
 
