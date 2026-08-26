@@ -153,6 +153,19 @@ rollback() {
             rm -rf "${EXISTING_BOS:?}/$item"
         fi
     done
+    # Restore the git index if the boundary migration already ran: the files
+    # are untouched on disk, so re-adding them recreates the identical index.
+    if [ -f "$BACKUP_DIR/untracked-state.txt" ] && [ -d "$EXISTING_BOS/.git" ]; then
+        # `git add` has no --quiet; a stray flag here would abort the whole
+        # rollback under set -e and leave the index half-restored.
+        ( cd "$EXISTING_BOS" && while IFS= read -r f; do
+            if [ -n "$f" ] && [ -e "$f" ]; then
+              git add -f -- "$f" >/dev/null 2>&1 || echo "  (could not re-stage $f)"
+            fi
+          done < "$BACKUP_DIR/untracked-state.txt" ) || true
+        rm -f "$BACKUP_DIR/untracked-state.txt"
+        echo -e "  ${GREEN}✓${NC} git index restored (untracked files re-staged)."
+    fi
     echo -e "  ${GREEN}✓${NC} Rolled back. Your installation is as it was before the update."
 }
 
@@ -313,12 +326,20 @@ cp "$NEW_BOS/update.sh" "$EXISTING_BOS/update.sh"
 # ── Update profile.md version ─────────────────
 
 if [ -f "$EXISTING_BOS/profile.md" ]; then
-    # Update bos_version field if it exists
-    if grep -q "bos_version:" "$EXISTING_BOS/profile.md"; then
-        sed -i '' "s/bos_version: .*/bos_version: ${NEW_VERSION}/" "$EXISTING_BOS/profile.md" 2>/dev/null || \
-        sed -i "s/bos_version: .*/bos_version: ${NEW_VERSION}/" "$EXISTING_BOS/profile.md" 2>/dev/null || true
-        echo -e "  ${GREEN}✓${NC} profile.md → bos_version: ${NEW_VERSION}"
+    # The profile carries the version in a markdown table
+    # (| **bOS version** | x.y.z |); older profiles used a bare key.
+    PROFILE_BUMPED=0
+    sed_inplace() {
+        sed -i '' "$1" "$EXISTING_BOS/profile.md" 2>/dev/null || \
+        sed -i "$1" "$EXISTING_BOS/profile.md" 2>/dev/null || return 1
+    }
+    if grep -q "bOS version" "$EXISTING_BOS/profile.md"; then
+        sed_inplace "s/| \*\*bOS version\*\* | .* |/| **bOS version** | ${NEW_VERSION} |/" && PROFILE_BUMPED=1
     fi
+    if grep -q "bos_version:" "$EXISTING_BOS/profile.md"; then
+        sed_inplace "s/bos_version: .*/bos_version: ${NEW_VERSION}/" && PROFILE_BUMPED=1
+    fi
+    [ "$PROFILE_BUMPED" = "1" ] && echo -e "  ${GREEN}✓${NC} profile.md → version ${NEW_VERSION}"
 fi
 
 trap - ERR
@@ -336,6 +357,9 @@ if [ -d "$EXISTING_BOS/.git" ]; then
         echo "  They stay on disk — only git stops tracking them."
         read -p "  Untrack them now? [Y/n] " do_untrack
         if [[ ! "$do_untrack" =~ ^[Nn] ]]; then
+            # Record what we untrack so a later rollback can restore the index
+            # exactly — otherwise "as it was" would leave staged deletions.
+            printf '%s\n' "$LEGACY" > "$BACKUP_DIR/untracked-state.txt"
             ( cd "$EXISTING_BOS" && echo "$LEGACY" | while IFS= read -r f; do
                 [ -n "$f" ] && git rm --cached --quiet "$f" 2>/dev/null
               done )

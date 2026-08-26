@@ -4,7 +4,7 @@
 
 It is just a folder: markdown files, skills, and hooks. Open it in **Claude Code** (full enforcement; Codex and Grok work with reduced wiring — see [HONESTY.md](HONESTY.md)). Your tasks, finances, habits, and goals live in plain-text files on your machine. No server, no database, no daemon.
 
-> **v0.13.2** — `git clone https://github.com/zmrlk/bOS.git`
+> **v0.13.3** — `git clone https://github.com/zmrlk/bOS.git`
 
 ## What a session looks like
 

@@ -65,7 +65,7 @@ Create this folder yourself (`chmod 700`, files `600`). Never paste keys into ch
 If you use push notifications via ntfy.sh, your topic name and server URL are stored in `.secrets/ntfy.env`. This file is local-only and never synced to Supabase or any external service.
 
 ### File scan data
-During setup, if you give permission, bOS scans file and folder **names** (not contents) in your Desktop, Documents, Downloads, and Applications. It uses this to understand who you are and what tools you use. It does not read file contents, ever.
+During setup, bOS first detects only non-personal facts (locale, timezone, which tools are installed, whether state files exist). Anything identifying — installed application **names**, your git identity, how many Claude project folders you have — is read only after you say yes to one explicit question, and only names, never file contents. bOS does not walk Desktop/Documents/Downloads.
 
 bOS also checks file modification dates to determine which tools and projects are currently active vs. abandoned. Old files (365+ days) are treated as archived and won't trigger tool recommendations.
 
@@ -145,7 +145,7 @@ There is no delete skill — you delete files yourself (ask the agent to list th
 bOS only scans file and folder **names**. It never opens or reads file contents.
 
 Specifically:
-- It looks at names in Desktop, Documents, Downloads, Applications
+- After consent, it looks at application names in /Applications
 - It does NOT read your documents, spreadsheets, PDFs, images, or any other file
 - Scanning happens only with your explicit consent during `/setup`
 - You can say no — bOS works fine without scanning

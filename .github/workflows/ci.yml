@@ -27,40 +27,66 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # need tags: the old install must be a REAL past release
-      - name: Updater e2e from the previous release (real tree, not a copy)
+      - name: Updater e2e — legacy install with tracked personal state
         run: |
           set -e
           NEW="$PWD"
-          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^$(cat VERSION)$" | head -1)
-          echo "Previous release: ${PREV_TAG:-none}"
+          git config --global user.email ci@ci; git config --global user.name ci
+          PREV_TAG=$(git tag --sort=-v:refname | grep -vE "^v?$(cat VERSION)$" | head -1)
           OLD="$(mktemp -d)"
-          if [ -n "$PREV_TAG" ]; then
-            git archive "$PREV_TAG" | (cd "$OLD" && tar xf -)
-          else
-            tar cf - --exclude .git . | (cd "$OLD" && tar xf -); echo "0.0.1" > "$OLD/VERSION"
-          fi
-          # A real install is a git checkout — that is what exposes the
-          # data-boundary migration (old releases tracked state/*.md).
-          ( cd "$OLD" && git init -q . && git add -A \
-            && git -c user.email=ci@ci -c user.name=ci commit -qm "old release" )
-          echo "my custom profile" > "$OLD/profile.md"
-          # Snapshot the user's state files: NONE of them may disappear.
-          ( cd "$OLD" && ls state/*.md 2>/dev/null | sort ) > /tmp/state-before.txt || true
+          git archive "${PREV_TAG:-HEAD}" | (cd "$OLD" && tar xf -)
+          cd "$OLD"
+          # A pre-0.13.1 install tracked its personal state. Releases from
+          # 0.13.1 on ship none, so materialize them from the templates and
+          # force-add — otherwise this test silently degrades into a no-op.
+          if [ -d templates/state ]; then cp -n templates/state/*.md state/ 2>/dev/null || true; fi
+          git init -q . && git add -A && git add -f state/*.md 2>/dev/null || true
+          git commit -qm "legacy install"
+          BEFORE=$(git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ')
+          echo "personal files tracked before update: $BEFORE"
+          # HARD GUARD: a fixture with nothing to migrate proves nothing.
+          [ "$BEFORE" -gt 0 ] || { echo "FIXTURE IS A NO-OP — the migration path would not be exercised"; exit 1; }
+          echo "my custom profile" > profile.md
+          ls state/*.md 2>/dev/null | sort > /tmp/state-before.txt || true
           printf 'y\ny\ny\n' | bash "$NEW/update.sh" "$OLD"
-          # 1. version advanced, 2. user content survived
-          [ "$(cat "$OLD/VERSION")" = "$(cat "$NEW/VERSION")" ] || { echo "VERSION not updated"; exit 1; }
-          [ "$(cat "$OLD/profile.md")" = "my custom profile" ] || { echo "profile.md content was touched"; exit 1; }
-          # 3. the load-bearing file actually shipped
-          grep -q 'state/\*\.md' "$OLD/.gitignore" || { echo ".gitignore not migrated"; exit 1; }
-          # 4. personal state untracked but still on disk
-          LEFT=$( cd "$OLD" && git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ' )
-          [ "$LEFT" = "0" ] || { echo "personal state still tracked after update ($LEFT files)"; exit 1; }
-          ( cd "$OLD" && ls state/*.md 2>/dev/null | sort ) > /tmp/state-after.txt || true
+          [ "$(cat VERSION)" = "$(cat "$NEW/VERSION")" ] || { echo "VERSION not updated"; exit 1; }
+          [ "$(cat profile.md)" = "my custom profile" ] || { echo "profile.md content touched"; exit 1; }
+          grep -q 'state/\*\.md' .gitignore || { echo ".gitignore not migrated"; exit 1; }
+          AFTER=$(git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ')
+          [ "$AFTER" = "0" ] || { echo "still tracked after update: $AFTER"; exit 1; }
+          ls state/*.md 2>/dev/null | sort > /tmp/state-after.txt || true
           MISSING=$(comm -23 /tmp/state-before.txt /tmp/state-after.txt || true)
           [ -z "$MISSING" ] || { echo "state files vanished — data loss: $MISSING"; exit 1; }
-          # 5. backup captured agents
-          ls "$OLD"/state/.backup/pre-update-*/.claude/agents >/dev/null || { echo "agents backup missing"; exit 1; }
-          echo "updater e2e OK (real $PREV_TAG -> $(cat "$NEW/VERSION"), boundary migrated)"
+          ls state/.backup/pre-update-*/.claude/agents >/dev/null || { echo "agents backup missing"; exit 1; }
+          echo "migration OK: $BEFORE tracked -> 0, files intact on disk"
+
+      - name: Rollback e2e — a failed update must restore files AND the git index
+        run: |
+          set -e
+          NEW_SRC="$PWD"
+          PREV_TAG=$(git tag --sort=-v:refname | grep -vE "^v?$(cat VERSION)$" | head -1)
+          OLD="$(mktemp -d)"; NEW="$(mktemp -d)"
+          git archive "${PREV_TAG:-HEAD}" | (cd "$OLD" && tar xf -)
+          tar cf - --exclude .git . | (cd "$NEW" && tar xf -)
+          # Make the post-update self-test fail on purpose.
+          # Inject the failure at the TOP — appending lands after `exit 0`
+          # and would never run (that mistake made this test a no-op once).
+          sed -i '2i echo "  FAIL forced-failure"; exit 1' "$NEW/tests/run.sh"
+          bash "$NEW/tests/run.sh" >/dev/null 2>&1 && { echo "forced failure did not take"; exit 1; }
+          cd "$OLD"
+          if [ -d templates/state ]; then cp -n templates/state/*.md state/ 2>/dev/null || true; fi
+          git init -q . && git add -A && git add -f state/*.md 2>/dev/null || true
+          git commit -qm "legacy install"
+          git status --porcelain > /tmp/idx-before.txt
+          INDEX_BEFORE=$(git ls-files -s | sort | md5sum | cut -d' ' -f1)
+          printf 'y\ny\ny\ny\n' | bash "$NEW/update.sh" "$OLD" || true
+          INDEX_AFTER=$(git ls-files -s | sort | md5sum | cut -d' ' -f1)
+          git status --porcelain > /tmp/idx-after.txt
+          [ "$(cat VERSION)" = "$PREV_TAG_VERSION" ] 2>/dev/null || true
+          if [ "$INDEX_BEFORE" != "$INDEX_AFTER" ]; then
+            echo "ROLLBACK LEFT THE GIT INDEX DIRTY:"; diff /tmp/idx-before.txt /tmp/idx-after.txt || true; exit 1
+          fi
+          echo "rollback OK: git index identical to pre-update state"
 
   # Experimental: Git Bash on Windows. Symlinks and BSD/GNU tool gaps are
   # known unknowns — failures here don't block a release yet.
