@@ -42,7 +42,6 @@ Daily activity tracked in local markdown files:
 | `state/invoices.md` | Invoice records — numbers, amounts, clients, payment status |
 | `state/time-log.md` | Time tracking entries — project, duration, description |
 | `state/schedules.md` | Only if you copy `examples/skills/schedule/` — not Lite |
-| `state/marketplace.md` | Not used by Lite (no skill registry) |
 | `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
 
 ### Auto-memory (`~/.claude/projects/<project>/memory/`)

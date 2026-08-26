@@ -35,7 +35,10 @@ Two more things worth knowing:
 |-----|--------------------|
 | **Claude Code** | Full enforcement: all 6 hooks fire (state injection, guard, logging, digests), AskUserQuestion works. This is the reference host. |
 | **Codex** | Context injection: `.codex/hooks.json` wires session-start and time-aware. No PreToolUse guard, no session-end. If your build doesn't inject hook stdout, Read `AGENTS.md` manually. |
+| **Windows** | Unverified. The CI job is experimental (`continue-on-error`) and currently fails the roster check under Git Bash — symlink and BSD/GNU tool gaps. Treat Windows as unsupported until that job is green. |
 | **Grok** | Prompt-only: hook stdout is ignored entirely. The contract asks the model to Read `AGENTS.md`, `state/handoff.md`, and `state/ping.md` every turn. It works when the model complies — that is best-effort by definition. |
+
+`.gitignore` keeps your state out of git — that is protection against mistakes, not a cage: `git add -f` can still force a personal file in, deliberately.
 
 `/ship` stages files by explicit name only (`git add .` is forbidden in the skill) and checks the staged diff for `state/`, `profile.md`, `.secrets/` before committing.
 

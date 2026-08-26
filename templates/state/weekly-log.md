@@ -1,36 +1,38 @@
-# WEEKLY LOG
+# Weekly Log
 
 > Friday review entries. Tracks patterns over time.
 
----
-
-## Format
-
-```
-### Week of [DATE]
-
-**Goal:** [What was planned]
-**Result:** [What actually happened]
-**Completion rate:** X/Y tasks (Z%)
-**Hours worked (growth):** Xh / [target]h
-**Energy average:** X/10
-**Buffer progress:** [current] / [target]
-
-**Wins:**
-1.
-2.
-
-**Blockers:**
-1.
-2.
-
-**Lesson:** [1 thing to remember]
-
-**Next week focus:** [1 sentence]
-```
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Last review | — |
+| Last completion rate | — |
+| 4-week avg | — |
+| Current week goal | — |
 
 ---
 
-## Entries
+## Active
 
-*(Newest first)*
+<!-- One section per week (## Week of YYYY-MM-DD). /plan-week creates it; fill results at review. -->
+
+## Week of YYYY-MM-DD
+
+| Field | Value |
+|-------|-------|
+| Week goal | |
+| Planned | |
+| Done | |
+| Rate | |
+| Energy avg | |
+| Wins | |
+| Lessons | |
+| Next week | |
+
+---
+
+## Archive
+
+<!-- Weeks older than 2 months → state/archive/weekly-log-YYYY-MM.md -->

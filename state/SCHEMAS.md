@@ -5,7 +5,7 @@
 
 ## Growing File Structure (Smart Context Loading)
 
-Growing state files (tasks.md, daily-log.md, finances.md, weekly-log.md) use a 3-zone format. The bus is JSONL, not this format.
+Growing state files (tasks.md, daily-log.md, finances.md, weekly-log.md, time-log.md) use a 3-zone format. The bus is JSONL, not this format.
 
 ```markdown
 # [TITLE]
@@ -303,7 +303,7 @@ Active section: lines XX-YY
 
 ### Rules:
 - One Budget section per month
-- Buffer updated monthly by @finance
+- Buffer recalculated monthly by @finance; the Summary buffer line is updated IMMEDIATELY on any change (hard rule)
 - Expense Log is append-only, newest on top
 - @boss owns business section (if separate), @finance owns personal
 - Archive: Completed months → state/archive/finances-YYYY-MM.md
@@ -320,7 +320,7 @@ Active section: lines XX-YY
 |------|-------|---------|-------------|----------|--------|
 | Build 3-month buffer | @finance | 2026-01-15 | 2026-06-15 | 40% | on track |
 | Run 5K | @trainer | 2026-02-01 | 2026-05-01 | 20% | on track |
-| Learn Python basics | @teacher | 2026-03-01 | 2026-04-15 | 0% | new |
+| Learn Python basics | @reader | 2026-03-01 | 2026-04-15 | 0% | new |
 
 ## Completed Goals
 
@@ -514,7 +514,7 @@ Active section: lines XX-YY
 
 ## network.md
 
-Small file (read in full). Owner: @mentor.
+Small file (read in full). Owner: @coach.
 
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -542,7 +542,7 @@ Small file (read in full). Owner: @mentor.
 - **Extended (500):** Every 3-6 months
 
 ### Rules:
-- @mentor is primary writer (via /network skill)
+- @coach is primary writer (via /network skill)
 - Sorted by follow-up date (most overdue first)
 - Natural language input supported: "I met Anna today" → parse + log
 - /morning surfaces overdue inner-circle follow-ups as nudges
@@ -585,6 +585,8 @@ Small file (read in full). Owner: @boss.
 ---
 
 ## telemetry.md
+
+> **Runtime-only** — no template ships; `session-end.sh` creates it on first run. Untracked (gitignored).
 
 Small file (read in full). Owner: @boss. Auto-updated by session hooks.
 
@@ -723,3 +725,20 @@ Every proposal must show all 6 gates: PURPOSE, BUDGET, CAPACITY, HEALTH, VALUES,
 - Applied proposals: move from Pending to Applied with date and impact notes
 
 ---
+
+---
+
+## Runtime-only files (no template — created by hooks and skills, all gitignored)
+
+| File | Created by | Purpose |
+|------|-----------|---------|
+| `state/handoff.md` | `/wrap-up` | Session handoff; session-start injects it only for **3 days** (mtime), then ignores it |
+| `state/ping.md` | you / another session | One message for a running session; consumed (deleted) on the next turn |
+| `state/reminders.md` | `/remind` | Timed reminders; session-start surfaces overdue rows |
+| `state/session-log.md` | `session-end.sh` | Session timestamps (max 1/hour) |
+| `state/telemetry.md` | `session-end.sh` | Session counter + agent stats |
+| `state/tool-log.md`, `state/tool-log.jsonl` | `tool-logger.sh` | Tool usage log |
+| `state/skill-runs.jsonl` | `tool-logger.sh` | Skill invocation results |
+| `state/.working.md`, `state/.backup/`, `state/archive/` | hooks | Crash buffer, snapshots, archived entries |
+
+Everything else in this document is template-backed: the blank skeleton ships in `templates/state/` and session-start materializes it.

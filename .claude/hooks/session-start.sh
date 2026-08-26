@@ -30,8 +30,9 @@ if [ -f "$WORKING_FILE" ]; then
 fi
 
 if [ -f "$BOS_DIR/state/tasks.md" ]; then
-  echo "### Tasks (max 3)"
-  grep -E '^\|.*\|$|^- \[' "$BOS_DIR/state/tasks.md" | head -3
+  echo "### Tasks (Summary, max 3 lines)"
+  # Summary metric rows only — skip the table header and separator
+  head -25 "$BOS_DIR/state/tasks.md" | grep -E '^\| [A-Za-z]' | grep -v '^\| Metric' | head -3
   echo ""
 fi
 
@@ -47,10 +48,15 @@ if [ -f "$BOS_DIR/state/finances.md" ]; then
   echo ""
 fi
 
+# Handoff expires after 3 days (PRIVACY.md contract — enforced here, not just promised)
 if [ -f "$BOS_DIR/state/handoff.md" ]; then
-  echo "### Handoff"
-  head -20 "$BOS_DIR/state/handoff.md"
-  echo ""
+  H_MTIME=$(stat -f '%m' "$BOS_DIR/state/handoff.md" 2>/dev/null || stat -c '%Y' "$BOS_DIR/state/handoff.md" 2>/dev/null)
+  NOW_EPOCH=$(date +%s)
+  if [ -n "$H_MTIME" ] && [ $(( (NOW_EPOCH - H_MTIME) / 86400 )) -lt 3 ]; then
+    echo "### Handoff"
+    head -20 "$BOS_DIR/state/handoff.md"
+    echo ""
+  fi
 fi
 
 # Overdue reminders (written by /remind; ntfy-less fallback surfaces here)

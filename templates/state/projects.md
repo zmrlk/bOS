@@ -1,20 +1,10 @@
-# PROJECTS
+# Projects
 
-> Updated by @boss. Read by @cto, @cmo, @finance.
-> Only active when Business pack is enabled.
+> Written by @boss and @cto. Only active when Business pack is enabled.
 
----
+<!-- Hours updated weekly. Completed projects move to archive. -->
 
-## Active Projects
+| Project | Client | Status | Hours est. | Hours actual | Deadline | Rate | Agent |
+|---------|--------|--------|------------|--------------|----------|------|-------|
 
-| Project | Client | Status | Hours logged | Hours estimated | Deadline | Rate (/h) | Notes |
-|---------|--------|--------|-------------|-----------------|----------|-----------|-------|
-| | | planning / in progress / review / done | | | | | |
-
----
-
-## Completed Projects
-
-| Project | Client | Hours | Rate (/h) | Revenue | Completed | Lessons |
-|---------|--------|-------|-----------|---------|-----------|---------|
-| | | | | | | |
+(no projects yet — normal for a fresh start)
