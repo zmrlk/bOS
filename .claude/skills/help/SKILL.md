@@ -57,8 +57,9 @@ Show a clean, one-screen reference of everything available.
   /setup            — onboarding / profile refresh
   /check            — system health check
   /evolve           — audit and improve bOS itself
-  /connect          — manage MCP connections
-  /build-agent      — create a custom agent
+  /connect          — manage MCP connections (optional)
+  /build-agent      — create a custom agent (optional)
+  /skill-creator    — create or improve a skill (optional)
   /help             — this screen
 
   Live list + core|optional: config/roster.md (`bash scripts/bos-roster.sh`)

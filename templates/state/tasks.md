@@ -1,48 +1,34 @@
-# TASK BOARD
+# Tasks
 
 > Daily/weekly tasks managed by @boss. Energy-tagged for optimal scheduling.
 
----
-
-## Today: [DATE]
-
-| # | Task | Status | Energy | Context | Done = |
-|---|------|--------|--------|---------|--------|
-| | | ⬜ | H/M/L | | |
-
----
-
-## Status Legend
-- ⬜ Not started
-- 🟡 In progress
-- 🟢 Done
-- ⏭️ Skipped (with reason)
-
-## Energy Legend
-- **H** = High energy required (creative, strategic, building)
-- **M** = Medium energy (writing, emails, admin)
-- **L** = Low energy (planning, review, light research)
+## Summary
+<!-- AUTO-UPDATED by @boss at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Today [YYYY-MM-DD] | 0/0 done (—) |
+| This week | 0/0 done |
+| Overdue | 0 tasks |
+| Backlog | 0 tasks |
+| Avg completion 7d | — |
 
 ---
 
-## This Week
+## Active
 
-🎯 **Week goal:** [1 sentence]
+<!-- One section per date (## YYYY-MM-DD). Status: ☐ = todo, ✅ = done, ⏭️ = skipped. Energy: H/M/L. -->
+<!-- Carry-over: copy ☐ tasks from yesterday into today's section. -->
 
-| Day | Task | Energy | Status |
-|-----|------|--------|--------|
-| Mon | | H/M/L | |
-| Tue | | H/M/L | |
-| Wed | | H/M/L | |
-| Thu | | H/M/L | |
-| Fri | Review | L | |
+## YYYY-MM-DD
 
-**Completion rate:** ___/%
+| Task | Status | Energy | Context | Time | Agent |
+|------|--------|--------|---------|------|-------|
+
+(no tasks yet — normal for a fresh start)
 
 ---
 
-## Backlog (not scheduled yet)
+## Archive
 
-| Task | Energy | Priority | Notes |
-|------|--------|----------|-------|
-| | | | |
+<!-- Sections older than 2 months → state/archive/tasks-YYYY-MM.md -->

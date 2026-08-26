@@ -1,10 +1,10 @@
 # bOS — a folder OS
 
-**A personal operating system for brains that sprint and crash.** Built ADHD-first: max 3 visible tasks, streaks that decay instead of resetting, energy over time, crisis data never persisted — and the guardrails are enforced by hooks, not promises.
+**A personal operating system for brains that sprint and crash.** Built ADHD-first: max 3 visible tasks, streaks that decay instead of resetting, energy over time. Where a guardrail can be enforced by code it is a hook, not a promise — and [HONESTY.md](HONESTY.md) says exactly which is which.
 
 It is just a folder: markdown files, skills, and hooks. Open it in **Claude Code** (full enforcement; Codex and Grok work with reduced wiring — see [HONESTY.md](HONESTY.md)). Your tasks, finances, habits, and goals live in plain-text files on your machine. No server, no database, no daemon.
 
-> **v0.13.0** — `git clone https://github.com/zmrlk/bOS.git`
+> **v0.13.2** — `git clone https://github.com/zmrlk/bOS.git`
 
 ## What a session looks like
 
@@ -37,7 +37,7 @@ Everything above is a file you can open: the plan reads `state/tasks.md`, the ex
 - **Code (hook):** a PreToolUse guard blocks hand-edits of the message bus, destructive ops on archives, and in-session `settings.json` edits — fed hostile payloads in CI on every push. It's a speed bump against the model's mistakes, not a security boundary ([HONESTY.md](HONESTY.md) says exactly where the line is).
 - **Code (boundary):** your data lives in untracked `state/` files — git never sees them, so a commit or push cannot ship them.
 - **Code (permissions, Claude Code):** `git push`, `rm`, `sudo`, `curl` are deny-listed in chat; destructive actions require a separate, explicit yes.
-- **Contract (prompt, all hosts):** crisis conversations are never persisted — no notes, no logs, external hotlines instead (Rule 12). Send/spend consent on non-Claude hosts is also contract, not hook.
+- **Contract (prompt, all hosts):** crisis conversations are never persisted — no notes, no logs, external hotlines instead (the crisis rule — AGENTS.md rule 9). Send/spend consent on non-Claude hosts is also contract, not hook.
 - Every claim is auditable from disk: `bash scripts/bos-roster.sh` + `bash tests/run.sh`. Full breakdown: [HONESTY.md](HONESTY.md).
 
 ## Quick start
