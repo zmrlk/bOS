@@ -46,6 +46,15 @@ case "$TOOL" in
         exit 2
       fi
     fi
+    # Durable memory: direct writes bypass provenance, secret/crisis filters,
+    # conflict quarantine and the append-only ledger. The helper is allowed,
+    # but a chained direct write must still be blocked.
+    if echo "$COMMAND" | grep -qE 'memory/'; then
+      if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*memory/|(tee|truncate|cp|mv|dd|shred|unlink|rm)[[:space:]][^;|&]*memory/|sed[[:space:]]+-i.*memory/|(python[0-9.]*|node|perl|ruby)[[:space:]].*memory/'; then
+        echo "BLOCKED: write durable memory only via bash scripts/bos-memory.sh"
+        exit 2
+      fi
+    fi
     exit 0
     ;;
   *)
@@ -78,6 +87,13 @@ fi
 
 if echo "$FILE_PATH" | grep -qE 'state/context-bus\.(jsonl|md)$'; then
   echo "BLOCKED: write the bus only via bash scripts/context-bus-append.sh"
+  exit 2
+fi
+
+# Durable memory records, hot cache and ledger are helper-managed. This is a
+# best-effort Claude guard; Codex/Grok rely on the shared contract.
+if echo "$FILE_PATH" | grep -qE '(^|/)memory/'; then
+  echo "BLOCKED: write durable memory only via bash scripts/bos-memory.sh"
   exit 2
 fi
 

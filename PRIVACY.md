@@ -44,10 +44,27 @@ Daily activity tracked in local markdown files:
 | `state/schedules.md` | Only if you copy `examples/skills/schedule/` — not Lite |
 | `state/.engagement-log.md` | Session timestamps and directive outcomes — used by lifecycle hooks to detect first-session-of-day and track system health. Never stores message content or conversation text. |
 
-### Auto-memory (`~/.claude/projects/<project>/memory/`)
-Each agent you talk to remembers things about you across sessions. For example, @coach might remember you're a sprinter-type who needs short tasks. @finance might remember you tend toward impulse purchases.
+### Durable memory (`memory/`)
 
-This is stored in `~/.claude/projects/<project>/memory/` — separate from bOS itself, managed by Claude Code.
+Explicitly confirmed preferences, decisions and facts may be stored here so
+Claude, Codex and Grok can use the same memory. The folder is fully gitignored.
+
+- `current/`: current records with source, confidence, dates and a content hash
+- `conflicts/`: incompatible proposals waiting for a human choice
+- `archive/`: superseded history
+- `HOT.md`: generated startup cache, maximum 12 records / 2400 characters
+- `ledger.jsonl`: event metadata and hashes; no memory plaintext
+
+Raw web/email/PDF/model source labels are rejected until explicitly confirmed.
+The helper blocks known secret, crisis and prompt-injection patterns, but regex
+filters are not complete classification; every CLI is also contractually told
+never to persist those categories. Review dates remove stale records from
+`HOT.md`; they do not delete the historical file. Provenance labels are
+auditable caller assertions, not cryptographic proof of confirmation.
+
+### Claude auto-memory (`~/.claude/projects/<project>/memory/`)
+Claude Code may keep its own host-specific memory. It is separate from bOS,
+does not make Codex/Grok equivalent, and is not canonical durable memory.
 
 ### Runtime marker files (`state/.*`)
 Small dotfiles written by lifecycle hooks and skills during a session — for example `state/.last-message` (a timestamp) or `state/.working.md` (a crash buffer). They hold only what the hook needs to avoid repeating itself, they stay on your machine, and they are never synced to Supabase. All of them are gitignored, so they never travel with the distribution.
@@ -67,7 +84,8 @@ If you use push notifications via ntfy.sh, your topic name and server URL are st
 ### File scan data
 During setup, bOS first detects only non-personal facts (locale, timezone, which tools are installed, whether state files exist). Anything identifying — installed application **names**, your git identity, how many Claude project folders you have — is read only after you say yes to one explicit question, and only names, never file contents. bOS does not walk Desktop/Documents/Downloads.
 
-bOS also checks file modification dates to determine which tools and projects are currently active vs. abandoned. Old files (365+ days) are treated as archived and won't trigger tool recommendations.
+The shipped setup scanner does not rank projects by modification date and does
+not walk Desktop/Documents/Downloads.
 
 ---
 
@@ -96,7 +114,7 @@ When you run `/evolve` **and you consent to a file-name scan**, bOS may look for
 
 ## Where it lives
 
-**Lite (this repo):** Everything stays on your computer. `profile.md`, state files, `.secrets/` — all local. Nothing leaves your machine unless you send it (chat to Anthropic, or an optional ntfy topic you configured).
+**Lite (this repo):** `profile.md`, `state/`, `memory/`, and `.secrets/` are local. Relevant content leaves the machine when your chosen AI host reads it as conversation context (Anthropic for Claude, OpenAI for Codex, xAI for Grok), or when you enable an optional external integration such as ntfy.
 
 **Supabase / “Pro”:** sample schemas live in `examples/supabase/`. Lite does **not** dual-write to the cloud. If you copy those samples and connect a database yourself, that is your setup — not shipped behavior.
 
@@ -116,17 +134,20 @@ Secrets in `.secrets/` stay local. They are not synced anywhere by Lite.
 
 ## How long it persists
 
-Data stays until you delete it. There's no automatic expiration.
+Most data stays until you delete it. Two read-time limits do not delete files:
+handoff stops being injected after 3 days, and durable-memory review dates remove
+stale records from `HOT.md` until reviewed or superseded.
 
 - Profile, state files, `.secrets/`: until you delete the files yourself (Lite has no `/delete-my-data` skill)
-- Agent memory: until you clear it (`~/.claude/projects/<project>/memory/` — delete the folder)
+- Durable memory: until you delete `memory/`; superseded versions remain in `memory/archive/`
+- Claude auto-memory: until you clear its separate `~/.claude/projects/<project>/memory/` folder
 - Anything you put in your own Supabase (not Lite): until you delete it there
 
 ---
 
 ## Exporting your data
 
-Lite has **no** `/export` skill. Copy `profile.md` and `state/*.md` yourself (or ask the agent to pack a zip). Do not copy `.secrets/` into chat.
+Lite has **no** `/export` skill. Copy `profile.md`, `state/*.md`, and `memory/` yourself (or ask the agent to pack a zip). Do not copy `.secrets/` into chat.
 
 ---
 
@@ -134,6 +155,7 @@ Lite has **no** `/export` skill. Copy `profile.md` and `state/*.md` yourself (or
 
 There is no delete skill — you delete files yourself (ask the agent to list the paths first):
 - Delete `profile.md` and reset `state/*.md` to blank templates
+- Delete `memory/` to remove bOS durable memory (this is destructive; inspect paths first)
 - Delete `.secrets/` if present
 - Agent memory is separate: `~/.claude/projects/<project>/memory/` — delete that folder yourself if you want it gone
 - Optional cloud data (if you set up the Supabase examples) is separate — drop the tables from your Supabase dashboard
@@ -149,7 +171,7 @@ Specifically:
 - It does NOT read your documents, spreadsheets, PDFs, images, or any other file
 - Scanning happens only with your explicit consent during `/setup`
 - You can say no — bOS works fine without scanning
-- File modification dates are checked to prioritize recent/active files
+- The shipped scanner does not use modification dates to infer active projects
 
 ---
 
@@ -365,7 +387,8 @@ Claude Code plugins you install yourself have their own policies. They are not p
 bOS is an open system — you can read every file it creates. If you're ever unsure what's stored, just look in:
 - `profile.md` — your profile
 - `state/` — your activity data
+- `memory/` — canonical durable memory, conflicts, history and hash ledger
 - `.secrets/` — your secrets (open files in an editor; never paste into chat)
-- `~/.claude/projects/<project>/memory/` — agent memory
+- `~/.claude/projects/<project>/memory/` — optional Claude-only auto-memory
 
 Everything is readable text. Nothing is hidden.
