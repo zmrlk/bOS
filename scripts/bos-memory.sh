@@ -98,7 +98,9 @@ validate() {
   # Only user-confirmed records enter startup context. Other verified records
   # remain durable and searchable, but cold.
   [ "$heat" = hot ] && ! printf '%s' "$source" | grep -q '^user:' && heat=cold
-  if printf '%s' "$text" | grep -Eiq '(BEGIN[[:space:]]+(RSA |EC |OPENSSH )?PRIVATE KEY|((api[_ -]?key|password|passwd|token|secret)[[:space:]]*[:=][[:space:]]*[^[:space:]]{8,})|(gh[pousr]_[A-Za-z0-9]{20,})|(sk-[A-Za-z0-9]{20,})|(AKIA[0-9A-Z]{16}))'; then
+  # Vendor key shapes often contain hyphens/underscores (sk-ant-api03-…,
+  # sk-proj-…), so the alphanumeric-only class used to let them through.
+  if printf '%s' "$text" | grep -Eiq '(BEGIN[[:space:]]+(RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY|((api[_ -]?key|password|passwd|token|secret|authorization)[[:space:]]*[:=][[:space:]]*[^[:space:]]{8,})|(gh[pousr]_[A-Za-z0-9]{20,})|(sk-[A-Za-z0-9][A-Za-z0-9_-]{19,})|(AKIA[0-9A-Z]{16})|([Bb]earer[[:space:]]+[A-Za-z0-9._~+/-]{20,})|(eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.?[A-Za-z0-9_-]*)|(xox[baprs]-[A-Za-z0-9-]{10,})|(AIza[0-9A-Za-z_-]{35})|(glpat-[A-Za-z0-9_-]{20,})|(hf_[A-Za-z0-9]{30,})|((sk|pk)_(live|test)_[A-Za-z0-9]{20,})|(SG\.[A-Za-z0-9_-]{20,})|(npm_[A-Za-z0-9]{30,}))'; then
     fail "secret-like content is forbidden"
   fi
   if printf '%s' "$text" | grep -Eiq '(suicid|self[- ]?harm|samob[oó]j|odebra[cć][[:space:]]+sobie[[:space:]]+[zż]ycie|nie[[:space:]]+chc[eę][[:space:]]+[zż]y[cć]|anoreks|anorex|bulimi|disordered[[:space:]]+eating)'; then
