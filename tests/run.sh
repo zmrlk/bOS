@@ -99,6 +99,9 @@ if ( cd "$SANDBOX" && bash scripts/bos-roster.sh >/dev/null 2>&1 ); then bad "ro
 rm -rf "$SANDBOX/.claude/skills/zz-drift-fixture"
 
 echo "== 7. Data boundary (P0): user state never tracked =="
+if [ ! -d "$REPO/.git" ]; then
+  echo "  SKIP (not a git checkout — boundary is enforced by .gitignore, verified in CI)"
+else
 for f in state/finances.md state/journal.md state/tasks.md state/network.md; do
   if ( cd "$REPO" && git check-ignore -q "$f" ); then ok "gitignored $f"; else bad "gitignored $f"; fi
 done
@@ -106,6 +109,7 @@ TRACKED_STATE=$( cd "$REPO" && git ls-files state/ | grep -vE '^state/(SCHEMAS\.
 if [ "$TRACKED_STATE" = "0" ]; then ok "only SCHEMAS/stub/.gitkeep tracked in state/"; else bad "only SCHEMAS/stub/.gitkeep tracked in state/" "($TRACKED_STATE extra)"; fi
 TPL_COUNT=$(ls "$REPO/templates/state"/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$TPL_COUNT" -ge 15 ]; then ok "templates/state ships $TPL_COUNT templates"; else bad "templates/state ships templates" "(got $TPL_COUNT)"; fi
+fi
 rm -f "$SANDBOX/state/tasks.md"
 bash "$SANDBOX/.claude/hooks/session-start.sh" >/dev/null 2>&1
 if [ -f "$SANDBOX/state/tasks.md" ]; then ok "session-start bootstraps missing state from template"; else bad "session-start bootstraps missing state from template"; fi
@@ -118,15 +122,19 @@ BEFORE="$SANDBOX/.before-sums"
 for h in "$SANDBOX"/.claude/hooks/*.sh; do printf '{}' | bash "$h" >/dev/null 2>&1; done
 DIRTY=0
 ( cd "$SANDBOX" && find . -type f ! -path './.before-sums' -exec cksum {} + | sort ) > "$SANDBOX/.after-sums"
-while IFS= read -r line; do
-  f=$(echo "$line" | awk '{print $3}' | sed 's|^\./||')
-  if ! ( cd "$REPO" && git check-ignore -q "$f" 2>/dev/null ); then
-    if ( cd "$REPO" && git ls-files --error-unmatch "$f" >/dev/null 2>&1 ); then
-      echo "  DIRTY tracked file: $f"; DIRTY=1
+if [ ! -d "$REPO/.git" ]; then
+  echo "  SKIP (not a git checkout — verified in CI)"
+else
+  while IFS= read -r line; do
+    f=$(echo "$line" | awk '{print $3}' | sed 's|^\./||')
+    if ! ( cd "$REPO" && git check-ignore -q "$f" 2>/dev/null ); then
+      if ( cd "$REPO" && git ls-files --error-unmatch "$f" >/dev/null 2>&1 ); then
+        echo "  DIRTY tracked file: $f"; DIRTY=1
+      fi
     fi
-  fi
-done < <(comm -13 "$BEFORE" "$SANDBOX/.after-sums")
-if [ "$DIRTY" = 0 ]; then ok "no tracked file mutated by hooks"; else bad "no tracked file mutated by hooks"; fi
+  done < <(comm -13 "$BEFORE" "$SANDBOX/.after-sums")
+  if [ "$DIRTY" = 0 ]; then ok "no tracked file mutated by hooks"; else bad "no tracked file mutated by hooks"; fi
+fi
 
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"
