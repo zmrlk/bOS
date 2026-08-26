@@ -30,7 +30,12 @@ LOCALE_SYS=$(defaults read -g AppleLocale 2>/dev/null || echo "${LANG:-}")
 LANG1=$(defaults read -g AppleLanguages 2>/dev/null | sed -n 's/[^"]*"\([a-z][a-z]\)[-"].*/\1/p' | head -1)
 [ -n "${LANG1:-}" ] && echo "language_guess: $LANG1 (tie-break: the language of the user's FIRST MESSAGE wins over locale)" && DETECTED_FIELDS="$DETECTED_FIELDS Language"
 case "$LOCALE_SYS" in *PL*) echo "currency_guess: PLN";; *US*) echo "currency_guess: USD";; *GB*) echo "currency_guess: GBP";; *DE*|*FR*|*ES*|*IT*|*NL*) echo "currency_guess: EUR";; esac
-GIT_NAME=$(git config --global user.name 2>/dev/null)
+# Personal identity: only with --with-names (post-consent), like app names.
+if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+  GIT_NAME=$(git config --global user.name 2>/dev/null)
+else
+  GIT_NAME=""
+fi
 if [ -n "${GIT_NAME:-}" ]; then
   if [ ${#GIT_NAME} -le 3 ] || ! echo "$GIT_NAME" | grep -qi '[aeiouy]'; then
     echo "name_guess: $GIT_NAME (WEAK — looks like initials; ask for the name directly, don't waste a click on confirmation)"
@@ -40,7 +45,9 @@ if [ -n "${GIT_NAME:-}" ]; then
   fi
 fi
 command -v git >/dev/null && echo "has_git: yes"
-[ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (suggest import — REQUIRES SEPARATE CONSENT, a different privacy scope than the app scan)"
+if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+  [ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (import REQUIRES SEPARATE CONSENT — a different privacy scope)"
+fi
 [ -d "$HOME/bos-wiki" ] && echo "existing_bos_wiki: yes (import requires separate consent)"
 # App NAMES are personal-ish: listed only with --with-names, i.e. AFTER the
 # user consented to the names scan in /setup (PRIVACY.md: consent-gated).
