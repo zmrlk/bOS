@@ -1,59 +1,48 @@
-# FINANCIAL TRACKER
+# Finances
 
-> Personal section owned by @finance. Business section owned by @boss.
+> Personal section owned by @finance. Business section (if separate) owned by @boss.
 
----
-
-## Personal Budget (@finance)
-
-| Metric | Amount |
-|--------|--------|
-| Income (net, all sources) | |
-| Fixed expenses | |
-| Variable expenses | |
-| **Discretionary** | |
-| Saved to buffer | |
-| **Buffer balance** | /[target] |
-| **Months runway** | |
-
-### Monthly Expense Log
-
-| Date | Amount | Category | Note | Impulse? |
-|------|--------|----------|------|----------|
-| | | food / transport / housing / health / entertainment / subscriptions / other | | yes / no |
-
-### Subscriptions & Recurring
-
-| Tool/Service | Cost/month | Category | Needed? | Notes |
-|-------------|-----------|----------|---------|-------|
-| | | personal / business | Yes / No | |
+## Summary
+<!-- AUTO-UPDATED: buffer ALWAYS immediate, rest at session end -->
+Active section: lines XX-YY
+| Metric | Value |
+|--------|-------|
+| Buffer | — |
+| This month spent | — |
+| Budget remaining | — |
+| Top category | — |
+| Impulse ratio | — |
+| Last expense | — |
 
 ---
 
-## Business Finances (@boss)
+## Active
 
-> Only active when Business pack is enabled.
+## Budget — [Month YYYY]
 
-| Metric | Amount |
-|--------|--------|
-| Revenue (this month) | |
-| Business expenses | |
-| **Net profit** | |
-| Effective rate (/h) | |
-| Hours invoiced | |
-| Pending invoices | |
-| Business fund balance | |
+| Category | Budgeted | Spent | Remaining |
+|----------|----------|-------|-----------|
 
-### Invoice Log
+## Buffer
+<!-- Updated monthly by @finance -->
 
-| # | Client | Amount | Issued | Due | Status |
-|---|--------|--------|--------|-----|--------|
-| | | | | | draft / sent / paid / overdue |
+| Field | Value |
+|-------|-------|
+| Target | 3 months (—) |
+| Current | — |
+| Progress | — |
+| Monthly savings | — |
+
+## Expense Log
+<!-- Append-only, newest on top -->
+
+| Date | Amount | Category | Description | Impulse? |
+|------|--------|----------|-------------|----------|
+
+(no expenses yet — normal for a fresh start)
 
 ---
 
-## Monthly History
+## Archive
 
-| Month | Personal income | Business revenue | Total expenses | Saved | Buffer | Rate (/h) |
-|-------|----------------|-----------------|----------------|-------|--------|-----------|
-| | | | | | | |
+<!-- Completed months → state/archive/finances-YYYY-MM.md -->

@@ -126,7 +126,7 @@ mkdir -p "$BACKUP_DIR"
 # Everything the updater may touch gets backed up first — the same list the
 # rollback below restores. User data (state/, profile.md, .secrets/) is never
 # touched by apply, so it needs no restore; profile.md is backed up anyway.
-SYSTEM_ITEMS="CLAUDE.md AGENTS.md README.md PRIVACY.md HONESTY.md SECURITY.md VERSION profile-template.md update.sh state/SCHEMAS.md .claude/settings.json .claude/agents .claude/skills .claude/hooks .agents .codex .grok scripts config examples templates tests"
+SYSTEM_ITEMS="CLAUDE.md AGENTS.md README.md PRIVACY.md HONESTY.md SECURITY.md VERSION profile-template.md update.sh .gitignore .gitattributes state/SCHEMAS.md state/context-bus.md .claude/settings.json .claude/agents .claude/skills .claude/hooks .agents .codex .grok scripts config examples templates tests docs .github"
 
 backup_item() {
     local item="$1"
@@ -147,6 +147,10 @@ rollback() {
             rm -rf "${EXISTING_BOS:?}/$item"
             mkdir -p "$EXISTING_BOS/$(dirname "$item")"
             cp -R -P "$BACKUP_DIR/$item" "$EXISTING_BOS/$item"
+        elif [ -e "$EXISTING_BOS/$item" ]; then
+            # Item did not exist before this update (e.g. templates/, tests/,
+            # docs/ on an older install) — a true rollback removes it.
+            rm -rf "${EXISTING_BOS:?}/$item"
         fi
     done
     echo -e "  ${GREEN}✓${NC} Rolled back. Your installation is as it was before the update."
@@ -254,11 +258,19 @@ for d in .codex .grok config; do
     fi
 done
 
-# README, PRIVACY
-for f in README.md PRIVACY.md; do
+# Docs and dotfiles that the piecemeal copies above do not cover.
+# .gitignore is load-bearing: it is what keeps user state out of git (P0).
+for f in README.md PRIVACY.md HONESTY.md SECURITY.md .gitignore .gitattributes; do
     if [ -f "$NEW_BOS/$f" ]; then
         cp "$NEW_BOS/$f" "$EXISTING_BOS/$f"
         echo -e "  ${GREEN}✓${NC} $f"
+    fi
+done
+for d in docs .github; do
+    if [ -d "$NEW_BOS/$d" ]; then
+        mkdir -p "$EXISTING_BOS/$d"
+        cp -R "$NEW_BOS/$d/"* "$EXISTING_BOS/$d/" 2>/dev/null || true
+        echo -e "  ${GREEN}✓${NC} $d/"
     fi
 done
 
@@ -311,6 +323,29 @@ fi
 
 trap - ERR
 
+# ── Data-boundary migration (v0.13.1+) ────────
+# Older installs tracked state/*.md in git. The new .gitignore alone does not
+# untrack an already-indexed file — do it explicitly, WITHOUT deleting data.
+if [ -d "$EXISTING_BOS/.git" ]; then
+    LEGACY=$( cd "$EXISTING_BOS" && git ls-files state/ 2>/dev/null \
+        | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' || true )
+    if [ -n "$LEGACY" ]; then
+        echo ""
+        echo -e "  ${YELLOW}Data boundary:${NC} these personal files are still tracked by git:"
+        echo "$LEGACY" | sed 's/^/    /'
+        echo "  They stay on disk — only git stops tracking them."
+        read -p "  Untrack them now? [Y/n] " do_untrack
+        if [[ ! "$do_untrack" =~ ^[Nn] ]]; then
+            ( cd "$EXISTING_BOS" && echo "$LEGACY" | while IFS= read -r f; do
+                [ -n "$f" ] && git rm --cached --quiet "$f" 2>/dev/null
+              done )
+            echo -e "  ${GREEN}✓${NC} Untracked. Commit the change when convenient — your data is intact."
+        else
+            echo -e "  ${YELLOW}Skipped — your personal state stays in the git index.${NC}"
+        fi
+    fi
+fi
+
 # ── Post-update self-test ─────────────────────
 
 if [ -f "$EXISTING_BOS/tests/run.sh" ]; then
@@ -336,7 +371,7 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${BOLD}  ${GREEN}bOS updated: ${OLD_VERSION} → ${NEW_VERSION}${NC}"
 echo ""
 echo -e "  Your data is safe:"
-echo -e "    ${GREEN}✓${NC} profile.md — untouched"
+echo -e "    ${GREEN}✓${NC} profile.md — your content untouched (only the bos_version field is bumped)"
 echo -e "    ${GREEN}✓${NC} state/ — untouched"
 echo -e "    ${GREEN}✓${NC} .secrets/ — untouched"
 echo ""

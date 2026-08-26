@@ -1,5 +1,7 @@
 # External audit — v0.13.0 (commit 5eaa66c), 2026-08-26
 
+> **STATUS: all P0/P1 findings below were fixed in v0.13.1** (branch `fix/p0-data-boundary`, merged as `5f0cf23` + tail `ec68513`). This document describes the PRE-fix state; the Response table at the bottom maps each finding to its fix.
+
 Independent multi-model audit of the public tree (host session + council: Claude 7/10 CONDITIONAL GO, GLM 6/10 CONDITIONAL GO with independent reproduction of all key findings; Grok timeout ×2; Gemini empty). Overall verdict: **6.0/10 — CONDITIONAL GO** as an experimental project for technical early adopters; **NO-GO for broader promotion as a safe personal OS until private data is separated from code**. Concept/positioning rated ~8/10.
 
 | Area | Score |

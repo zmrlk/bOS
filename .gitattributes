@@ -1,0 +1,4 @@
+# skill-creator is a vendored Anthropic skill (Apache-2.0) — keep it out of
+# GitHub language stats so the repo does not read as a Python project.
+.claude/skills/skill-creator/** linguist-vendored
+.agents/skills/skill-creator/** linguist-vendored

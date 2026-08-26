@@ -36,6 +36,11 @@ guard "echo-bus"          '{"tool_name":"Bash","command":"echo x >> state/contex
 guard "interp-bus"        '{"tool_name":"Bash","command":"node write.js state/context-bus.jsonl"}' 2
 guard "helper-chain"      '{"tool_name":"Bash","command":"bash scripts/context-bus-append.sh a b insight info hi; echo x >> state/context-bus.jsonl"}' 2
 guard "mv-archive"        '{"tool_name":"Bash","command":"mv state/archive/old.md /tmp/"}' 2
+guard "cp-devnull-archive" '{"tool_name":"Bash","command":"cp /dev/null state/archive/x.md"}' 2
+guard "cp-bus"            '{"tool_name":"Bash","command":"cp /tmp/fake.jsonl state/context-bus.jsonl"}' 2
+guard "mv-bus"            '{"tool_name":"Bash","command":"mv /tmp/fake.jsonl state/context-bus.jsonl"}' 2
+guard "rm-bus"            '{"tool_name":"Bash","command":"rm state/context-bus.jsonl"}' 2
+guard "cp-elsewhere-ok"   '{"tool_name":"Bash","command":"cp README.md /tmp/"}' 0
 guard "redirect-archive"  '{"tool_name":"Bash","command":"echo x > state/archive/old.md"}' 2
 guard "write-settings"    '{"tool_name":"Write","file_path":".claude/settings.json"}' 2
 guard "write-archive"     '{"tool_name":"Write","file_path":"state/archive/old.md"}' 2
@@ -125,16 +130,45 @@ DIRTY=0
 if [ ! -d "$REPO/.git" ]; then
   echo "  SKIP (not a git checkout — verified in CI)"
 else
-  while IFS= read -r line; do
-    f=$(echo "$line" | awk '{print $3}' | sed 's|^\./||')
-    if ! ( cd "$REPO" && git check-ignore -q "$f" 2>/dev/null ); then
-      if ( cd "$REPO" && git ls-files --error-unmatch "$f" >/dev/null 2>&1 ); then
-        echo "  DIRTY tracked file: $f"; DIRTY=1
+  DIFF_FILE="$SANDBOX/.sums-diff"
+  if ! comm -13 "$BEFORE" "$SANDBOX/.after-sums" > "$DIFF_FILE" 2>/dev/null; then
+    bad "no tracked file mutated by hooks" "(comm failed — cannot verify)"
+  else
+    while IFS= read -r line; do
+      [ -n "$line" ] || continue
+      f=$(echo "$line" | awk '{print $3}' | sed 's|^\./||')
+      if ! ( cd "$REPO" && git check-ignore -q "$f" 2>/dev/null ); then
+        if ( cd "$REPO" && git ls-files --error-unmatch "$f" >/dev/null 2>&1 ); then
+          echo "  DIRTY tracked file: $f"; DIRTY=1
+        fi
       fi
-    fi
-  done < <(comm -13 "$BEFORE" "$SANDBOX/.after-sums")
-  if [ "$DIRTY" = 0 ]; then ok "no tracked file mutated by hooks"; else bad "no tracked file mutated by hooks"; fi
+    done < "$DIFF_FILE"
+    if [ "$DIRTY" = 0 ]; then ok "no tracked file mutated by hooks"; else bad "no tracked file mutated by hooks"; fi
+  fi
 fi
+
+echo "== 9. SCHEMAS <-> templates consistency =="
+RUNTIME_ONLY="handoff.md ping.md reminders.md session-log.md telemetry.md tool-log.md context-bus.jsonl schedules.md marketplace.md inbox.md notes.md"
+MISSING_TPL=""
+SCHEMA_FILES="$SANDBOX/.schema-files"
+grep -E '^## [a-z-]+\.(md|jsonl)' "$REPO/state/SCHEMAS.md" | sed 's/^## //; s/ .*//' > "$SCHEMA_FILES"
+while IFS= read -r name; do
+  case " $RUNTIME_ONLY " in *" $name "*) continue ;; esac
+  [ "$name" = "SCHEMAS.md" ] && continue
+  [ -f "$REPO/templates/state/$name" ] || MISSING_TPL="$MISSING_TPL $name"
+done < "$SCHEMA_FILES"
+if [ -z "$MISSING_TPL" ]; then ok "every SCHEMAS file is template-backed or runtime-only"; else bad "every SCHEMAS file is template-backed or runtime-only" "(missing:$MISSING_TPL)"; fi
+
+echo "== 10. Handoff TTL (3 days) =="
+printf '# Handoff\n- goal: fresh handoff test\n' > "$SANDBOX/state/handoff.md"
+OUT=$(bash "$SANDBOX/.claude/hooks/session-start.sh" 2>/dev/null)
+if echo "$OUT" | grep -q "fresh handoff test"; then ok "fresh handoff injected"; else bad "fresh handoff injected"; fi
+if command -v touch >/dev/null; then
+  touch -t 202001010000 "$SANDBOX/state/handoff.md" 2>/dev/null || touch -d "2020-01-01" "$SANDBOX/state/handoff.md" 2>/dev/null
+  OUT=$(bash "$SANDBOX/.claude/hooks/session-start.sh" 2>/dev/null)
+  if echo "$OUT" | grep -q "fresh handoff test"; then bad "stale handoff (>3d) filtered"; else ok "stale handoff (>3d) filtered"; fi
+fi
+rm -f "$SANDBOX/state/handoff.md"
 
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"

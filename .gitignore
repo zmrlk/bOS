@@ -1,7 +1,7 @@
 # ============================================
 # bOS — .gitignore
-# Only excludes internal business docs and runtime artifacts.
-# All product files ship to users.
+# Excludes ALL user data (state/, profile.md, .secrets/) plus internal docs
+# and runtime artifacts. System/product files ship; your data never does.
 # ============================================
 
 # ─────────────────────────────────────────────

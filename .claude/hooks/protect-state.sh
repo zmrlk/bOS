@@ -25,7 +25,7 @@ case "$TOOL" in
     ;;
   Bash)
     # Archive/backup: block every destructive verb we can name, not just rm.
-    if echo "$COMMAND" | grep -qE '(rm\s+|find\s+.*-delete|unlink\s+|truncate\s+|shred\s+|dd\s+.*of=|mv\s+)[^;|&]*state/(archive|\.backup)|state/(archive|\.backup)[^;|&]*(-delete)|(>|>>|tee\s)[^;|&]*state/(archive|\.backup)'; then
+    if echo "$COMMAND" | grep -qE '(rm\s+|find\s+.*-delete|unlink\s+|truncate\s+|shred\s+|dd\s+.*of=|mv\s+|cp\s+)[^;|&]*state/(archive|\.backup)|state/(archive|\.backup)[^;|&]*(-delete)|(>|>>|tee\s)[^;|&]*state/(archive|\.backup)'; then
       echo "BLOCKED: Cannot delete, move, truncate or overwrite files in state/archive/ or state/.backup/"
       exit 2
     fi
@@ -41,7 +41,7 @@ case "$TOOL" in
     # Bus: one helper. NO early-exit on the helper's name — a chained command
     # ("helper.sh …; echo x >> bus") must still hit the write patterns below.
     if echo "$COMMAND" | grep -qE 'context-bus\.(jsonl|md)'; then
-      if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*context-bus\.(jsonl|md)|(tee|truncate)[[:space:]].*context-bus\.(jsonl|md)|sed[[:space:]]+-i.*context-bus\.(jsonl|md)|(python[0-9.]*|node|perl|ruby)[[:space:]].*context-bus\.(jsonl|md)'; then
+      if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*context-bus\.(jsonl|md)|(tee|truncate|cp|mv|dd|shred|unlink|rm)[[:space:]][^;|&]*context-bus\.(jsonl|md)|sed[[:space:]]+-i.*context-bus\.(jsonl|md)|(python[0-9.]*|node|perl|ruby)[[:space:]].*context-bus\.(jsonl|md)'; then
         echo "BLOCKED: write the bus only via bash scripts/context-bus-append.sh"
         exit 2
       fi
