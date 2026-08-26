@@ -1,6 +1,6 @@
 # FINANCIAL TRACKER
 
-> Personal section owned by @finance. Business section owned by @cfo.
+> Personal section owned by @finance. Business section owned by @boss.
 
 ---
 
@@ -30,7 +30,7 @@
 
 ---
 
-## Business Finances (@cfo)
+## Business Finances (@boss)
 
 > Only active when Business pack is enabled.
 

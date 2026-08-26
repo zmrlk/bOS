@@ -1,0 +1,20 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test suite (guard payloads, bus schema, hooks, roster, clean-clone)
+        run: bash tests/run.sh
+      - name: Roster matches disk
+        run: bash scripts/bos-roster.sh

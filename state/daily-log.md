@@ -10,7 +10,7 @@
 | Sleep last 7d | — |
 | Exercise last 7d | — |
 
-> Updated by @boss (via /evening). Read by @coo, @wellness, @trainer.
+> Updated by @boss (via /evening). Read by @coach and @trainer.
 
 ---
 

@@ -1,7 +1,7 @@
 # PROJECT EVALUATION TEMPLATE
 
 > Use this when evaluating a new opportunity, project, or client.
-> Involves: @SALES (client assessment) → @CFO (pricing) → @CTO (technical) → @CEO (go/no-go)
+> Personas of @boss in sequence: sales (client assessment) → cfo (pricing) → @cto (technical) → @boss (go/no-go)
 
 ---
 
@@ -11,7 +11,7 @@
 
 ---
 
-### 1. Client Assessment (@SALES)
+### 1. Client Assessment (sales persona)
 
 | Field | Answer |
 |-------|--------|
@@ -28,7 +28,7 @@
 
 ---
 
-### 2. Pricing Analysis (@CFO)
+### 2. Pricing Analysis (cfo persona)
 
 | Field | Value |
 |-------|-------|
@@ -44,7 +44,7 @@
 
 ---
 
-### 3. Technical Estimate (@CTO)
+### 3. Technical Estimate (@cto)
 
 | Field | Value |
 |-------|-------|

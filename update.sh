@@ -87,7 +87,7 @@ echo -e "  ${YELLOW}UPDATE (system files):${NC}"
 echo "    CLAUDE.md, AGENTS.md"
 echo "    .claude/agents/  .claude/skills/  .claude/hooks/"
 echo "    .claude/settings.json"
-echo "    .codex/  .grok/  scripts/  config/"
+echo "    .agents/  .codex/  .grok/  scripts/  config/"
 echo "    VERSION, README.md, PRIVACY.md"
 echo "    profile-template.md"
 echo "    state/SCHEMAS.md"
@@ -161,6 +161,38 @@ if [ -d "$NEW_BOS/.claude/skills" ]; then
     mkdir -p "$EXISTING_BOS/.claude/skills"
     cp -r "$NEW_BOS/.claude/skills/"* "$EXISTING_BOS/.claude/skills/"
     echo -e "  ${GREEN}✓${NC} .claude/skills/"
+
+    # Orphan check: skills present locally but absent from this release.
+    # Never delete silently — list them and ask once.
+    ORPHANS=""
+    for d in "$EXISTING_BOS/.claude/skills"/*/; do
+        name=$(basename "$d")
+        if [ ! -d "$NEW_BOS/.claude/skills/$name" ]; then
+            ORPHANS="$ORPHANS $name"
+        fi
+    done
+    if [ -n "$ORPHANS" ]; then
+        echo ""
+        echo -e "  ${YELLOW}These skills are not part of v${NEW_VERSION}:${NC}$ORPHANS"
+        echo "  (your own custom skills belong here too — keep them!)"
+        read -p "  Remove the ones listed above? [y/N] " rm_orphans
+        if [[ "$rm_orphans" =~ ^[Yy] ]]; then
+            for name in $ORPHANS; do
+                cp -r "$EXISTING_BOS/.claude/skills/$name" "$BACKUP_DIR/removed-skill-$name" 2>/dev/null
+                rm -rf "$EXISTING_BOS/.claude/skills/$name"
+                echo -e "  ${GREEN}✓${NC} removed $name (backup in state/.backup/)"
+            done
+        else
+            echo "  Kept. They stay untouched."
+        fi
+    fi
+fi
+
+# Codex/agents symlink layer (mirrors .claude/skills for AGENTS.md hosts)
+if [ -d "$NEW_BOS/.agents" ]; then
+    mkdir -p "$EXISTING_BOS/.agents"
+    cp -R "$NEW_BOS/.agents/"* "$EXISTING_BOS/.agents/" 2>/dev/null || true
+    echo -e "  ${GREEN}✓${NC} .agents/ (symlink layer)"
 fi
 
 # Hooks (the scripts settings.json points at)

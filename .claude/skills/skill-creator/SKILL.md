@@ -1,7 +1,7 @@
 ---
 name: skill-creator
 description: "Create or improve a skill. Use when the user wants a new skill, to update a skill, or to run skill evals."
-tier: core
+tier: optional
 ---
 
 # Skill creator

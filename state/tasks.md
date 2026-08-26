@@ -1,6 +1,6 @@
 # TASK BOARD
 
-> Daily/weekly tasks managed by @COO. Energy-tagged for optimal scheduling.
+> Daily/weekly tasks managed by @boss. Energy-tagged for optimal scheduling.
 
 ---
 
