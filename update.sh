@@ -123,34 +123,45 @@ echo ""
 BACKUP_DIR="$EXISTING_BOS/state/.backup/pre-update-${OLD_VERSION}-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
+# Everything the updater may touch gets backed up first — the same list the
+# rollback below restores. User data (state/, profile.md, .secrets/) is never
+# touched by apply, so it needs no restore; profile.md is backed up anyway.
+SYSTEM_ITEMS="CLAUDE.md AGENTS.md README.md PRIVACY.md HONESTY.md SECURITY.md VERSION profile-template.md update.sh state/SCHEMAS.md .claude/settings.json .claude/agents .claude/skills .claude/hooks .agents .codex .grok scripts config examples templates tests"
+
+backup_item() {
+    local item="$1"
+    [ -e "$EXISTING_BOS/$item" ] || return 0
+    mkdir -p "$BACKUP_DIR/$(dirname "$item")"
+    cp -R -P "$EXISTING_BOS/$item" "$BACKUP_DIR/$item"
+}
 if [ -f "$EXISTING_BOS/profile.md" ]; then
     cp "$EXISTING_BOS/profile.md" "$BACKUP_DIR/profile.md"
 fi
-cp "$EXISTING_BOS/CLAUDE.md" "$BACKUP_DIR/CLAUDE.md"
-if [ -f "$EXISTING_BOS/AGENTS.md" ]; then
-    cp "$EXISTING_BOS/AGENTS.md" "$BACKUP_DIR/AGENTS.md"
-fi
-if [ -f "$EXISTING_BOS/VERSION" ]; then
-    cp "$EXISTING_BOS/VERSION" "$BACKUP_DIR/VERSION"
-fi
-if [ -f "$EXISTING_BOS/.claude/settings.json" ]; then
-    mkdir -p "$BACKUP_DIR/.claude"
-    cp "$EXISTING_BOS/.claude/settings.json" "$BACKUP_DIR/.claude/settings.json"
-fi
-if [ -d "$EXISTING_BOS/.claude/skills" ]; then
-    mkdir -p "$BACKUP_DIR/.claude"
-    cp -r "$EXISTING_BOS/.claude/skills" "$BACKUP_DIR/.claude/skills"
-fi
-if [ -d "$EXISTING_BOS/.claude/hooks" ]; then
-    mkdir -p "$BACKUP_DIR/.claude"
-    cp -r "$EXISTING_BOS/.claude/hooks" "$BACKUP_DIR/.claude/hooks"
-fi
-if [ -d "$EXISTING_BOS/.claude/agents" ]; then
-    mkdir -p "$BACKUP_DIR/.claude"
-    cp -r "$EXISTING_BOS/.claude/agents" "$BACKUP_DIR/.claude/agents"
-fi
+for item in $SYSTEM_ITEMS; do backup_item "$item"; done
+
+rollback() {
+    echo ""
+    echo -e "  ${YELLOW}Rolling back from $BACKUP_DIR ...${NC}"
+    for item in $SYSTEM_ITEMS; do
+        if [ -e "$BACKUP_DIR/$item" ]; then
+            rm -rf "${EXISTING_BOS:?}/$item"
+            mkdir -p "$EXISTING_BOS/$(dirname "$item")"
+            cp -R -P "$BACKUP_DIR/$item" "$EXISTING_BOS/$item"
+        fi
+    done
+    echo -e "  ${GREEN}✓${NC} Rolled back. Your installation is as it was before the update."
+}
 
 echo -e "  ${GREEN}✓${NC} Backup created: state/.backup/pre-update-${OLD_VERSION}-..."
+
+# Any failure during apply (set -e) triggers an automatic rollback — the
+# installation is never left half-updated.
+on_apply_error() {
+    echo -e "  ${RED}✗ Update failed mid-apply.${NC}"
+    rollback
+    exit 1
+}
+trap on_apply_error ERR
 
 # ── Copy system files ─────────────────────────
 
@@ -270,6 +281,13 @@ if [ -d "$NEW_BOS/templates/state" ]; then
     echo -e "  ${GREEN}✓${NC} templates/state/"
 fi
 
+# Test suite (used for the post-update self-test)
+if [ -d "$NEW_BOS/tests" ]; then
+    mkdir -p "$EXISTING_BOS/tests"
+    cp -r "$NEW_BOS/tests/"* "$EXISTING_BOS/tests/"
+    echo -e "  ${GREEN}✓${NC} tests/"
+fi
+
 # Examples (supabase schemas, n8n templates, ntfy hooks, sample skills)
 if [ -d "$NEW_BOS/examples" ]; then
     mkdir -p "$EXISTING_BOS/examples"
@@ -288,6 +306,26 @@ if [ -f "$EXISTING_BOS/profile.md" ]; then
         sed -i '' "s/bos_version: .*/bos_version: ${NEW_VERSION}/" "$EXISTING_BOS/profile.md" 2>/dev/null || \
         sed -i "s/bos_version: .*/bos_version: ${NEW_VERSION}/" "$EXISTING_BOS/profile.md" 2>/dev/null || true
         echo -e "  ${GREEN}✓${NC} profile.md → bos_version: ${NEW_VERSION}"
+    fi
+fi
+
+trap - ERR
+
+# ── Post-update self-test ─────────────────────
+
+if [ -f "$EXISTING_BOS/tests/run.sh" ]; then
+    echo ""
+    echo -e "  Running post-update self-test ..."
+    if ( cd "$EXISTING_BOS" && bash tests/run.sh >/tmp/bos-update-test.log 2>&1 ); then
+        echo -e "  ${GREEN}✓${NC} Self-test passed ($(grep -o '[0-9]* passed' /tmp/bos-update-test.log | head -1))."
+    else
+        echo -e "  ${RED}✗ Self-test FAILED.${NC} Log: /tmp/bos-update-test.log"
+        read -p "  Roll back to the pre-update state? [Y/n] " do_rb
+        if [[ ! "$do_rb" =~ ^[Nn] ]]; then
+            rollback
+            exit 1
+        fi
+        echo -e "  ${YELLOW}Kept the updated (failing) files — backup remains in state/.backup/.${NC}"
     fi
 fi
 

@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # The repo is bash + markdown — the only updatable dependency surface is
+  # the GitHub Actions used by CI. (CodeQL is intentionally absent: it does
+  # not support shell, and a token workflow would be checkbox theater.)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

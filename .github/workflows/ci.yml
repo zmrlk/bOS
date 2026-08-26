@@ -18,3 +18,15 @@ jobs:
         run: bash tests/run.sh
       - name: Roster matches disk
         run: bash scripts/bos-roster.sh
+
+  # Experimental: Git Bash on Windows. Symlinks and BSD/GNU tool gaps are
+  # known unknowns — failures here don't block a release yet.
+  test-windows:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - run: git config --global core.symlinks true
+      - uses: actions/checkout@v4
+      - name: Test suite (Git Bash, experimental)
+        shell: bash
+        run: bash tests/run.sh
