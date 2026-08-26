@@ -26,6 +26,10 @@ Gather from current conversation:
 4. **Key decisions** — any architectural, strategic, or priority decisions made this session
 5. **Context that would be lost** — things discussed but not written to state files (insights, user preferences expressed, mental models shared)
 
+The handoff/digest is session history, not durable truth. Do not copy it into
+`memory/`. Only facts the user explicitly asked to remember (or explicitly
+confirmed during this session) may be saved via `/remember`.
+
 ### Step 2: Write handoff file
 
 Write to `state/handoff.md` (overwrite previous — only latest matters):

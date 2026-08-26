@@ -88,6 +88,7 @@ echo ""
 echo -e "  ${GREEN}PRESERVE (your data):${NC}"
 echo "    profile.md"
 echo "    state/*.md (tasks, finances, habits...)"
+echo "    memory/ (durable cross-CLI memory)"
 echo "    .secrets/"
 echo ""
 echo -e "  ${YELLOW}UPDATE (system files):${NC}"
@@ -97,7 +98,7 @@ echo "    .claude/settings.json"
 echo "    .agents/  .codex/  .grok/  scripts/  config/"
 echo "    VERSION, README.md, PRIVACY.md"
 echo "    profile-template.md"
-echo "    state/SCHEMAS.md, templates/state/"
+echo "    state/SCHEMAS.md, templates/state/, templates/memory/"
 echo "    examples/"
 echo ""
 echo "  Note: customized skills/agents/hooks are overwritten"
@@ -306,6 +307,13 @@ if [ -d "$NEW_BOS/templates/state" ]; then
     echo -e "  ${GREEN}✓${NC} templates/state/"
 fi
 
+# Memory schema/examples only (user's live memory/ is NEVER touched)
+if [ -d "$NEW_BOS/templates/memory" ]; then
+    mkdir -p "$EXISTING_BOS/templates/memory"
+    cp -r "$NEW_BOS/templates/memory/"* "$EXISTING_BOS/templates/memory/"
+    echo -e "  ${GREEN}✓${NC} templates/memory/"
+fi
+
 # Test suite (used for the post-update self-test)
 if [ -d "$NEW_BOS/tests" ]; then
     mkdir -p "$EXISTING_BOS/tests"
@@ -397,6 +405,7 @@ echo ""
 echo -e "  Your data is safe:"
 echo -e "    ${GREEN}✓${NC} profile.md — your content untouched (only the bos_version field is bumped)"
 echo -e "    ${GREEN}✓${NC} state/ — untouched"
+echo -e "    ${GREEN}✓${NC} memory/ — untouched"
 echo -e "    ${GREEN}✓${NC} .secrets/ — untouched"
 echo ""
 echo -e "  Open bOS in Claude Code and say hi."

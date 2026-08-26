@@ -102,6 +102,8 @@
       "Bash(bash scripts/bos-roster.sh*)",
       "Bash(bash scripts/context-bus-append.sh*)",
       "Bash(scripts/context-bus-append.sh*)",
+      "Bash(bash scripts/bos-memory.sh*)",
+      "Bash(scripts/bos-memory.sh*)",
       "Bash(test *)",
       "Bash([ *)",
       "mcp__*"
