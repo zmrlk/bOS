@@ -1,6 +1,6 @@
 # DECISION LOG
 
-> Key decisions with reasoning. Written by @CEO after every go/no-go, strategy change, or team synthesis.
+> Key decisions with reasoning. Written by @boss after every go/no-go, strategy change, or team synthesis.
 
 ---
 
@@ -12,7 +12,7 @@
 **Decision:** [GO / NO-GO / CHANGE / etc.]
 **Reasoning:** [1-3 sentences]
 **Score:** [X/15] (if project evaluation)
-**Agent:** [@ceo / @team]
+**Agent:** [@boss / @team]
 ```
 
 ---

@@ -1,6 +1,6 @@
 # SALES PIPELINE
 
-> Updated weekly by @SALES. Track leads from first contact to closed.
+> Updated weekly by @cmo. Track leads from first contact to closed.
 
 ---
 

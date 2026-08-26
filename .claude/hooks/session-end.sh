@@ -15,6 +15,14 @@ rm -f "$BOS_DIR/state/.working.md"
 
 # Bus TTL is a SessionStart read-filter. Do not rewrite jsonl here.
 
+# Bootstrap runtime files on first run (they are gitignored, not shipped)
+if [ ! -f "$BOS_DIR/state/telemetry.md" ]; then
+  printf '# Agent Telemetry\n\n<!-- Summary (auto-updated by @boss at session end) -->\nSessions: 0 | Since: %s\nTop agents: (no data yet)\nAvg satisfaction: (no data yet)\nRouting accuracy: (no data yet)\n' "$TODAY" > "$BOS_DIR/state/telemetry.md" 2>/dev/null
+fi
+if [ ! -f "$BOS_DIR/state/session-log.md" ]; then
+  printf '# Session Log\n<!-- Auto-appended by session-end.sh hook -->\n<!-- Format: date | event | source -->\n' > "$BOS_DIR/state/session-log.md" 2>/dev/null
+fi
+
 # Update telemetry session count (cross-platform)
 if [ -f "$BOS_DIR/state/telemetry.md" ]; then
   SESSIONS=$(grep -o 'Sessions: [0-9]*' "$BOS_DIR/state/telemetry.md" 2>/dev/null | grep -o '[0-9]*')

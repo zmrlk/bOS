@@ -1,34 +1,49 @@
 #!/bin/bash
 # bOS Guard Hook — PreToolUse file protection (ISI-11)
-# Deterministic enforcement: blocks dangerous writes BEFORE they happen.
+# Best-effort guard: catches the model's own mistakes BEFORE they happen.
+# It is a speed bump against accidents, NOT a security boundary against a
+# determined adversary (any interpreter can sidestep a grep — see HONESTY.md).
 # Exit code 2 = BLOCK the tool call. Exit code 0 = allow.
-#
-# Source: Codex-OS protect-archive.sh + PAI SecurityValidator
 # Must execute in <50ms.
 
 # Read the tool use JSON from stdin
 INPUT=$(cat)
 
-# Extract tool name and file path from JSON
-TOOL=$(echo "$INPUT" | grep -o '"tool_name":"[^"]*"' | head -1 | cut -d'"' -f4)
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path":"[^"]*"' | head -1 | cut -d'"' -f4)
-COMMAND=$(echo "$INPUT" | grep -o '"command":"[^"]*"' | head -1 | cut -d'"' -f4)
+# Extract tool name, file path and command from JSON.
+# sed -E with an escaped-char-aware group — a naive [^"]* stops at the first
+# \" inside the command and lets the rest of the payload slip past the guard.
+json_field() {
+  printf '%s' "$INPUT" | sed -nE 's/.*"'"$1"'":"(([^"\\]|\\.)*)".*/\1/p' | head -1
+}
+TOOL=$(json_field tool_name)
+FILE_PATH=$(json_field file_path)
+COMMAND=$(json_field command)
 
 # Write/Edit/MultiEdit: path guards. Bash: archive-rm + bus helper.
 case "$TOOL" in
   Write|Edit|MultiEdit)
     ;;
   Bash)
-    if echo "$COMMAND" | grep -qE 'rm\s+.*state/(archive|\.backup)'; then
-      echo "BLOCKED: Cannot delete files in state/archive/ or state/.backup/"
+    # Archive/backup: block every destructive verb we can name, not just rm.
+    if echo "$COMMAND" | grep -qE '(rm\s+|find\s+.*-delete|unlink\s+|truncate\s+|shred\s+|dd\s+.*of=)[^;|&]*state/(archive|\.backup)|state/(archive|\.backup)[^;|&]*(-delete)'; then
+      echo "BLOCKED: Cannot delete or truncate files in state/archive/ or state/.backup/"
       exit 2
     fi
-    # Bus: one helper. Allow the helper; block redirects/tee/sed onto the files.
+    # settings.json: the Write/Edit guard below is useless if Bash can write it.
+    if echo "$COMMAND" | grep -q '\.claude/settings\.json'; then
+      if echo "$COMMAND" | grep -qE '(>|>>|tee\s|sed\s+-i|truncate|mv\s|cp\s|python[0-9.]*\s|node\s|perl\s|ruby\s)[^;|&]*'; then
+        if ! echo "$COMMAND" | grep -qE '^\s*(cat|head|tail|grep|diff|wc|stat|ls|jq|python[0-9.]*\s+-m\s+json\.tool)\s[^>]*$'; then
+          echo "BLOCKED: settings.json is not editable from a session. Edit it in your own editor."
+          exit 2
+        fi
+      fi
+    fi
+    # Bus: one helper. Allow the helper; block redirects/tee/sed AND interpreters onto the files.
     if echo "$COMMAND" | grep -q 'context-bus-append.sh'; then
       exit 0
     fi
     if echo "$COMMAND" | grep -qE 'context-bus\.(jsonl|md)'; then
-      if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*context-bus\.(jsonl|md)|tee[[:space:]].*context-bus\.(jsonl|md)|sed[[:space:]]+-i.*context-bus\.(jsonl|md)'; then
+      if echo "$COMMAND" | grep -qE '(>>|>)[[:space:]]*[^[:space:]]*context-bus\.(jsonl|md)|(tee|truncate)[[:space:]].*context-bus\.(jsonl|md)|sed[[:space:]]+-i.*context-bus\.(jsonl|md)|(python[0-9.]*|node|perl|ruby)[[:space:]].*context-bus\.(jsonl|md)'; then
         echo "BLOCKED: write the bus only via bash scripts/context-bus-append.sh"
         exit 2
       fi

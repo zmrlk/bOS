@@ -1,6 +1,6 @@
 # GOALS
 
-> Updated by @coach (life goals) and @ceo (business goals). Reviewed monthly.
+> Updated by @coach (life goals) and @boss (business goals). Reviewed monthly.
 
 ---
 
@@ -8,7 +8,7 @@
 
 | # | Goal | Owner | Category | Target date | Status | Progress |
 |---|------|-------|----------|-------------|--------|----------|
-| | | @coach / @ceo | life / business / health / learning | | not started / in progress / done | |
+| | | @coach / @boss | life / business / health / learning | | not started / in progress / done | |
 
 ---
 

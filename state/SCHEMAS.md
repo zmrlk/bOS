@@ -74,7 +74,7 @@ Active section: lines XX-YY
 
 | Task | Status | Energy | Context | Time | Agent |
 |------|--------|--------|---------|------|-------|
-| Wypisz 3 potencjalnych klientów | ☐ | M | work | 30min | @sales |
+| List 3 potential clients | ☐ | M | work | 30min | @cmo |
 | Spacer 20 min | ✅ | L | health | 20min | @trainer |
 ```
 
@@ -161,7 +161,7 @@ Active section: lines XX-YY
 ### Rules:
 - Single table, sorted by streak (longest first)
 - Streak resets to 0 if Last done > target interval
-- @wellness is coordinator (primary writer), others POST updates via context-bus
+- @coach is coordinator (primary writer), others POST updates via context-bus
 - Archive: Keep active habits only. Abandoned habits (streak=0 for 30+ days) → archive note
 
 ---
@@ -246,7 +246,7 @@ Active section: lines XX-YY
 
 ### Rules:
 - Single table sorted by status priority (hot > warm > cold)
-- @sales is primary writer
+- @cmo is primary writer
 - Follow-up framework: Day 0 (initial), Day 3 (follow up), Day 7, Day 14
 - Archive: Won/lost entries older than 1 month → state/archive/pipeline-YYYY-MM.md
 
@@ -305,7 +305,7 @@ Active section: lines XX-YY
 - One Budget section per month
 - Buffer updated monthly by @finance
 - Expense Log is append-only, newest on top
-- @cfo owns business section (if separate), @finance owns personal
+- @boss owns business section (if separate), @finance owns personal
 - Archive: Completed months → state/archive/finances-YYYY-MM.md
 
 ---
@@ -352,11 +352,11 @@ Active section: lines XX-YY
 ```
 
 ### Rules:
-- @ceo is primary writer
+- @boss is primary writer
 - Newest decision on top
 - Major decisions also saved to agent memory (summary)
 - Never delete decisions — mark as reversed/superseded with reason
-- **Review date** is required for all GO and CONDITIONAL decisions. @ceo tracks pending reviews in memory: `pending_reviews: [{title, review_date}]`. /morning (when you run it) checks for reviews due today.
+- **Review date** is required for all GO and CONDITIONAL decisions. @boss tracks pending reviews in memory: `pending_reviews: [{title, review_date}]`. /morning (when you run it) checks for reviews due today.
 
 ---
 
@@ -370,7 +370,7 @@ Active section: lines XX-YY
 ```
 
 ### Rules:
-- @ceo, @coo, @cto are writers
+- @boss and @cto are writers
 - Hours updated weekly
 - Completed projects move to archive
 
@@ -432,7 +432,7 @@ Small file (read in full). Owner: @coach.
 
 ## invoices.md
 
-Small file (read in full). Owner: @cfo.
+Small file (read in full). Owner: @boss.
 
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -457,7 +457,7 @@ Small file (read in full). Owner: @cfo.
 ```
 
 ### Rules:
-- @cfo is primary writer (via /invoice skill)
+- @boss is primary writer
 - Invoice numbers auto-increment: find highest INV-XXX, increment by 1
 - Status transitions: draft → sent → paid (or overdue if past due date)
 - Never delete invoices — only update status

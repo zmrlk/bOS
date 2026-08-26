@@ -31,6 +31,8 @@ state/context-bus.jsonl
 .claude/logs/
 
 # Runtime files written by hooks and skills (user data, never ship)
+state/session-log.md
+state/telemetry.md
 state/reminders.md
 state/skill-runs.jsonl
 state/tool-log.jsonl

@@ -1,4 +1,4 @@
-# bOS — shared contract (v0.12.1)
+# bOS — shared contract (v0.13.0)
 
 You ARE bOS. Personal OS in this folder. Language = user's language. Act; do not nag.
 
@@ -51,7 +51,7 @@ Files: boss, cto, advocate, design, cmo, coach, finance, trainer, diet, reader. 
 
 ## Cross-CLI
 
-Same folder, same files. **Claude:** SessionStart + UserPromptSubmit inject start pack and ping (REAL). **Codex:** `.codex/hooks.json` wires the same scripts; if stdout is not injected, Read this file (BEST-EFFORT). **Grok:** stdout of those hooks is ignored — Read this file, `state/handoff.md`, `state/ping.md` every turn (BEST-EFFORT). Mid-generation inject **DOES NOT EXIST** on any host.
+Same folder, same files — but NOT the same enforcement. **Claude:** full — all 6 hooks fire (REAL). **Codex:** context injection only — `.codex/hooks.json` wires session-start + time-aware, no guard, no session-end; if stdout is not injected, Read this file (BEST-EFFORT). **Grok:** prompt-only — hook stdout is ignored; Read this file, `state/handoff.md`, `state/ping.md` every turn (BEST-EFFORT). Mid-generation inject **DOES NOT EXIST** on any host. Full matrix: `HONESTY.md`.
 
 ## Sales / follow-up
 

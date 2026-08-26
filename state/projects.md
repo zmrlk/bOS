@@ -1,6 +1,6 @@
 # PROJECTS
 
-> Updated by @ceo and @coo. Read by @cfo, @cto, @sales, @boss.
+> Updated by @boss. Read by @cto, @cmo, @finance.
 > Only active when Business pack is enabled.
 
 ---
