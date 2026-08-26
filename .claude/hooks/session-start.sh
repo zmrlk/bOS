@@ -43,14 +43,19 @@ fi
 
 if [ -f "$BOS_DIR/state/finances.md" ]; then
   BUFFER=$(grep -i 'buffer' "$BOS_DIR/state/finances.md" | head -1)
-  MTIME=$(stat -f '%Sm' -t '%Y-%m-%d' "$BOS_DIR/state/finances.md" 2>/dev/null || stat -c '%y' "$BOS_DIR/state/finances.md" 2>/dev/null | cut -d' ' -f1)
+  MTIME=$(stat -c '%y' "$BOS_DIR/state/finances.md" 2>/dev/null | cut -d' ' -f1)
+  [ -z "$MTIME" ] && MTIME=$(stat -f '%Sm' -t '%Y-%m-%d' "$BOS_DIR/state/finances.md" 2>/dev/null)
   [ -n "$BUFFER" ] && echo "### Buffer (mtime $MTIME): $BUFFER"
   echo ""
 fi
 
 # Handoff expires after 3 days (PRIVACY.md contract — enforced here, not just promised)
 if [ -f "$BOS_DIR/state/handoff.md" ]; then
-  H_MTIME=$(stat -f '%m' "$BOS_DIR/state/handoff.md" 2>/dev/null || stat -c '%Y' "$BOS_DIR/state/handoff.md" 2>/dev/null)
+  # GNU `stat -c` first: on BSD/macOS it fails and we fall back to `-f`.
+  # (The reverse order silently "succeeds" on GNU — `-f` there is --file-system.)
+  H_MTIME=$(stat -c '%Y' "$BOS_DIR/state/handoff.md" 2>/dev/null)
+  case "$H_MTIME" in ''|*[!0-9]*) H_MTIME=$(stat -f '%m' "$BOS_DIR/state/handoff.md" 2>/dev/null) ;; esac
+  case "$H_MTIME" in ''|*[!0-9]*) H_MTIME="" ;; esac
   NOW_EPOCH=$(date +%s)
   if [ -n "$H_MTIME" ] && [ $(( (NOW_EPOCH - H_MTIME) / 86400 )) -lt 3 ]; then
     echo "### Handoff"
