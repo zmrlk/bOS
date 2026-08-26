@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Test suite (guard payloads, bus schema, hooks, roster, clean-clone)
         run: bash tests/run.sh
       - name: Roster matches disk
@@ -24,7 +24,7 @@ jobs:
   test-updater:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # need tags: the old install must be a REAL past release
       - name: Updater e2e — legacy install with tracked personal state
@@ -95,7 +95,7 @@ jobs:
     continue-on-error: true
     steps:
       - run: git config --global core.symlinks true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Test suite (Git Bash, experimental)
         shell: bash
         run: bash tests/run.sh
