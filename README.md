@@ -1,12 +1,20 @@
 # bOS — a folder OS
 
-**A personal operating system for brains that sprint and crash.** Built ADHD-first: max 3 visible tasks, streaks that decay instead of resetting, energy over time. Where a guardrail can be enforced by code it is a hook, not a promise — and [HONESTY.md](HONESTY.md) says exactly which is which.
+**A personal operating system that is just a folder. And it proves what it claims.**
 
-It is just a folder: markdown files, skills, and hooks. Open it in **Claude Code** (full enforcement; Codex and Grok work with reduced wiring — see [HONESTY.md](HONESTY.md)). Your tasks, finances, habits, goals, and confirmed cross-session memory live in plain-text files on your machine. No server, no database, no daemon.
+Your tasks, finances, habits, goals and confirmed memory live in plain markdown files on your machine. An AI CLI opens the folder and becomes your operator: it plans your day, logs what you mention in passing, remembers what you confirm, and refuses to do dangerous things without asking. No server, no database, no daemon, no account.
+
+Three things make it different from every other "AI life OS":
+
+1. **It is a folder, not a platform.** Markdown and bash. Works in Claude Code (full enforcement), Codex and Grok (reduced wiring). You can read every byte of your "OS", grep it, back it up, or leave — the files are yours either way.
+2. **Guardrails are code, not promises.** Where a rule can be enforced, it is a hook that blocks the action before it happens — hand-edits of memory, destructive ops on archives, `git push` from chat. CI feeds the guards hostile payloads on every push. Where a rule is only a prompt, [HONESTY.md](HONESTY.md) says so out loud.
+3. **Honesty is a feature.** A maintained table of what is REAL, what is best-effort, and what does not exist. Memory with declared provenance and conflict quarantine instead of "the AI just remembers". External audit reports committed to [docs/audits/](docs/audits/), including the failed rounds.
 
 > **v0.14.0** — `git clone https://github.com/zmrlk/bOS.git`
 
 ## What a session looks like
+
+![bOS session demo](docs/assets/demo.svg)
 
 *(example session — Alex is the fixture persona from `/setup`)*
 
@@ -25,19 +33,48 @@ It is just a folder: markdown files, skills, and hooks. Open it in **Claude Code
 > remember that I want the answer first, then evidence
 💾 Saved → memory/current/user--answer-style.md
 
-> /habit
-🚭 Day 47 smoke-free — about 470 saved.
-   Tuesday's slip? The streak decays, it doesn't reset to zero.
-   You don't lose 46 days of progress to one evening.
-
 ⏭️ Next step: the invoice draft. One thing. Just one.
 ```
 
-Everything above is a file you can open: the plan reads `state/tasks.md`, the expense lands in `state/finances.md`, the quit-tracker lives in `state/habits.md`.
+Everything above is a file you can open: the plan reads `state/tasks.md`, the expense lands in `state/finances.md`, the memory is a markdown record with a hash and a source.
+
+## How it works
+
+| Layer | What it is | Where |
+|-------|-----------|-------|
+| **State** | Your live data: tasks, finances, habits, goals, daily log | `state/*.md` — plain markdown, gitignored, never leaves your disk |
+| **Skills** | 25 repeatable workflows (`/morning`, `/expense`, `/remember`, `/ship`, …) | `.claude/skills/` — each one a readable SKILL.md |
+| **Agents** | One orchestrator (@boss) plus nine specialists (@cto, @coach, @finance, …) | `.claude/agents/` — roles of one model, not separate processes |
+| **Hooks** | Code that runs around the model: context injection at session start, write guards, session close | `.claude/hooks/` — 6 wired, tested in CI |
+| **Memory** | Durable cross-CLI store with provenance, hashes and conflict quarantine | `memory/` — one helper script is the only writer |
+| **Bus** | Cross-session signals through one schema-validating writer | `state/context-bus.jsonl` |
+
+The model reads the contract ([AGENTS.md](AGENTS.md)), the hooks enforce what they can, and the rest is honest prompting. That split — and the discipline of documenting it — is the design.
+
+## What it actually does for you
+
+- **Plans with your energy, not just your calendar.** `/morning` builds a max-3 plan from your tasks, calendar and yesterday's energy. Defaults are built for real humans: three visible tasks, streaks that decay instead of resetting to zero, quick wins first.
+- **Catches what you say in passing.** Mention an expense, a workout, a finished task mid-conversation and it lands in the right file with a `⏳ Logged:` confirmation. Best-effort by design, and labelled as such.
+- **Remembers only what you confirm.** `/remember` writes a record with source and hash. Conflicting facts are quarantined, never silently overwritten. Session summaries and web content never become "truth" on their own.
+- **Stands between you and expensive mistakes.** Spending advice reads your actual buffer first. Sending, paying, deleting, pushing — always a separate explicit yes, defaulting to dry-run.
+- **Survives the tool you use.** The same folder works across three AI CLIs. If one vendor changes course, your OS is still a folder.
+
+## Why not the alternatives
+
+No names, just categories — judge for yourself:
+
+| Category | What you get | What bOS does instead |
+|----------|-------------|----------------------|
+| Prompt-pack "life OS" templates | A large system prompt and hope. Every rule is a promise the model may forget. | Rules that matter are hooks with exit codes, tested against hostile payloads in CI. The rest is labelled best-effort. |
+| Autonomous agent frameworks | Maximum autonomy: daemons, schedulers, agents acting while you sleep. | Maximum trust: no daemon, no background actions, destructive ops always ask. It acts *with* you in session. |
+| AI memory layers / vector stores | Black-box recall. Model-generated summaries get promoted to facts. | Inspectable markdown records with declared provenance. Lexical search you can verify with grep. Conflicts quarantined, not averaged. |
+| Hosted life dashboards | Your data on their server, their pricing, their roadmap. | Local files, gitignored, MIT-licensed. Leaving costs you nothing because there is nothing to leave. |
+
+The honest trade-off: bOS will not act while you are away, will not sync to your phone by itself, and its routing is ~60-80% accurate, not 100%. If you want a fully autonomous cloud agent, this is not it — deliberately.
 
 ## Guardrails — what is code, what is contract
 
-- **Code (hook):** a PreToolUse guard blocks hand-edits of the message bus, destructive ops on archives, and in-session `settings.json` edits — fed hostile payloads in CI on every push. It's a speed bump against the model's mistakes, not a security boundary ([HONESTY.md](HONESTY.md) says exactly where the line is).
+- **Code (hook):** a PreToolUse guard blocks hand-edits of the message bus and durable memory, destructive ops on archives, and in-session `settings.json` edits — fed hostile payloads in CI on every push. It's a speed bump against the model's mistakes, not a security boundary ([HONESTY.md](HONESTY.md) says exactly where the line is).
 - **Code (boundary):** your data lives in untracked `state/` files — git never sees them, so a commit or push cannot ship them.
 - **Code (memory):** one local store works across Claude/Codex/Grok; conflicts quarantine instead of overwriting, stale records leave the startup cache, and known secret/crisis/injection patterns are rejected. Provenance is auditable, not cryptographically proven. See [docs/MEMORY.md](docs/MEMORY.md).
 - **Code (permissions, Claude Code):** `git push`, `rm`, `sudo`, `curl` are deny-listed in chat; destructive actions require a separate, explicit yes.
