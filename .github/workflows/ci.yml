@@ -47,10 +47,15 @@ jobs:
           # HARD GUARD: a fixture with nothing to migrate proves nothing.
           [ "$BEFORE" -gt 0 ] || { echo "FIXTURE IS A NO-OP — the migration path would not be exercised"; exit 1; }
           echo "my custom profile" > profile.md
+          mkdir -p memory/current
+          echo "my durable memory fixture" > memory/current/user--fixture.md
+          MEMORY_BEFORE=$(sha256sum memory/current/user--fixture.md | cut -d' ' -f1)
           ls state/*.md 2>/dev/null | sort > /tmp/state-before.txt || true
           printf 'y\ny\ny\n' | bash "$NEW/update.sh" "$OLD"
           [ "$(cat VERSION)" = "$(cat "$NEW/VERSION")" ] || { echo "VERSION not updated"; exit 1; }
           [ "$(cat profile.md)" = "my custom profile" ] || { echo "profile.md content touched"; exit 1; }
+          MEMORY_AFTER=$(sha256sum memory/current/user--fixture.md | cut -d' ' -f1)
+          [ "$MEMORY_BEFORE" = "$MEMORY_AFTER" ] || { echo "memory/ content touched"; exit 1; }
           grep -q 'state/\*\.md' .gitignore || { echo ".gitignore not migrated"; exit 1; }
           AFTER=$(git ls-files state/ | grep -vE '^state/(SCHEMAS\.md|context-bus\.md|\.gitkeep)$' | wc -l | tr -d ' ')
           [ "$AFTER" = "0" ] || { echo "still tracked after update: $AFTER"; exit 1; }
@@ -58,7 +63,7 @@ jobs:
           MISSING=$(comm -23 /tmp/state-before.txt /tmp/state-after.txt || true)
           [ -z "$MISSING" ] || { echo "state files vanished — data loss: $MISSING"; exit 1; }
           ls state/.backup/pre-update-*/.claude/agents >/dev/null || { echo "agents backup missing"; exit 1; }
-          echo "migration OK: $BEFORE tracked -> 0, files intact on disk"
+          echo "migration OK: $BEFORE tracked -> 0, state and memory intact on disk"
 
       - name: Rollback e2e — a failed update must restore files AND the git index
         run: |

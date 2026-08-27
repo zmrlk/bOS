@@ -37,7 +37,7 @@
 | **Setup extras pending** | no |
 | **DND hours** | (none / e.g. 22:00-07:00) |
 | **Output mode** | auto (auto / minimal / detailed / visual) |
-| **bOS version** | 0.13.3 |
+| **bOS version** | 0.14.0 |
 
 ---
 

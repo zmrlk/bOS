@@ -1,6 +1,6 @@
 ---
 name: recall
-description: "Search across all past bOS sessions — session digests, memory files, pre-compact snapshots, state files, and context-bus history. Use this skill whenever the user says /recall, 'remember when', 'last time we', 'we talked about', 'what did we decide', 'find that conversation', or references something from a previous session. Also trigger when user seems confused about past context or asks 'did I already...' or 'have we...'. This is the go-to skill for recovering any information from past sessions."
+description: "Search durable bOS memory, live state, and session history with source locators. Use for /recall, 'remember when', 'what did we decide', 'did I already', or any cross-session fact recovery."
 user_invocable: true
 command: /recall
 tier: core
@@ -13,22 +13,24 @@ tier: core
 
 Search everything bOS remembers across sessions. Powered by @boss.
 
-The user loses context between Claude Code sessions. This skill bridges that gap by searching all persistent stores where past session data lives.
+Start with the canonical, vendor-neutral durable store. Session history is
+evidence of what was said, not automatically a current fact.
 
 ---
 
 ## Search Sources (priority order)
 
-Search ALL sources in parallel. Each source has different strengths:
+Search sources in this order; independent searches may run in parallel:
 
 | Source | Path | What it captures | Best for |
 |--------|------|-----------------|----------|
-| **Session digests** | `state/.backup/session-digests/` | Topic, decisions, open threads per session | "What did we decide about X?" |
-| **Agent memory** | `~/.claude/projects/<project>/memory/` | Persistent facts, patterns, feedback; MEMORY.md index (Claude Code hosts) | "What do you know about X?" |
+| **Durable memory** | `bash scripts/bos-memory.sh recall "<query>"` | Confirmed/verified records with status and provenance | "What do you know about X?" |
+| **Live state** | `state/*.md` | Current tasks, finances, habits, goals | "Did I log/do X?" |
+| **Session digests** | `state/.backup/session-digests/` | Lossy record of topics and decisions | "What did we discuss?" |
 | **Pre-compact snapshots** | `state/.backup/pre-compact-*.md` | State at moment of context compaction | Recovering mid-session context |
 | **Context bus** | `state/context-bus.jsonl` | Inter-agent signals, decisions | "When did agent X say Y?" |
 | **Session log** | `state/session-log.md` | Timestamps of sessions | "When was our last session?" |
-| **State files** | `state/*.md` | Tasks, finances, habits, goals, etc. | "What task did we add for X?" |
+| **Claude auto-memory** | `~/.claude/projects/<project>/memory/` | Optional, host-specific hints | Claude-only fallback |
 
 ---
 
@@ -44,9 +46,8 @@ Parse what the user is looking for:
 ### Step 2: Search (all parallel, one turn)
 
 ```
-Glob: state/.backup/session-digests/*.md
-Grep: [user's keywords] across all sources
-Read: MEMORY.md for index of memory files
+bash scripts/bos-memory.sh recall "<keywords>"
+Grep: [user's keywords] across state and session-history sources
 ```
 
 Use multiple Grep calls in parallel across different source directories. Search for:
@@ -70,14 +71,15 @@ Context: [synthesized answer to user's question]
 ```
 
 ### Rules
-- Always show WHERE the information was found (source + date) so user can verify
+- Always show WHERE the information was found (locator + source/date)
+- Current durable memory outranks a session digest; an unresolved conflict must
+  be shown, not silently resolved
+- Stale/archived records are historical, never phrased as current
 - If nothing found → say so clearly: "I couldn't find this in any source. It may have been in a session that left no digest."
 - If partial match → show what you found + ask for clarification
 - If multiple sessions mention the topic → show chronological progression
 - Never fabricate recalled information — only report what's actually in the files
 - Keep synthesis concise — user wants the answer, not a tour of the search process
 
-### Step 4: Offer follow-up
-After recall, offer:
-- "Want me to save this to memory so it doesn't get lost?"
-- "Want to continue that work?"
+Do not claim semantic/vector search. The shipped helper is deterministic lexical
+search. If nothing matches it prints `MEMORY-NONE`; keep that honest wording.
