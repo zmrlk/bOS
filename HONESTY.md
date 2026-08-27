@@ -31,6 +31,12 @@ that a caller honestly classified `user:` or `verified`. Claude has a direct-
 write guard; Codex and Grok follow the prompt contract. Treat provenance as an
 auditable assertion, not cryptographic attestation.
 
+The `SETUP REQUIRED` gate in session-start is the same kind of thing: a
+deterministic stdout banner, not a tool block. The model can technically talk
+past it (and on Grok, which ignores hook stdout, it is prompt-contract only).
+It makes skipping setup a visible violation instead of a silent one — that is
+all it claims.
+
 Two more things worth knowing:
 
 - **Hooks run outside the CLI permission model.** The deny-list in `settings.json` (no `curl`, no `git push`, no `rm` from chat) governs what the model may run in conversation. Hook scripts are not subject to it — e.g. the optional evening push in `session-end.sh` uses `curl` to ntfy, and only if you created `.secrets/ntfy.env` yourself.

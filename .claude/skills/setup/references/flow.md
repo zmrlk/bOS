@@ -6,7 +6,7 @@ Goal: a filled Core section of `profile.md` and first value in under 3 minutes o
 
 ## Step 0 — scan (non-personal detection first)
 
-If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh`. The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun `bash .claude/skills/setup/scripts/profile-scan.sh --with-names`. Never open file contents at all during setup.
+If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh --stamp` (the flag records the start time for the duration quote; without it the scan is strictly read-only). The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun `bash .claude/skills/setup/scripts/profile-scan.sh --with-names`. Never open file contents at all during setup.
 
 ## Step 0.5 — offer the demo (FRESH_INSTALL only)
 
@@ -29,7 +29,7 @@ Only from `gaps_by_leverage`, highest leverage first. One AskUserQuestion at a t
 1. Copy `profile-template.md` → `profile.md` (only if missing) and fill confirmed fields. Leave unknown fields empty — never invent.
 2. Seed state from the answers: 1-2 tasks derived from the primary goal into `state/tasks.md`, the goal into `state/goals.md`, named habits into `state/habits.md`. Do not overwrite existing `state/*.md`.
 3. Welcome message with real counts from `bash scripts/bos-roster.sh` (skills, agents, hooks) — no marketing numbers.
-4. **Verify done with code, not with a feeling:** rerun `bash .claude/skills/setup/scripts/profile-scan.sh` and quote its `core_filled` and `mode` lines to the user ("Core 6/6, mode REVIEW — the setup gate is off"). If mode is still FRESH_INSTALL/PARTIAL, setup is NOT done — fill the remaining Core gap or say plainly which question was skipped.
+4. **Verify done with code, not with a feeling:** rerun `bash .claude/skills/setup/scripts/profile-scan.sh` and quote its `core_filled` and `mode` lines to the user ("gate fields 3/3, mode REVIEW — the setup gate is off"). Mode is decided by the same three gate fields the session-start hook checks (Name / Active packs / Primary goal), so "done" is reachable within the 5-question cap. If mode is still FRESH_INSTALL/PARTIAL, setup is NOT done — fill the missing gate field or say plainly which question was skipped.
 5. Quote the measured duration: elapsed time from the `started:` line in `state/.setup-progress.md` ("that took 2 min 40 s"), then delete the file.
 6. **Pay off immediately:** build the day-one plan from what was just gathered — the 1-2 seeded tasks plus one concrete ≤30-min next step from the primary goal. The user leaves with a plan, not a filled form. Close by naming progressive profiling (SKILL rule 12).
 

@@ -328,41 +328,59 @@ if command -v git >/dev/null 2>&1; then
   fi
 fi
 
-# Demo mode: start materializes the fixture + manifest, end removes exactly
-# that and nothing else; start refuses to overwrite a real state file.
+# Demo mode on the REAL first-run path: session-start already bootstrapped
+# state/ from blank templates in this sandbox (exactly what a fresh clone
+# sees). start must replace bootstrapped blanks and succeed; end must restore
+# them byte-identical. Real user content must still refuse.
 DEMO="$SANDBOX/.claude/skills/setup/scripts/demo.sh"
-# Demo needs a truly fresh install; the shared sandbox already materialized
-# state/ in earlier tests, so give it its own root.
-DEMO_ROOT="$SANDBOX/demo-root"
-mkdir -p "$DEMO_ROOT"
-cp -r "$SANDBOX/templates" "$DEMO_ROOT/templates"
-if bash "$DEMO" start "$DEMO_ROOT" >/dev/null 2>&1 \
-  && grep -q 'DEMO DATA' "$DEMO_ROOT/state/tasks.md" 2>/dev/null \
-  && [ -f "$DEMO_ROOT/state/.demo-mode" ] \
-  && bash "$DEMO" end "$DEMO_ROOT" >/dev/null 2>&1 \
-  && [ ! -f "$DEMO_ROOT/state/tasks.md" ] && [ ! -f "$DEMO_ROOT/state/.demo-mode" ]; then
-  ok "setup demo start/end roundtrip is clean"
+bash "$SANDBOX/.claude/hooks/session-start.sh" >/dev/null 2>&1  # ensure bootstrap ran
+if bash "$DEMO" start "$SANDBOX" >/dev/null 2>&1 \
+  && grep -q 'DEMO DATA' "$SANDBOX/state/tasks.md" 2>/dev/null \
+  && [ -f "$SANDBOX/state/.demo-mode" ] \
+  && bash "$DEMO" end "$SANDBOX" >/dev/null 2>&1 \
+  && [ ! -f "$SANDBOX/state/.demo-mode" ] \
+  && cmp -s "$SANDBOX/state/tasks.md" "$SANDBOX/templates/state/tasks.md"; then
+  ok "setup demo works after session-start bootstrap (first-run path)"
 else
-  bad "setup demo start/end roundtrip is clean"
+  bad "setup demo works after session-start bootstrap (first-run path)"
 fi
-mkdir -p "$DEMO_ROOT/state"; echo "real user task" > "$DEMO_ROOT/state/tasks.md"
-if ! bash "$DEMO" start "$DEMO_ROOT" >/dev/null 2>&1 \
-  && grep -q 'real user task' "$DEMO_ROOT/state/tasks.md"; then
+echo "real user task" > "$SANDBOX/state/tasks.md"
+if ! bash "$DEMO" start "$SANDBOX" >/dev/null 2>&1 \
+  && grep -q 'real user task' "$SANDBOX/state/tasks.md" \
+  && [ ! -f "$SANDBOX/state/.demo-mode" ]; then
   ok "setup demo refuses to overwrite real state"
 else
   bad "setup demo refuses to overwrite real state"
 fi
-rm -rf "$DEMO_ROOT"
+cp "$SANDBOX/templates/state/tasks.md" "$SANDBOX/state/tasks.md"
 
-# Duration stamp: a fresh-install scan writes started: into .setup-progress.md
+# Duration stamp: only --stamp writes .setup-progress.md; plain scan is read-only
 rm -f "$SANDBOX/state/.setup-progress.md"
 bash "$SANDBOX/.claude/skills/setup/scripts/profile-scan.sh" "$SANDBOX" >/dev/null 2>&1
-if grep -q '^started: 20' "$SANDBOX/state/.setup-progress.md" 2>/dev/null; then
-  ok "profile-scan stamps setup start time"
+NO_STAMP_OK=1; [ -f "$SANDBOX/state/.setup-progress.md" ] && NO_STAMP_OK=0
+bash "$SANDBOX/.claude/skills/setup/scripts/profile-scan.sh" "$SANDBOX" --stamp >/dev/null 2>&1
+if [ "$NO_STAMP_OK" = 1 ] && grep -q '^started: 20' "$SANDBOX/state/.setup-progress.md" 2>/dev/null; then
+  ok "profile-scan is read-only by default and stamps only with --stamp"
 else
-  bad "profile-scan stamps setup start time"
+  bad "profile-scan is read-only by default and stamps only with --stamp"
 fi
 rm -f "$SANDBOX/state/.setup-progress.md"
+
+# Done must be reachable under the 5-question cap: a template profile with
+# ONLY the three gate fields filled must scan as mode REVIEW.
+cp "$SANDBOX/profile-template.md" "$SANDBOX/profile.md"
+sed -i.bak \
+  -e 's/^| \*\*Name\*\* |[^|]*|/| **Name** | Alex |/' \
+  -e 's/^| \*\*Active packs\*\* |[^|]*|/| **Active packs** | Business |/' \
+  -e 's/^| \*\*Primary goal\*\* |[^|]*|/| **Primary goal** | Ship the invoice |/' \
+  "$SANDBOX/profile.md"
+GATE_SCAN=$(bash "$SANDBOX/.claude/skills/setup/scripts/profile-scan.sh" "$SANDBOX" 2>/dev/null)
+rm -f "$SANDBOX/profile.md" "$SANDBOX/profile.md.bak" "$SANDBOX/state/.setup-progress.md"
+if echo "$GATE_SCAN" | grep -q '^mode: REVIEW'; then
+  ok "gate-filled profile scans as REVIEW (done reachable under the cap)"
+else
+  bad "gate-filled profile scans as REVIEW (done reachable under the cap)"
+fi
 
 # Hard setup gate: no profile.md → SETUP REQUIRED in session-start stdout;
 # a profile with Core identity filled → gate silent.
