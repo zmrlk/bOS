@@ -116,7 +116,7 @@ When you run `/evolve` **and you consent to a file-name scan**, bOS may look for
 
 **Lite (this repo):** `profile.md`, `state/`, `memory/`, and `.secrets/` are local. Relevant content leaves the machine when your chosen AI host reads it as conversation context (Anthropic for Claude, OpenAI for Codex, xAI for Grok), or when you enable an optional external integration such as ntfy.
 
-**Supabase / “Pro”:** sample schemas live in `examples/supabase/`. Lite does **not** dual-write to the cloud. If you copy those samples and connect a database yourself, that is your setup — not shipped behavior.
+**Supabase:** sample schemas live in `examples/supabase/` as **unsupported samples**. Lite does **not** dual-write to the cloud. If you copy those samples and connect a database yourself, that is your setup — not shipped behavior. (There is no "Pro" edition; the word appears nowhere else on purpose.)
 
 Secrets in `.secrets/` stay local. They are not synced anywhere by Lite.
 
@@ -184,7 +184,7 @@ If you activate the Health pack, bOS may store:
 - Habit streaks, milestones, and personal bests
 - Energy patterns (day-of-week analysis from your daily logs)
 
-This data is stored locally (Lite mode) or in your own Supabase database (Pro mode). It is not shared with health platforms, insurance companies, or anyone else.
+This data is stored locally. (If you wired the unsupported `examples/supabase/` samples yourself, it may also sit in your own database — that is your setup, not shipped behavior.) It is not shared with health platforms, insurance companies, or anyone else.
 
 For serious health concerns, bOS will always recommend talking to a real doctor. It is not a medical device.
 
@@ -215,9 +215,9 @@ Your phone → claude.ai/Claude app → Anthropic API → your local Claude Code
 
 ---
 
-### Option B: Telegram (not Lite)
+### Option B: Telegram (unsupported sample — not shipped, not maintained)
 
-There is **no** `/connect-mobile` skill in this repo. Sample n8n flows live under `examples/templates/n8n/`. If you wire Telegram yourself, data may flow like this:
+There is **no** `/connect-mobile` skill in this repo. Sample n8n flows live under `examples/templates/n8n/` as **unsupported samples**. If you wire Telegram yourself, data may flow like this:
 
 ### Data path
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # bOS SessionStart — short fact pack. stdout → Claude/Codex context.
-# Grok ignores this stdout; it must Read AGENTS.md + state/handoff.md + state/ping.md.
+# Grok ignores this stdout; it must Read AGENTS.md + memory/HOT.md + state/handoff.md + state/ping.md.
 
 BOS_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 # shellcheck source=ping-inject.sh

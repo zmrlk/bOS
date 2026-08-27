@@ -43,7 +43,7 @@ Everything above is a file you can open: the plan reads `state/tasks.md`, the ex
 | Layer | What it is | Where |
 |-------|-----------|-------|
 | **State** | Your live data: tasks, finances, habits, goals, daily log | `state/*.md` — plain markdown, gitignored, never leaves your disk |
-| **Skills** | 25 repeatable workflows (`/morning`, `/expense`, `/remember`, `/ship`, …) | `.claude/skills/` — each one a readable SKILL.md |
+| **Skills** | 24 repeatable workflows (`/morning`, `/expense`, `/remember`, `/ship`, …) | `.claude/skills/` — each one a readable SKILL.md |
 | **Agents** | One orchestrator (@boss) plus nine specialists (@cto, @coach, @finance, …) | `.claude/agents/` — roles of one model, not separate processes |
 | **Hooks** | Code that runs around the model: context injection at session start, write guards, session close | `.claude/hooks/` — 6 wired, tested in CI |
 | **Memory** | Durable cross-CLI store with provenance, hashes and conflict quarantine | `memory/` — one helper script is the only writer |
@@ -134,6 +134,13 @@ Secrets live in a local `.secrets/` directory you create yourself (`chmod 700`, 
 
 ## Limits
 
-One model wearing roles routes correctly ~60-80% of the time, not 100%. Data quality equals what you tell it. Privacy model: [PRIVACY.md](PRIVACY.md). What's real vs. aspirational: [HONESTY.md](HONESTY.md). Cross-CLI contract: [AGENTS.md](AGENTS.md).
+These are system limits, not footnotes:
+
+- **"OS" is a metaphor.** In practice bOS is a folder + a contract + hooks, with **one reference host**: Claude Code gets full enforcement, Codex gets context injection, Grok gets prompt-only compliance, Windows is unsupported until its CI job is green. There is no daemon and nothing runs while your session is closed.
+- **Provenance is asserted, not proven.** The memory helper rejects raw `web:`/`model:` sources and known secret patterns, but it cannot verify that a model honestly labelled a record `user:`. On Codex and Grok, where no write guard exists, that assertion is the only line of defense.
+- **Routing is ~60-80%, and memory does not fix it.** One model wearing ten roles misroutes sometimes, and it can still "remember" things outside the store in a given conversation. The store is the auditable arbiter you check against — not a guarantee of what the model says.
+- **Data quality equals what you tell it.** Nothing is captured that you didn't say.
+
+Privacy model: [PRIVACY.md](PRIVACY.md). What's real vs. aspirational: [HONESTY.md](HONESTY.md). Cross-CLI contract: [AGENTS.md](AGENTS.md).
 
 License: [MIT](LICENSE).

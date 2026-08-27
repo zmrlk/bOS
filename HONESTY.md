@@ -13,7 +13,7 @@ bash tests/run.sh            # guard payloads, bus schema, clean-clone check
 |-------------------------|-------------------------|----------------|
 | User state is untracked: `state/*.md` is gitignored, blank templates ship in `templates/state/`, session-start materializes them | Ambient capture (energy/expense mentioned → logged) | Background daemon or 24/7 automation |
 | 6 hooks wired in `.claude/settings.json` | Crisis-data ephemerality and send/spend consent on non-Claude hosts (prompt contract) | Automatic cloud backup of your data |
-| 25 skills, `tier: core` (17) or `optional` (8), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite/vector backend |
+| 24 skills, `tier: core` (17) or `optional` (7), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite/vector backend |
 | 10 agent files | Routing accuracy ~60-80%, not 100% | Unprompted morning check-ins or weekly nags |
 | Message bus: single writer script with schema validation | Grok integration (see per-CLI matrix below) | Mid-generation message injection |
 | Durable memory: helper-only records, declared provenance, hashes, conflict quarantine, review-date filtering, bounded hot cache, known-pattern filters | Whether a model labels confirmation/provenance truthfully or notices every fact worth proposing | Automatic promotion of session summaries/web claims into truth |

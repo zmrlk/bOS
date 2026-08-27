@@ -13,7 +13,7 @@ VERSION 0.14.0
 | follow-up | optional | 5592 | ok | no |
 | goal | core | 1912 | ok | yes |
 | habit | core | 2906 | ok | yes |
-| help | core | 3406 | ok | no |
+| help | core | 3428 | ok | no |
 | home | core | 895 | ok | yes |
 | inbox | optional | 3926 | ok | yes |
 | log-expense | core | 2910 | ok | no |
@@ -26,11 +26,10 @@ VERSION 0.14.0
 | remind | core | 1748 | ok | no |
 | setup | core | 1360 | ok | yes |
 | ship | core | 3723 | ok | no |
-| skill-creator | optional | 911 | ok | yes |
 | task | core | 2145 | ok | yes |
 | wrap-up | core | 2644 | ok | no |
 
-count 25 · core 17 · optional 8 · over_8kb 0
+count 24 · core 17 · optional 7 · over_8kb 0
 
 ## Agents
 | name | bytes |
