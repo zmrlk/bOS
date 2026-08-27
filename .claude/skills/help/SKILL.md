@@ -48,7 +48,8 @@ Show a clean, one-screen reference of everything available.
   /reflect          — one-question micro-journal
 
   🔎  MEMORY & INBOX
-  /recall           — search past sessions
+  /remember         — save a confirmed fact to durable memory
+  /recall           — search durable memory + session history
   /remind           — set a timed reminder
   /inbox            — email triage (Gmail + Outlook)
   /network          — contacts and follow-ups
@@ -59,7 +60,6 @@ Show a clean, one-screen reference of everything available.
   /evolve           — audit and improve bOS itself
   /connect          — manage MCP connections (optional)
   /build-agent      — create a custom agent (optional)
-  /skill-creator    — create or improve a skill (optional)
   /help             — this screen
 
   Live list + core|optional: config/roster.md (`bash scripts/bos-roster.sh`)

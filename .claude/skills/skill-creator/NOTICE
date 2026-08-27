@@ -1,7 +1,0 @@
-skill-creator
-Based on Anthropic's public "skill-creator" skill, licensed under the
-Apache License 2.0 (see LICENSE.txt in this directory).
-Modified for bOS: frontmatter tier/user_invocable/command support and
-workflow adjustments. These modifications are (c) 2026 zmrlk and are
-distributed under the repository's MIT license where compatible; the
-original Apache-2.0 terms continue to apply to the vendored portions.

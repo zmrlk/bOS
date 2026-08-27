@@ -16,4 +16,4 @@ If `profile.md` Name / Active packs / Primary goal are empty → `/setup` before
 
 ## Do not resurrect
 
-No unprompted morning check-ins, no energy interrogation, no weekly-review offers, no mandatory cloud sync, no `/vault` in chat, no `git push` inside `/ship`, no hand-edit of `state/context-bus.jsonl` (helper only).
+No unprompted morning check-ins, no energy interrogation, no weekly-review offers, no mandatory cloud sync, no `/vault` in chat, no `git push` inside `/ship`, no hand-edit of `state/context-bus.jsonl` (helper only), no hand-edit of `memory/` (write only via `bash scripts/bos-memory.sh remember|supersede` — the guard blocks direct writes, including Bash redirects).
