@@ -48,6 +48,24 @@ if [ -f "$BOS_DIR/state/tasks.md" ]; then
   echo ""
 fi
 
+# Hard setup gate (deterministic — the AGENTS.md prompt alone is bypassable):
+# missing profile.md or empty Core identity → SETUP REQUIRED in hook stdout.
+SETUP_NEEDED=0
+if [ ! -f "$BOS_DIR/profile.md" ]; then
+  SETUP_NEEDED=1
+else
+  for FIELD in 'Name' 'Active packs' 'Primary goal'; do
+    VAL=$(grep -i "| \*\*$FIELD\*\*" "$BOS_DIR/profile.md" | head -1 | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}')
+    if [ -z "$VAL" ] || printf '%s' "$VAL" | grep -q '^(.*)$'; then SETUP_NEEDED=1; fi
+  done
+fi
+if [ "$SETUP_NEEDED" = 1 ]; then
+  echo "### ⚠️ SETUP REQUIRED"
+  echo "profile.md is missing or Core identity (Name / Active packs / Primary goal) is empty."
+  echo "Greet, then run /setup BEFORE anything else. Do not free-chat past this."
+  echo ""
+fi
+
 if [ -f "$BOS_DIR/profile.md" ]; then
   GOAL=$(grep -i 'Primary goal' "$BOS_DIR/profile.md" | head -1 | sed 's/.*|[ ]*//;s/[ ]*|.*//;s/^|//;s/|$//' | head -c 120)
   [ -n "$GOAL" ] && echo "### Goal: $GOAL"

@@ -13,7 +13,7 @@ tier: core
 Hard rules (also in flow.md):
 0. Run `bash scripts/bos-memory.sh init`. It creates an empty local store and
    never copies profile, git identity, Claude memory, or scan results into it.
-1. Run `scripts/profile-scan.sh` (non-personal detection: locale, timezone, state presence). App/file **names** are scanned only after one consent question — then rerun with `--with-names` (PRIVACY.md contract).
+1. Run `bash .claude/skills/setup/scripts/profile-scan.sh` (non-personal detection: locale, timezone, state presence). App/file **names** are scanned only after one consent question — then rerun the same command with `--with-names` appended (PRIVACY.md contract; the flag is valid in any argument position).
 2. Never ask what is already detected or saved.
 3. One AskUserQuestion at a time. Max two open-text fields: name (if unknown) and primary goal.
 4. Every question skippable.
@@ -23,5 +23,7 @@ Hard rules (also in flow.md):
 8. Resume from `state/.setup-progress.md`; delete it when done.
 9. Never echo secrets.
 10. Stale data = "still true?", never "you're behind."
+11. On Codex/Grok there is no AskUserQuestion — numbered lists replace clickable cards. The question cap matters MORE there, not less; the 3-minute goal is measured on Claude Code.
+12. Close by saying Core is complete and the rest of `profile.md` fills itself with usage (progressive profiling). Never present empty non-Core sections as unfinished work.
 
 Do not overwrite existing `state/*.md`. Copy `profile-template.md` → `profile.md` only for missing fields.
