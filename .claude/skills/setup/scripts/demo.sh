@@ -22,23 +22,40 @@ case "$CMD" in
     if [ -f "$BOS_DIR/profile.md" ] && grep -qE '\| \*\*Name\*\* \| *[^ |(]' "$BOS_DIR/profile.md"; then
       fail "profile.md has a real Name — demo is for fresh installs only"
     fi
-    # Never overwrite real state: refuse if any target exists.
+    # First-run reality: session-start bootstraps state/ from blank templates
+    # BEFORE /setup runs. A file byte-identical to its blank template is not
+    # user data — it may be replaced (and is restored on 'end'). Anything the
+    # user actually touched refuses, as before.
     for SRC in "$DEMO_SRC"/*.md; do
-      [ -e "$BOS_DIR/state/$(basename "$SRC")" ] && fail "state/$(basename "$SRC") already exists — will not overwrite"
+      NAME="$(basename "$SRC")"; DEST="$BOS_DIR/state/$NAME"; TPL="$BOS_DIR/templates/state/$NAME"
+      if [ -e "$DEST" ] && ! { [ -f "$TPL" ] && cmp -s "$DEST" "$TPL"; }; then
+        fail "state/$NAME has real content — will not overwrite"
+      fi
     done
     mkdir -p "$BOS_DIR/state"
     : > "$MARKER"
     for SRC in "$DEMO_SRC"/*.md; do
-      cp "$SRC" "$BOS_DIR/state/$(basename "$SRC")"
-      printf 'state/%s\n' "$(basename "$SRC")" >> "$MARKER"
+      NAME="$(basename "$SRC")"; DEST="$BOS_DIR/state/$NAME"
+      if [ -e "$DEST" ]; then KIND=blank; else KIND=new; fi
+      cp "$SRC" "$DEST"
+      printf '%s:state/%s\n' "$KIND" "$NAME" >> "$MARKER"
     done
     echo "DEMO-STARTED: fixture persona Alex materialized. Try /morning, /habit, 'spent 40 on lunch'."
     echo "DEMO-NOTE: every file is marked DEMO DATA; 'bash .claude/skills/setup/scripts/demo.sh end' removes all of it."
     ;;
   end)
     [ -f "$MARKER" ] || fail "no demo running (state/.demo-mode missing)"
-    while IFS= read -r REL; do
-      case "$REL" in state/*.md) rm -f "$BOS_DIR/$REL";; esac
+    while IFS= read -r LINE; do
+      KIND="${LINE%%:*}"; REL="${LINE#*:}"
+      case "$REL" in
+        state/*.md)
+          rm -f "$BOS_DIR/$REL"
+          # A file that was a bootstrapped blank template goes back to being one.
+          if [ "$KIND" = blank ] && [ -f "$BOS_DIR/templates/$REL" ]; then
+            cp "$BOS_DIR/templates/$REL" "$BOS_DIR/$REL"
+          fi
+          ;;
+      esac
     done < "$MARKER"
     rm -f "$MARKER"
     echo "DEMO-ENDED: fixture data removed. state/ is clean for the real setup."

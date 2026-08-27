@@ -8,10 +8,11 @@
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WITH_NAMES=0; BOS_DIR=""
+WITH_NAMES=0; STAMP=0; BOS_DIR=""
 for ARG in "$@"; do
   case "$ARG" in
     --with-names) WITH_NAMES=1;;
+    --stamp) STAMP=1;;
     *) [ -z "$BOS_DIR" ] && BOS_DIR="$ARG";;
   esac
 done
@@ -96,15 +97,17 @@ EOF
   [ -z "$(printf "%b" "$OUT")" ] && echo "  (none — no questions allowed)"
 }
 
-# Duration is measured, not felt: stamp setup start once; the completion step
-# in flow.md computes elapsed minutes from this line and quotes them.
+# Duration is measured, not felt: with --stamp, record setup start once; the
+# completion step in flow.md computes elapsed minutes from this line and
+# quotes them. Without --stamp the scan is strictly read-only.
 stamp_start() {
   local P="$BOS_DIR/state/.setup-progress.md"
-  if [ ! -f "$P" ]; then
+  if [ "$STAMP" = 1 ] && [ ! -f "$P" ]; then
     mkdir -p "$BOS_DIR/state"
     printf 'started: %s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" > "$P"
   fi
-  grep '^started:' "$P" | head -1 | sed 's/^/setup_/'
+  [ -f "$P" ] && grep '^started:' "$P" | head -1 | sed 's/^/setup_/'
+  return 0
 }
 
 if [ ! -f "$PROFILE" ]; then
@@ -114,24 +117,29 @@ if [ ! -f "$PROFILE" ]; then
   exit 0
 fi
 
-CORE_FILLED=0; CORE_EMPTY=0; ALL_FILLED=0; ALL_EMPTY=0; GAPS=""; IN_CORE=0
+# Completeness counts LEVERAGE fields (9), and the mode is decided by the
+# three GATE fields — the exact fields the session-start SETUP REQUIRED gate
+# checks. The template's full Core section (27 rows) would make "done"
+# mathematically unreachable under the 5-question cap.
+LEV_FILLED=0; LEV_TOTAL=$(echo "$LEVERAGE" | grep -c '|')
+GATE_FILLED=0; ALL_FILLED=0; ALL_EMPTY=0; GAPS=""
 while IFS= read -r line; do
-  case "$line" in "## Core"*) IN_CORE=1;; "## "*) [ "$IN_CORE" = "1" ] && [ "${line#\#\# Core}" = "$line" ] && IN_CORE=0;; esac
   FIELD=$(echo "$line" | sed -n 's/^| \*\*\([^*]*\)\*\* |.*/\1/p')
   [ -z "$FIELD" ] && continue
   VALUE=$(echo "$line" | awk -F'|' '{gsub(/^ +| +$/,"",$3); print $3}')
+  LEV=$(echo "$LEVERAGE" | grep "^$FIELD|" | cut -d'|' -f2)
   if [ -z "$VALUE" ] || echo "$VALUE" | grep -q '^(.*)$'; then
-    ALL_EMPTY=$((ALL_EMPTY+1)); [ "$IN_CORE" = "1" ] && CORE_EMPTY=$((CORE_EMPTY+1))
-    LEV=$(echo "$LEVERAGE" | grep "^$FIELD|" | cut -d'|' -f2)
+    ALL_EMPTY=$((ALL_EMPTY+1))
     [ -n "${LEV:-}" ] && GAPS="$GAPS$FIELD|$LEV\n"
   else
-    ALL_FILLED=$((ALL_FILLED+1)); [ "$IN_CORE" = "1" ] && CORE_FILLED=$((CORE_FILLED+1))
+    ALL_FILLED=$((ALL_FILLED+1))
+    [ -n "${LEV:-}" ] && LEV_FILLED=$((LEV_FILLED+1))
+    case "$FIELD" in Name|"Active packs"|"Primary goal") GATE_FILLED=$((GATE_FILLED+1));; esac
   fi
 done < "$PROFILE"
 
-CORE_TOTAL=$((CORE_FILLED+CORE_EMPTY)); CORE_PCT=0; [ "$CORE_TOTAL" -gt 0 ] && CORE_PCT=$((CORE_FILLED*100/CORE_TOTAL))
 ALL_TOTAL=$((ALL_FILLED+ALL_EMPTY))
-echo "core_filled: $CORE_FILLED / $CORE_TOTAL (${CORE_PCT}%) — CORE DECIDES THE MODE"
+echo "core_filled: $LEV_FILLED / $LEV_TOTAL leverage fields (gate fields filled: $GATE_FILLED / 3 — GATE DECIDES THE MODE)"
 echo "all_fields: $ALL_FILLED / $ALL_TOTAL (the rest grows with usage, do NOT ask about it)"
 
 # Staleness: freshness line → section name (nearest ## heading above)
@@ -147,10 +155,10 @@ grep -n 'freshness: 20' "$PROFILE" 2>/dev/null | while IFS= read -r fl; do
   fi
 done
 
-if [ "$CORE_PCT" -ge 80 ]; then
-  echo "mode: REVIEW (Core >=80% — read values back, 'still accurate?' for stale sections in ONE multiSelect, NEVER re-interview)"
-elif [ "$CORE_PCT" -ge 30 ]; then
-  echo "mode: PARTIAL (fill gaps only)"
+if [ "$GATE_FILLED" -ge 3 ]; then
+  echo "mode: REVIEW (gate fields Name/packs/goal filled — the SETUP REQUIRED gate is off; read values back, 'still accurate?' for stale sections in ONE multiSelect, NEVER re-interview)"
+elif [ "$GATE_FILLED" -ge 1 ] || [ "$LEV_FILLED" -ge 1 ]; then
+  echo "mode: PARTIAL (fill gate/leverage gaps only)"
   stamp_start
 else
   echo "mode: FRESH_INSTALL"
