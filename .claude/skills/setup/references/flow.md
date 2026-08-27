@@ -2,11 +2,11 @@
 
 # /setup — full flow
 
-Goal: a filled `profile.md` and first value in under 3 minutes of the user's attention. Detection over interrogation.
+Goal: a filled Core section of `profile.md` and first value in under 3 minutes of the user's attention (measured on Claude Code; Codex/Grok use numbered lists instead of clickable cards and take longer — keep the same question cap). Detection over interrogation. Detection is deepest on macOS; on Linux fewer fields auto-detect, which means fewer confirmations, never more questions than the cap.
 
 ## Step 0 — scan (non-personal detection first)
 
-If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh`. The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun with `--with-names`. Never open file contents at all during setup.
+If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh`. The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun `bash .claude/skills/setup/scripts/profile-scan.sh --with-names`. Never open file contents at all during setup.
 
 ## Step 1 — present, don't ask
 

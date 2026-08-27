@@ -315,6 +315,32 @@ else
   fi
 fi
 
+# Regression: --with-names as the FIRST argument must not become BOS_DIR.
+# The scan must still resolve the repo root (inventory shows real skill count)
+# and still honor the consent flag (fixture name revealed).
+if command -v git >/dev/null 2>&1; then
+  SCAN_FLAG_FIRST=$(cd / && HOME="$FAKE_HOME" bash "$SANDBOX/.claude/skills/setup/scripts/profile-scan.sh" --with-names 2>/dev/null)
+  if echo "$SCAN_FLAG_FIRST" | grep -q 'Consent Fixture' \
+    && echo "$SCAN_FLAG_FIRST" | grep -qE 'skills: [1-9][0-9]* \|'; then
+    ok "profile-scan accepts --with-names in any position"
+  else
+    bad "profile-scan accepts --with-names in any position"
+  fi
+fi
+
+# Hard setup gate: no profile.md → SETUP REQUIRED in session-start stdout;
+# a profile with Core identity filled → gate silent.
+GATE_EMPTY=$(bash "$SANDBOX/.claude/hooks/session-start.sh" 2>/dev/null)
+printf '| **Name** | Alex |\n| **Active packs** | work |\n| **Primary goal** | ship |\n' > "$SANDBOX/profile.md"
+GATE_FILLED=$(bash "$SANDBOX/.claude/hooks/session-start.sh" 2>/dev/null)
+rm -f "$SANDBOX/profile.md"
+if echo "$GATE_EMPTY" | grep -q 'SETUP REQUIRED' \
+  && ! echo "$GATE_FILLED" | grep -q 'SETUP REQUIRED'; then
+  ok "session-start hard-gates empty profile with SETUP REQUIRED"
+else
+  bad "session-start hard-gates empty profile with SETUP REQUIRED"
+fi
+
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"
 [ "$FAIL" = 0 ] || exit 1

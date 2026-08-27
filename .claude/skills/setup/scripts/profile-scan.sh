@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 # profile-scan.sh — completeness scanner for bOS /setup
 # Instead of a questionnaire: count what we already know, detect what we can, return ONLY the undetectable gaps.
-# Usage: profile-scan.sh [BOS_DIR]   (default: repo root two levels up from this script)
+# Usage: profile-scan.sh [BOS_DIR] [--with-names]   (flag valid in any position;
+#   BOS_DIR defaults to the repo root resolved from this script's location)
+# Canonical invocation: bash .claude/skills/setup/scripts/profile-scan.sh [--with-names]
 # Output: plain-text report for the model. Exit 0 always (degrade gracefully).
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BOS_DIR="${1:-$(cd "$SCRIPT_DIR/../../../.." && pwd)}"
+WITH_NAMES=0; BOS_DIR=""
+for ARG in "$@"; do
+  case "$ARG" in
+    --with-names) WITH_NAMES=1;;
+    *) [ -z "$BOS_DIR" ] && BOS_DIR="$ARG";;
+  esac
+done
+[ -n "$BOS_DIR" ] || BOS_DIR="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 PROFILE="$BOS_DIR/profile.md"
 TODAY_EPOCH=$(date +%s)
 
@@ -28,10 +37,12 @@ TZ_SYS=$(readlink /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||') ; [ -n "$
 LOCALE_SYS=$(defaults read -g AppleLocale 2>/dev/null || echo "${LANG:-}")
 [ -n "$LOCALE_SYS" ] && echo "locale: $LOCALE_SYS" && DETECTED_FIELDS="$DETECTED_FIELDS Location"
 LANG1=$(defaults read -g AppleLanguages 2>/dev/null | sed -n 's/[^"]*"\([a-z][a-z]\)[-"].*/\1/p' | head -1)
+# Linux has no `defaults`; fall back to the locale prefix (pl_PL.UTF-8 -> pl).
+[ -z "${LANG1:-}" ] && LANG1=$(printf '%s' "$LOCALE_SYS" | sed -n 's/^\([a-z][a-z]\)[_-].*/\1/p')
 [ -n "${LANG1:-}" ] && echo "language_guess: $LANG1 (tie-break: the language of the user's FIRST MESSAGE wins over locale)" && DETECTED_FIELDS="$DETECTED_FIELDS Language"
 case "$LOCALE_SYS" in *PL*) echo "currency_guess: PLN";; *US*) echo "currency_guess: USD";; *GB*) echo "currency_guess: GBP";; *DE*|*FR*|*ES*|*IT*|*NL*) echo "currency_guess: EUR";; esac
 # Personal identity: only with --with-names (post-consent), like app names.
-if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+if [ "$WITH_NAMES" = 1 ]; then
   GIT_NAME=$(git config --global user.name 2>/dev/null)
 else
   GIT_NAME=""
@@ -45,13 +56,13 @@ if [ -n "${GIT_NAME:-}" ]; then
   fi
 fi
 command -v git >/dev/null && echo "has_git: yes"
-if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+if [ "$WITH_NAMES" = 1 ]; then
   [ -d "$HOME/.claude/projects" ] && MEMDIRS=$(ls "$HOME/.claude/projects" 2>/dev/null | wc -l | tr -d ' ') && [ "$MEMDIRS" -gt 0 ] && echo "existing_claude_memory_dirs: $MEMDIRS (import REQUIRES SEPARATE CONSENT — a different privacy scope)"
 fi
 [ -d "$HOME/bos-wiki" ] && echo "existing_bos_wiki: yes (import requires separate consent)"
 # App NAMES are personal-ish: listed only with --with-names, i.e. AFTER the
 # user consented to the names scan in /setup (PRIVACY.md: consent-gated).
-if [ "${2:-}" = "--with-names" ] || [ "${1:-}" = "--with-names" ]; then
+if [ "$WITH_NAMES" = 1 ]; then
   ls /Applications 2>/dev/null | head -60 | tr '\n' ',' | sed 's/,$//' | awk '{print "apps_sample: " $0}'
 else
   echo "apps_sample: (skipped — rerun with --with-names after user consent)"
