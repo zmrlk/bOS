@@ -98,7 +98,7 @@ echo "    .claude/settings.json"
 echo "    .agents/  .codex/  .grok/  scripts/  config/"
 echo "    VERSION, README.md, PRIVACY.md"
 echo "    profile-template.md"
-echo "    state/SCHEMAS.md, templates/state/, templates/memory/"
+echo "    state/SCHEMAS.md, templates/state/, templates/memory/, templates/demo/"
 echo "    examples/"
 echo ""
 echo "  Note: customized skills/agents/hooks are overwritten"
@@ -312,6 +312,13 @@ if [ -d "$NEW_BOS/templates/memory" ]; then
     mkdir -p "$EXISTING_BOS/templates/memory"
     cp -r "$NEW_BOS/templates/memory/"* "$EXISTING_BOS/templates/memory/"
     echo -e "  ${GREEN}✓${NC} templates/memory/"
+fi
+
+# Demo fixture for /setup (only ever copied into state/ by demo.sh, with consent)
+if [ -d "$NEW_BOS/templates/demo" ]; then
+    mkdir -p "$EXISTING_BOS/templates/demo"
+    cp -r "$NEW_BOS/templates/demo/"* "$EXISTING_BOS/templates/demo/"
+    echo -e "  ${GREEN}✓${NC} templates/demo/"
 fi
 
 # Test suite (used for the post-update self-test)

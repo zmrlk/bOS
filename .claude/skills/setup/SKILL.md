@@ -25,5 +25,7 @@ Hard rules (also in flow.md):
 10. Stale data = "still true?", never "you're behind."
 11. On Codex/Grok there is no AskUserQuestion — numbered lists replace clickable cards. The question cap matters MORE there, not less; the 3-minute goal is measured on Claude Code.
 12. Close by saying Core is complete and the rest of `profile.md` fills itself with usage (progressive profiling). Never present empty non-Core sections as unfinished work.
+13. FRESH_INSTALL → offer the 30-second demo first (`bash .claude/skills/setup/scripts/demo.sh start|end` — Alex fixture, never touches profile.md, refuses over real state).
+14. Show progress on every question ("2/5"). Done = the rescan says so (`core_filled` + `mode`) and the measured duration is quoted — not a feeling.
 
 Do not overwrite existing `state/*.md`. Copy `profile-template.md` → `profile.md` only for missing fields.
