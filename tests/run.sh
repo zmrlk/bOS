@@ -328,6 +328,18 @@ if command -v git >/dev/null 2>&1; then
   fi
 fi
 
+# Version drift gate: VERSION is the single source; README, AGENTS.md and
+# profile-template.md must quote it (this drifted on 0.13.0->0.13.1 AND
+# 0.14.0->0.14.1 — a rule without ignition is dead, so it is a test now).
+VER=$(cat "$SANDBOX/VERSION" | tr -d ' \n')
+if grep -q "v$VER" "$SANDBOX/README.md" \
+  && grep -q "v$VER" "$SANDBOX/AGENTS.md" \
+  && grep -q "| $VER |" "$SANDBOX/profile-template.md"; then
+  ok "VERSION matches README / AGENTS.md / profile-template.md"
+else
+  bad "VERSION matches README / AGENTS.md / profile-template.md"
+fi
+
 # Demo mode on the REAL first-run path: session-start already bootstrapped
 # state/ from blank templates in this sandbox (exactly what a fresh clone
 # sees). start must replace bootstrapped blanks and succeed; end must restore

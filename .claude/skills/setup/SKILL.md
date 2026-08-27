@@ -13,7 +13,7 @@ tier: core
 Hard rules (also in flow.md):
 0. Run `bash scripts/bos-memory.sh init`. It creates an empty local store and
    never copies profile, git identity, Claude memory, or scan results into it.
-1. Run `bash .claude/skills/setup/scripts/profile-scan.sh` (non-personal detection: locale, timezone, state presence). App/file **names** are scanned only after one consent question — then rerun the same command with `--with-names` appended (PRIVACY.md contract; the flag is valid in any argument position).
+1. Run `bash .claude/skills/setup/scripts/profile-scan.sh --stamp` (non-personal detection: locale, timezone, state presence; `--stamp` records the start time ONCE, on this first invocation only — every later rerun goes without it). App/file **names** are scanned only after one consent question — then rerun with `--with-names` (PRIVACY.md contract; flags are valid in any argument position).
 2. Never ask what is already detected or saved.
 3. One AskUserQuestion at a time. Max two open-text fields: name (if unknown) and primary goal.
 4. Every question skippable.
