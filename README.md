@@ -85,7 +85,7 @@ The honest trade-off: bOS will not act while you are away, will not sync to your
 
 1. Install [Claude Code](https://claude.ai/code) (or Codex CLI / Grok CLI — reduced wiring, see [HONESTY.md](HONESTY.md)).
 2. `git clone https://github.com/zmrlk/bOS.git` and open the folder in your CLI.
-3. Say "hi". If `profile.md` is empty, the session-start hook prints a hard `SETUP REQUIRED` and `/setup` runs — detection-first, max 5 questions, under 3 minutes on Claude Code (Codex/Grok use numbered lists instead of clickable cards and take longer).
+3. Say "hi". If `profile.md` is empty, the session-start hook prints a hard `SETUP REQUIRED` and `/setup` runs — detection-first, max 5 questions, under 3 minutes on Claude Code (Codex/Grok use numbered lists instead of clickable cards and take longer). Not sure yet? Setup offers a 30-second demo on sample data first — try `/morning` on the fixture, then it wipes itself.
 
 Windows note: `.agents/skills/` uses git symlinks — clone with `git clone -c core.symlinks=true …` (needs Developer Mode or admin).
 

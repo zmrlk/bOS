@@ -328,6 +328,42 @@ if command -v git >/dev/null 2>&1; then
   fi
 fi
 
+# Demo mode: start materializes the fixture + manifest, end removes exactly
+# that and nothing else; start refuses to overwrite a real state file.
+DEMO="$SANDBOX/.claude/skills/setup/scripts/demo.sh"
+# Demo needs a truly fresh install; the shared sandbox already materialized
+# state/ in earlier tests, so give it its own root.
+DEMO_ROOT="$SANDBOX/demo-root"
+mkdir -p "$DEMO_ROOT"
+cp -r "$SANDBOX/templates" "$DEMO_ROOT/templates"
+if bash "$DEMO" start "$DEMO_ROOT" >/dev/null 2>&1 \
+  && grep -q 'DEMO DATA' "$DEMO_ROOT/state/tasks.md" 2>/dev/null \
+  && [ -f "$DEMO_ROOT/state/.demo-mode" ] \
+  && bash "$DEMO" end "$DEMO_ROOT" >/dev/null 2>&1 \
+  && [ ! -f "$DEMO_ROOT/state/tasks.md" ] && [ ! -f "$DEMO_ROOT/state/.demo-mode" ]; then
+  ok "setup demo start/end roundtrip is clean"
+else
+  bad "setup demo start/end roundtrip is clean"
+fi
+mkdir -p "$DEMO_ROOT/state"; echo "real user task" > "$DEMO_ROOT/state/tasks.md"
+if ! bash "$DEMO" start "$DEMO_ROOT" >/dev/null 2>&1 \
+  && grep -q 'real user task' "$DEMO_ROOT/state/tasks.md"; then
+  ok "setup demo refuses to overwrite real state"
+else
+  bad "setup demo refuses to overwrite real state"
+fi
+rm -rf "$DEMO_ROOT"
+
+# Duration stamp: a fresh-install scan writes started: into .setup-progress.md
+rm -f "$SANDBOX/state/.setup-progress.md"
+bash "$SANDBOX/.claude/skills/setup/scripts/profile-scan.sh" "$SANDBOX" >/dev/null 2>&1
+if grep -q '^started: 20' "$SANDBOX/state/.setup-progress.md" 2>/dev/null; then
+  ok "profile-scan stamps setup start time"
+else
+  bad "profile-scan stamps setup start time"
+fi
+rm -f "$SANDBOX/state/.setup-progress.md"
+
 # Hard setup gate: no profile.md → SETUP REQUIRED in session-start stdout;
 # a profile with Core identity filled → gate silent.
 GATE_EMPTY=$(bash "$SANDBOX/.claude/hooks/session-start.sh" 2>/dev/null)

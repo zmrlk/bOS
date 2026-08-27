@@ -96,8 +96,20 @@ EOF
   [ -z "$(printf "%b" "$OUT")" ] && echo "  (none — no questions allowed)"
 }
 
+# Duration is measured, not felt: stamp setup start once; the completion step
+# in flow.md computes elapsed minutes from this line and quotes them.
+stamp_start() {
+  local P="$BOS_DIR/state/.setup-progress.md"
+  if [ ! -f "$P" ]; then
+    mkdir -p "$BOS_DIR/state"
+    printf 'started: %s\n' "$(date '+%Y-%m-%dT%H:%M:%S')" > "$P"
+  fi
+  grep '^started:' "$P" | head -1 | sed 's/^/setup_/'
+}
+
 if [ ! -f "$PROFILE" ]; then
   echo "mode: FRESH_INSTALL (no profile.md)"
+  stamp_start
   emit_gaps "$(echo "$LEVERAGE" | tr '\n' '\n')"
   exit 0
 fi
@@ -139,8 +151,10 @@ if [ "$CORE_PCT" -ge 80 ]; then
   echo "mode: REVIEW (Core >=80% — read values back, 'still accurate?' for stale sections in ONE multiSelect, NEVER re-interview)"
 elif [ "$CORE_PCT" -ge 30 ]; then
   echo "mode: PARTIAL (fill gaps only)"
+  stamp_start
 else
   echo "mode: FRESH_INSTALL"
+  stamp_start
 fi
 emit_gaps "$GAPS"
 exit 0
