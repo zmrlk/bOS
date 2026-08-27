@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 440" width="780" height="440" role="img" aria-label="Animated bOS session: morning plan, ambient expense logging, durable memory save">
+  <style>
+    .bg { fill: #0d1117; }
+    .frame { fill: none; stroke: #30363d; stroke-width: 1; }
+    .bar { fill: #161b22; }
+    text {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 15px;
+      fill: #c9d1d9;
+      white-space: pre;
+    }
+    .prompt { fill: #7ee787; }
+    .dim { fill: #8b949e; }
+    .path { fill: #79c0ff; }
+    .title { fill: #8b949e; font-size: 12px; }
+
+    /* One 20s master timeline. Each line owns a visibility window via
+       percentages; base state is fully visible, so prefers-reduced-motion
+       (animation: none) renders the complete static transcript. */
+    .a { animation: w 20s infinite; }
+    .typed { animation: t 20s infinite steps(24, end); }
+
+    .d1  { animation-name: w1; }  .d2  { animation-name: w2; }
+    .d3  { animation-name: w3; }  .d4  { animation-name: w4; }
+    .d5  { animation-name: w5; }  .d6  { animation-name: w6; }
+    .d7  { animation-name: w7; }  .d8  { animation-name: w8; }
+    .d9  { animation-name: w9; }  .d10 { animation-name: w10; }
+    .d11 { animation-name: w11; } .d12 { animation-name: w12; }
+
+    @keyframes w1  { 0%,2%  { opacity:0 } 3%,96%  { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w2  { 0%,7%  { opacity:0 } 8%,96%  { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w3  { 0%,10% { opacity:0 } 11%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w4  { 0%,13% { opacity:0 } 14%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w5  { 0%,15% { opacity:0 } 16%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w6  { 0%,17% { opacity:0 } 18%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w7  { 0%,25% { opacity:0 } 26%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w8  { 0%,31% { opacity:0 } 32%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w9  { 0%,40% { opacity:0 } 41%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w10 { 0%,46% { opacity:0 } 47%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w11 { 0%,55% { opacity:0 } 56%,96% { opacity:1 } 97%,100% { opacity:0 } }
+    @keyframes w12 { 0%,62% { opacity:0 } 63%,96% { opacity:1 } 97%,100% { opacity:0 } }
+
+    /* Typing reveal for user-typed lines: clip sweeps left to right. */
+    .t1 { animation-name: t1k; }
+    .t2 { animation-name: t2k; }
+    .t3 { animation-name: t3k; }
+    @keyframes t1k {
+      0%,2%   { clip-path: inset(-2px 100% -2px 0); opacity:1 }
+      6%,96%  { clip-path: inset(-2px -2% -2px 0);  opacity:1 }
+      97%,100%{ clip-path: inset(-2px -2% -2px 0);  opacity:0 }
+    }
+    @keyframes t2k {
+      0%,25%  { clip-path: inset(-2px 100% -2px 0); opacity:1 }
+      30%,96% { clip-path: inset(-2px -2% -2px 0);  opacity:1 }
+      97%,100%{ clip-path: inset(-2px -2% -2px 0);  opacity:0 }
+    }
+    @keyframes t3k {
+      0%,40%  { clip-path: inset(-2px 100% -2px 0); opacity:1 }
+      45%,96% { clip-path: inset(-2px -2% -2px 0);  opacity:1 }
+      97%,100%{ clip-path: inset(-2px -2% -2px 0);  opacity:0 }
+    }
+
+    .cursor { animation: blink 1s infinite steps(1, end); }
+    @keyframes blink { 0%,49% { opacity:1 } 50%,100% { opacity:0 } }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      .cursor { opacity: 0; }
+    }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="780" height="440" rx="10"/>
+  <rect class="frame" x="0.5" y="0.5" width="779" height="439" rx="10"/>
+  <path class="bar" d="M0 10 a10 10 0 0 1 10 -10 h760 a10 10 0 0 1 10 10 v22 h-780 z"/>
+  <circle cx="22" cy="16" r="5.5" fill="#ff5f56"/>
+  <circle cx="42" cy="16" r="5.5" fill="#ffbd2e"/>
+  <circle cx="62" cy="16" r="5.5" fill="#27c93f"/>
+  <text class="title" x="390" y="21" text-anchor="middle">bOS — just a folder, opened in an AI CLI</text>
+
+  <!-- user: morning -->
+  <text class="typed t1" x="24" y="66"><tspan class="prompt">&gt; </tspan>morning</text>
+
+  <!-- plan -->
+  <text class="a d2" x="24" y="96">☀️ Morning, Alex. Yesterday's energy: 5/10 — lighter plan today.</text>
+  <text class="a d3" x="24" y="122">✅ PLAN <tspan class="dim">(max 3 — that's the rule, not a suggestion)</tspan></text>
+  <text class="a d4" x="24" y="148">   1. Send Sam the invoice draft <tspan class="dim">(~45 min)</tspan></text>
+  <text class="a d5" x="24" y="174">   2. Book the car service <tspan class="dim">(5 min — quick win, do it first)</tspan></text>
+  <text class="a d6" x="24" y="200">   3. Read ch. 4 <tspan class="dim">(only if energy holds)</tspan></text>
+
+  <!-- user: expense -->
+  <text class="typed t2" x="24" y="240"><tspan class="prompt">&gt; </tspan>btw spent 40 on lunch</text>
+  <text class="a d8" x="24" y="266">⏳ Logged: 40 (Food) → <tspan class="path">state/finances.md</tspan></text>
+
+  <!-- user: remember -->
+  <text class="typed t3" x="24" y="306"><tspan class="prompt">&gt; </tspan>remember that I want the answer first, then evidence</text>
+  <text class="a d10" x="24" y="332">💾 Saved → <tspan class="path">memory/current/user--answer-style.md</tspan> <tspan class="dim">(source: user, hashed)</tspan></text>
+
+  <!-- next step -->
+  <text class="a d11" x="24" y="372">⏭️ Next step: the invoice draft. One thing. Just one.</text>
+
+  <!-- idle prompt + cursor -->
+  <text class="a d12" x="24" y="408"><tspan class="prompt">&gt; </tspan></text>
+  <g class="a d12"><rect class="cursor" x="42" y="395" width="9" height="17" fill="#c9d1d9"/></g>
+</svg>
