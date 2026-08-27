@@ -13,16 +13,23 @@ bash tests/run.sh            # guard payloads, bus schema, clean-clone check
 |-------------------------|-------------------------|----------------|
 | User state is untracked: `state/*.md` is gitignored, blank templates ship in `templates/state/`, session-start materializes them | Ambient capture (energy/expense mentioned → logged) | Background daemon or 24/7 automation |
 | 6 hooks wired in `.claude/settings.json` | Crisis-data ephemerality and send/spend consent on non-Claude hosts (prompt contract) | Automatic cloud backup of your data |
-| 24 skills, `tier: core` (16) or `optional` (8), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite backend |
+| 25 skills, `tier: core` (17) or `optional` (8), each SKILL.md ≤ 8 KB | Personas of @boss (ceo, coo, cfo, …) — roles, never separate processes | Cloud service, hosted sync, SQLite/vector backend |
 | 10 agent files | Routing accuracy ~60-80%, not 100% | Unprompted morning check-ins or weekly nags |
 | Message bus: single writer script with schema validation | Grok integration (see per-CLI matrix below) | Mid-generation message injection |
+| Durable memory: helper-only records, declared provenance, hashes, conflict quarantine, review-date filtering, bounded hot cache, known-pattern filters | Whether a model labels confirmation/provenance truthfully or notices every fact worth proposing | Automatic promotion of session summaries/web claims into truth |
 | Clickable questions via AskUserQuestion (Claude) | | `git push` inside `/ship` (always a separate, explicit ask) |
 
 ## What "enforced" honestly means
 
-The `protect-state` guard blocks the model's own predictable mistakes before they happen: hand-edits of the message bus, writes into `state/archive/` and `state/.backup/`, in-session edits of `settings.json` — including the obvious Bash routes (`rm`, `find -delete`, `truncate`, redirects, `sed -i`, interpreter one-liners). The test suite feeds it hostile payloads on every CI run.
+The `protect-state` guard blocks the model's own predictable mistakes before they happen: hand-edits of the message bus or durable memory, writes into `state/archive/` and `state/.backup/`, in-session edits of `settings.json` — including the obvious Bash routes (`rm`, `find -delete`, `truncate`, redirects, `sed -i`, interpreter one-liners). The test suite feeds it hostile payloads on every CI run.
 
 It is a **speed bump against accidents, not a security boundary**. A guard built on command inspection cannot enumerate every interpreter trick, and we will not pretend otherwise. If your threat model includes a malicious actor driving the session, no hook in this repo stops them — your OS permissions and judgment do.
+
+The same limit applies to durable memory: the helper can reject forbidden
+source prefixes and known secret/crisis/injection patterns, but it cannot prove
+that a caller honestly classified `user:` or `verified`. Claude has a direct-
+write guard; Codex and Grok follow the prompt contract. Treat provenance as an
+auditable assertion, not cryptographic attestation.
 
 Two more things worth knowing:
 
@@ -33,10 +40,10 @@ Two more things worth knowing:
 
 | CLI | What actually runs |
 |-----|--------------------|
-| **Claude Code** | Full enforcement: all 6 hooks fire (state injection, guard, logging, digests), AskUserQuestion works. This is the reference host. |
-| **Codex** | Context injection: `.codex/hooks.json` wires session-start and time-aware. No PreToolUse guard, no session-end. If your build doesn't inject hook stdout, Read `AGENTS.md` manually. |
+| **Claude Code** | Full enforcement: all 6 hooks fire; SessionStart loads the same bounded `memory/HOT.md`, and the guard enforces helper-only writes. |
+| **Codex** | Context injection: `.codex/hooks.json` wires session-start and time-aware, so it receives the same hot memory when hook stdout is supported. No PreToolUse guard or session-end; helper-only writes are contract-enforced. |
 | **Windows** | Unverified. The CI job is experimental (`continue-on-error`) and currently fails the roster check under Git Bash — symlink and BSD/GNU tool gaps. Treat Windows as unsupported until that job is green. |
-| **Grok** | Prompt-only: hook stdout is ignored entirely. The contract asks the model to Read `AGENTS.md`, `state/handoff.md`, and `state/ping.md` every turn. It works when the model complies — that is best-effort by definition. |
+| **Grok** | Prompt-only: hook stdout is ignored. Its rule asks it to Read `AGENTS.md`, `memory/HOT.md`, `state/handoff.md`, and `state/ping.md`. Compliance is best-effort; the files and helper are the same. |
 
 `.gitignore` keeps your state out of git — that is protection against mistakes, not a cage: `git add -f` can still force a personal file in, deliberately.
 

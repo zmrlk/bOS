@@ -11,6 +11,8 @@ tier: core
 **Read `references/flow.md` before the first user-facing question.** Without it you will interrogate — that is the failure mode.
 
 Hard rules (also in flow.md):
+0. Run `bash scripts/bos-memory.sh init`. It creates an empty local store and
+   never copies profile, git identity, Claude memory, or scan results into it.
 1. Run `scripts/profile-scan.sh` (non-personal detection: locale, timezone, state presence). App/file **names** are scanned only after one consent question — then rerun with `--with-names` (PRIVACY.md contract).
 2. Never ask what is already detected or saved.
 3. One AskUserQuestion at a time. Max two open-text fields: name (if unknown) and primary goal.
