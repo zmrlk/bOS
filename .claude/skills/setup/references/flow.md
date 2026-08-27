@@ -6,11 +6,11 @@ Goal: a filled Core section of `profile.md` and first value in under 3 minutes o
 
 ## Step 0 — scan (non-personal detection first)
 
-If `scripts/profile-scan.sh` exists: `bash .claude/skills/setup/scripts/profile-scan.sh --stamp` (the flag records the start time for the duration quote; without it the scan is strictly read-only). The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun `bash .claude/skills/setup/scripts/profile-scan.sh --with-names`. Never open file contents at all during setup.
+Run `bash .claude/skills/setup/scripts/profile-scan.sh --stamp` (the flag records the start time for the duration quote — first invocation only; without it the scan is strictly read-only). The default run detects only non-personal facts (locale, timezone, tool presence, state-file counts). Scanning **names** (installed apps, folders) needs consent first: ask one AskUserQuestion ("May I scan app and folder names — names only, never contents — to prefill your profile?"), and only on yes rerun `bash .claude/skills/setup/scripts/profile-scan.sh --with-names`. Never open file contents at all during setup.
 
 ## Step 0.5 — offer the demo (FRESH_INSTALL only)
 
-Before any question, offer one choice: "Want a 30-second demo on sample data first, or straight to your setup?" On demo: run `bash .claude/skills/setup/scripts/demo.sh start` (materializes the Alex fixture; refuses if any real state exists), show one `/morning`-style plan and one `/habit` line from that data, then ask "Ready to make it yours?" and run `bash .claude/skills/setup/scripts/demo.sh end` before continuing. The demo never touches `profile.md` and every fixture file is marked DEMO DATA.
+Before any question, offer one choice: "Want a 30-second demo on sample data first, or straight to your setup?" On demo: run `bash .claude/skills/setup/scripts/demo.sh start` (materializes the Alex fixture; bootstrapped blank templates are replaced and restored byte-identical on `end`, any file whose content differs from its blank template refuses), show one `/morning`-style plan and one `/habit` line from that data, then ask "Ready to make it yours?" and run `bash .claude/skills/setup/scripts/demo.sh end` before continuing. The demo never touches `profile.md` and every fixture file is marked DEMO DATA.
 
 ## Step 1 — present, don't ask
 

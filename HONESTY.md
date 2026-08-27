@@ -7,6 +7,12 @@ bash scripts/bos-roster.sh   # counts skills/agents/hooks, exit 1 on drift
 bash tests/run.sh            # guard payloads, bus schema, clean-clone check
 ```
 
+One limit of the test suite itself: all 100+ tests are deterministic scripts.
+No CI job drives a real model through a session, so "the model follows
+SKILL/flow from hi to a finished setup" is verified by manual audit rounds
+(docs/audits/), not by automation. The scripts prove the rails exist and hold;
+they do not prove the model stays on them.
+
 ## The table
 
 | REAL (enforced by code) | BEST-EFFORT (prompting) | Does not exist |
