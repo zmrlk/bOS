@@ -4,7 +4,7 @@ Date: 2026-08-26
 
 Candidate: `0.14.0`, branch `codex/memory-v1`
 
-Base: `v0.13.3` (`a5b3bcf`)
+Base: `v0.13.3` (`87ec62e`)
 Remote status: **not pushed / not released**
 
 ## Baseline verdict

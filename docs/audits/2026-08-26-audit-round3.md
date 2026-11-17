@@ -1,4 +1,4 @@
-# External audit round 3 — v0.13.2 (commit f86f500), 2026-08-26
+# External audit round 3 — v0.13.2 (commit 33a257b), 2026-08-26
 
 Verdict: fresh clone 8/10 GO · upgrade path 7/10 CONDITIONAL GO · Windows 5/10 unsupported. The auditor independently confirmed the real v0.13.0 → v0.13.2 migration works (15 personal files untracked, kept on disk) and that the botched v0.13.1 upgrade is repaired by it. Five findings remained; all are fixed in v0.13.3.
 

@@ -1,4 +1,4 @@
-# External audit round 2 — v0.13.1 (commit ec68513), 2026-08-26
+# External audit round 2 — v0.13.1 (commit 3c12a66), 2026-08-26
 
 Second independent pass, run against the published HEAD. It confirmed the P0 data boundary works **on a fresh clone** — and found that the **updater did not deliver it to existing installs**. Fixed in v0.13.2.
 
@@ -21,7 +21,7 @@ Lesson recorded: **a test whose fixture is derived from the artifact under test 
 | P2 | `.gitignore` framed as "physically impossible" to commit data | HONESTY.md now states plainly: it is protection against mistakes, `git add -f` still works deliberately |
 | P2 | README lead sentence bundled a prompt-level guarantee (crisis data) with "enforced by hooks" | Lead rewritten: "where a guardrail can be enforced by code it is a hook" + pointer to HONESTY.md |
 | P2 | Windows CI is red (59/60, roster check) and only green via `continue-on-error` | HONESTY.md per-CLI table now says Windows is unverified/unsupported until that job is green |
-| — | README showed v0.13.0, profile-template 0.12.1, schemas ≠ templates, "Rule 12" pointing at nothing | Already fixed in the working tree between `ec68513` and this release: versions aligned, 11 templates rewritten to match SCHEMAS, `Rule 12` → "AGENTS.md rule 9", audit doc annotated as fixed |
+| — | README showed v0.13.0, profile-template 0.12.1, schemas ≠ templates, "Rule 12" pointing at nothing | Already fixed in the working tree between `3c12a66` and this release: versions aligned, 11 templates rewritten to match SCHEMAS, `Rule 12` → "AGENTS.md rule 9", audit doc annotated as fixed |
 
 ## Still open (documented, not claimed)
 
