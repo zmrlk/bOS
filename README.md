@@ -8,7 +8,7 @@ Three things make it different from every other "AI life OS":
 
 1. **It is a folder, not a platform.** Markdown and bash. Works in Claude Code (full enforcement), Codex and Grok (reduced wiring). You can read every byte of your "OS", grep it, back it up, or leave — the files are yours either way.
 2. **Guardrails are code, not promises.** Where a rule can be enforced, it is a hook that blocks the action before it happens — hand-edits of memory, destructive ops on archives, `git push` from chat. CI feeds the guards hostile payloads on every push. Where a rule is only a prompt, [HONESTY.md](HONESTY.md) says so out loud.
-3. **Honesty is a feature.** A maintained table of what is REAL, what is best-effort, and what does not exist. Memory with declared provenance and conflict quarantine instead of "the AI just remembers". External audit reports committed to [docs/audits/](docs/audits/), including the failed rounds.
+3. **Honesty is a feature.** A maintained table of what is REAL, what is best-effort, and what does not exist. Memory with declared provenance and conflict quarantine instead of "the AI just remembers". Independent multi-model audit reports committed to [docs/audits/](docs/audits/), including the failed rounds.
 
 > **v0.14.1** — `git clone https://github.com/zmrlk/bOS.git`
 
